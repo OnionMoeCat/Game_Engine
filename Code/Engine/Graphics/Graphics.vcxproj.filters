@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="OpenGL\Graphics.gl.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Direct3D\Graphics.d3d.cpp">
+      <Filter>Direct3D</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Graphics.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="OpenGL">
+      <UniqueIdentifier>{92c3a4d2-ec51-4967-96aa-b6613f6e943e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Direct3D">
+      <UniqueIdentifier>{953fad87-ed73-48bf-9fec-95ff8216e8b6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
