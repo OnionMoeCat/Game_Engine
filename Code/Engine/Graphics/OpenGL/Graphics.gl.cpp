@@ -30,10 +30,13 @@ namespace
 		// 2 floats == 8 bytes
 		// Offset = 0
 		float x, y;
+		// COLOR0
+		// 4 uint8_ts == 4 bytes
+		// Offset = 8
+		uint8_t r, g, b, a;	// 8 bits [0,255] per RGBA channel (the alpha channel is unused but is present so that color uses a full 4 bytes)
 	};
 
-	// The vertex buffer holds the data for each vertex
-	GLuint s_vertexArrayId = 0;
+	eae6320::Graphics::Mesh s_mesh;
 
 	// OpenGL encapsulates a matching vertex shader and fragment shader into what it calls a "program".
 
@@ -64,7 +67,7 @@ namespace
 {
 	bool CreateProgram();
 	bool CreateRenderingContext();
-	bool CreateVertexBuffer();
+	bool CreateVertexArray();
 	bool LoadAndAllocateShaderProgram( const char* i_path, void*& o_shader, size_t& o_size, std::string* o_errorMessage );
 	bool LoadFragmentShader( const GLuint i_programId );
 	bool LoadVertexShader( const GLuint i_programId );
@@ -103,7 +106,7 @@ bool eae6320::Graphics::Initialize( const HWND i_renderingWindow )
 	}
 
 	// Initialize the graphics objects
-	if ( !CreateVertexBuffer() )
+	if ( !CreateVertexArray() )
 	{
 		goto OnError;
 	}
@@ -145,7 +148,7 @@ void eae6320::Graphics::Render()
 		}
 		// Bind a specific vertex buffer to the device as a data source
 		{
-			glBindVertexArray( s_vertexArrayId );
+			glBindVertexArray( s_mesh.m_vertexArrayId );
 			assert( glGetError() == GL_NO_ERROR );
 		}
 		// Render objects from the current streams
@@ -154,14 +157,20 @@ void eae6320::Graphics::Render()
 			// and we have defined the vertex buffer as a triangle list
 			// (meaning that every triangle is defined by three vertices)
 			const GLenum mode = GL_TRIANGLES;
-			// It's possible to start rendering primitives in the middle of the stream
-			const GLint indexOfFirstVertexToRender = 0;
-			// We are drawing two triangles
-			const unsigned int numTriangles = 2;
-			const unsigned int verticesPerTriangle = 3;
-			const GLsizei vertexCountToRender = numTriangles * verticesPerTriangle;
-			glDrawArrays( mode, indexOfFirstVertexToRender, vertexCountToRender );
-			assert( glGetError() == GL_NO_ERROR );
+			// We'll use 32-bit indices in this class to keep things simple
+			// (i.e. every index will be a 32 bit unsigned integer)
+			const GLenum indexType = GL_UNSIGNED_INT;
+			// It is possible to start rendering in the middle of an index buffer
+			const GLvoid* const offset = 0;
+			// We are drawing a square
+			const GLsizei primitiveCountToRender = 2;	// How many triangles will be drawn?
+			const GLsizei vertexCountPerTriangle = 3;
+			const GLsizei vertexCountToRender = primitiveCountToRender * vertexCountPerTriangle;
+			const RENDERCONTEXT renderContext = { mode, indexType, offset, vertexCountToRender };
+			if (!MeshHelper::DrawMesh(s_mesh, renderContext))
+			{
+				assert(false);
+			}
 		}
 	}
 
@@ -193,19 +202,11 @@ bool eae6320::Graphics::ShutDown()
 			}
 			s_programId = 0;
 		}
-		if ( s_vertexArrayId != 0 )
+
 		{
 			const GLsizei arrayCount = 1;
-			glDeleteVertexArrays( arrayCount, &s_vertexArrayId );
-			const GLenum errorCode = glGetError();
-			if ( errorCode != GL_NO_ERROR )
-			{
-				std::stringstream errorMessage;
-				errorMessage << "OpenGL failed to delete the vertex array: " <<
-					reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-				UserOutput::Print( errorMessage.str() );
-			}
-			s_vertexArrayId = 0;
+			eae6320::Graphics::FINALIZECONTEXT finalizeContext = { arrayCount };
+			eae6320::Graphics::MeshHelper::Finalize(s_mesh, finalizeContext);
 		}
 
 		if ( wglMakeCurrent( s_deviceContext, NULL ) != FALSE )
@@ -419,37 +420,17 @@ namespace
 		return true;
 	}
 
-	bool CreateVertexBuffer()
+	bool CreateVertexArray()
 	{
 		bool wereThereErrors = false;
-		GLuint vertexBufferId = 0;
 
 		// Create a vertex array object and make it active
 		{
 			const GLsizei arrayCount = 1;
-			glGenVertexArrays( arrayCount, &s_vertexArrayId );
-			const GLenum errorCode = glGetError();
-			if ( errorCode == GL_NO_ERROR )
-			{
-				glBindVertexArray( s_vertexArrayId );
-				const GLenum errorCode = glGetError();
-				if ( errorCode != GL_NO_ERROR )
-				{
-					wereThereErrors = true;
-					std::stringstream errorMessage;
-					errorMessage << "OpenGL failed to bind the vertex array: " <<
-						reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-					eae6320::UserOutput::Print( errorMessage.str() );
-					goto OnExit;
-				}
-			}
-			else
+			const eae6320::Graphics::INITIALIZECONTEXT initializeContext = { arrayCount };
+			if (!eae6320::Graphics::MeshHelper::Initialize(s_mesh, initializeContext))
 			{
 				wereThereErrors = true;
-				std::stringstream errorMessage;
-				errorMessage << "OpenGL failed to get an unused vertex array ID: " <<
-					reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-				eae6320::UserOutput::Print( errorMessage.str() );
 				goto OnExit;
 			}
 		}
@@ -457,159 +438,212 @@ namespace
 		// Create a vertex buffer object and make it active
 		{
 			const GLsizei bufferCount = 1;
-			glGenBuffers( bufferCount, &vertexBufferId );
-			const GLenum errorCode = glGetError();
-			if ( errorCode == GL_NO_ERROR )
-			{
-				glBindBuffer( GL_ARRAY_BUFFER, vertexBufferId );
-				const GLenum errorCode = glGetError();
-				if ( errorCode != GL_NO_ERROR )
-				{
-					wereThereErrors = true;
-					std::stringstream errorMessage;
-					errorMessage << "OpenGL failed to bind the vertex buffer: " <<
-						reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-					eae6320::UserOutput::Print( errorMessage.str() );
-					goto OnExit;
-				}
-			}
-			else
+			const eae6320::Graphics::CREATEVERTEXBUFFERCONTEXT createVertexBufferContext = { bufferCount };
+			if (!eae6320::Graphics::MeshHelper::CreateVertexBuffer(s_mesh, createVertexBufferContext))
 			{
 				wereThereErrors = true;
-				std::stringstream errorMessage;
-				errorMessage << "OpenGL failed to get an unused vertex buffer ID: " <<
-					reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-				eae6320::UserOutput::Print( errorMessage.str() );
 				goto OnExit;
 			}
 		}
+
+		{
+			const eae6320::Graphics::LOCKVERTEXBUFFERCONTEXT lockVertexBufferContext = {};
+			eae6320::Graphics::VERTEXBUFFERDATA vertexBufferData = { NULL };
+			if (!eae6320::Graphics::MeshHelper::LockVertexBuffer(s_mesh, vertexBufferData, lockVertexBufferContext))
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+		}
+
 		// Assign the data to the buffer
 		{
-			// We are drawing two triangles
-			const unsigned int numTriangles = 2;
-			const unsigned int verticesPerTriangle = 3;
-			sVertex vertexData[numTriangles * verticesPerTriangle];
+			// We are drawing a square
+			const unsigned int vertexCount = 4;	// What is the minimum number of vertices a square needs (so that no data is duplicated)?
+			const unsigned int bufferSize = vertexCount * sizeof(sVertex);
+			sVertex vertexData[vertexCount];
 			// Fill in the data for the triangle
 			{
+				// You will need to fill in two pieces of information for each vertex:
+				//	* 2 floats for the POSITION
+				//	* 4 uint8_ts for the COLOR
+
+				// The floats for POSITION are for the X and Y coordinates, like in Assignment 02.
+				// The difference this time is that there should be fewer (because we are sharing data).
+
+				// The uint8_ts for COLOR are "RGBA", where "RGB" stands for "Red Green Blue" and "A" for "Alpha".
+				// Conceptually each of these values is a [0,1] value, but we store them as an 8-bit value to save space
+				// (color doesn't need as much precision as position),
+				// which means that the data we send to the GPU will be [0,255].
+				// For now the alpha value should _always_ be 255, and so you will choose color by changing the first three RGB values.
+				// To make white you should use (255, 255, 255), to make black (0, 0, 0).
+				// To make pure red you would use the max for R and nothing for G and B, so (1, 0, 0).
+				// Experiment with other values to see what happens!
+
 				vertexData[0].x = 0.0f;
 				vertexData[0].y = 0.0f;
+				// Red
+				vertexData[0].r = 255;
+				vertexData[0].g = 0;
+				vertexData[0].b = 0;
+				vertexData[0].a = 255;
 
 				vertexData[1].x = 1.0f;
 				vertexData[1].y = 0.0f;
+				// Green
+				vertexData[1].r = 0;
+				vertexData[1].g = 255;
+				vertexData[1].b = 0;
+				vertexData[1].a = 255;
 
 				vertexData[2].x = 1.0f;
 				vertexData[2].y = 1.0f;
+				// White
+				vertexData[2].r = 255;
+				vertexData[2].g = 255;
+				vertexData[2].b = 255;
+				vertexData[2].a = 255;
 
 				vertexData[3].x = 0.0f;
-				vertexData[3].y = 0.0f;
-
-				vertexData[4].x = 1.0f;
-				vertexData[4].y = 1.0f;
-
-				vertexData[5].x = 0.0f;
-				vertexData[5].y = 1.0f;
+				vertexData[3].y = 1.0f;
+				// Blue
+				vertexData[3].r = 0;
+				vertexData[3].g = 0;
+				vertexData[3].b = 255;
+				vertexData[3].a = 255;
 			}
-			glBufferData( GL_ARRAY_BUFFER, sizeof( sVertex ) * numTriangles * verticesPerTriangle, reinterpret_cast<GLvoid*>( vertexData ),
-				// Our code will only ever write to the buffer
-				GL_STATIC_DRAW );
-			const GLenum errorCode = glGetError();
-			if ( errorCode != GL_NO_ERROR )
+			const eae6320::Graphics::SETVERTEXBUFFERCONTEXT setVertexBufferContext = { bufferSize };
+			const eae6320::Graphics::VERTEXBUFFERDATA vertexBufferData = { reinterpret_cast<GLvoid*>(vertexData) };
+			if (!eae6320::Graphics::MeshHelper::SetVertexBuffer(s_mesh, vertexBufferData, setVertexBufferContext))
 			{
 				wereThereErrors = true;
-				std::stringstream errorMessage;
-				errorMessage << "OpenGL failed to allocate the vertex buffer: " <<
-					reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-				eae6320::UserOutput::Print( errorMessage.str() );
 				goto OnExit;
 			}
 		}
+
+		{
+			if (!eae6320::Graphics::MeshHelper::UnlockVertexBuffer(s_mesh))
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+		}
+
 		// Initialize the vertex format
 		{
-			const GLsizei stride = sizeof( sVertex );
-			GLvoid* offset = 0;
-
+			const unsigned int vertexElementsCount = 2;
 			// Position (0)
 			// 2 floats == 8 bytes
 			// Offset = 0
+			const GLsizei stride_e1 = sizeof(sVertex);
+			GLvoid* offset_e1 = 0;
+			const GLuint vertexElementLocation_e1 = 0;
+			const GLint elementCount_e1 = 2;
+			const GLboolean notNormalized_e1 = GL_FALSE;	// The given floats should be used as-is
+			const GLenum type_e1 = GL_FLOAT;
+			// Color (1)
+			// 4 uint8_ts == 4 bytes
+			// Offset = 8
+			const GLsizei stride_e2 = sizeof(sVertex);
+			GLvoid* offset_e2 = reinterpret_cast<GLvoid*>(reinterpret_cast<uint8_t*>(offset_e1) + (elementCount_e1 * sizeof(float)));;
+			const GLuint vertexElementLocation_e2 = 1;
+			const GLint elementCount_e2 = 4;
+			const GLboolean notNormalized_e2 = GL_TRUE;
+			const GLenum type_e2 = GL_UNSIGNED_BYTE;
+			// Each element will be sent to the GPU as an unsigned byte in the range [0,255]
+			// but these values should be understood as representing [0,1] values
+			// and that is what the shader code will interpret them as
+			// (in other words, we could change the values provided here in C code
+			// to be floats and sent GL_FALSE instead and the shader code wouldn't need to change)
+			eae6320::Graphics::VERTEXDECLARATIONCONTEXT vertexDeclarationContext[] =
 			{
-				const GLuint vertexElementLocation = 0;
-				const GLint elementCount = 2;
-				const GLboolean notNormalized = GL_FALSE;	// The given floats should be used as-is
-				glVertexAttribPointer( vertexElementLocation, elementCount, GL_FLOAT, notNormalized, stride, offset );
-				const GLenum errorCode = glGetError();
-				if ( errorCode == GL_NO_ERROR )
-				{
-					glEnableVertexAttribArray( vertexElementLocation );
-					const GLenum errorCode = glGetError();
-					if ( errorCode == GL_NO_ERROR )
-					{
-						offset = reinterpret_cast<GLvoid*>( reinterpret_cast<uint8_t*>( offset ) + ( elementCount * sizeof( float ) ) );
-					}
-					else
-					{
-						wereThereErrors = true;
-						std::stringstream errorMessage;
-						errorMessage << "OpenGL failed to enable the POSITION vertex attribute: " <<
-							reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-						eae6320::UserOutput::Print( errorMessage.str() );
-						goto OnExit;
-					}
-				}
-				else
-				{
-					wereThereErrors = true;
-					std::stringstream errorMessage;
-					errorMessage << "OpenGL failed to set the POSITION vertex attribute: " <<
-						reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-					eae6320::UserOutput::Print( errorMessage.str() );
-					goto OnExit;
-				}
+				{ stride_e1, offset_e1, vertexElementLocation_e1, elementCount_e1, notNormalized_e1, type_e1 },
+				{ stride_e2, offset_e2, vertexElementLocation_e2, elementCount_e2, notNormalized_e2, type_e2 }
+			};
+
+			eae6320::Graphics::VERTEXDECLARATIONCONTEXTPTR vertexDeclarationContextPTR = { vertexDeclarationContext };
+
+			if (!eae6320::Graphics::MeshHelper::SetVertexDeclaration(s_mesh, vertexDeclarationContextPTR, vertexElementsCount))
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+		}
+
+		// Create an index buffer object and make it active
+		{
+			const GLsizei bufferCount = 1;
+			const eae6320::Graphics::CREATEINDEXBUFFERCONTEXT createIndexBufferContext = { bufferCount };
+			if (!eae6320::Graphics::MeshHelper::CreateIndexBuffer(s_mesh, createIndexBufferContext))
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+		}
+
+		{
+			const eae6320::Graphics::LOCKINDEXBUFFERCONTEXT lockVertexBufferContext = {};
+			eae6320::Graphics::INDEXBUFFERDATA indexBufferData = { NULL }; 
+			if (!eae6320::Graphics::MeshHelper::LockIndexBuffer(s_mesh, indexBufferData, lockVertexBufferContext))
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+		}
+
+		// Allocate space and copy the triangle data into the index buffer
+		{
+			// We are drawing a square
+			const unsigned int triangleCount = 2;	// How many triangles does a square have?
+			const unsigned int vertexCountPerTriangle = 3;
+			const GLsizeiptr bufferSize = triangleCount * vertexCountPerTriangle * sizeof(uint32_t);
+			uint32_t indexData[triangleCount * vertexCountPerTriangle];
+			// Fill in the data for the triangle
+			{
+				// EAE6320_TODO:
+				// You will need to fill in 3 indices for each triangle that needs to be drawn.
+				// Each index will be a 32-bit unsigned integer,
+				// and will index into the vertex buffer array that you have created.
+				// The order of indices is important, but the correct order will depend on
+				// which vertex you have assigned to which spot in your vertex buffer
+				// (also remember to maintain the correct handedness for the triangle winding order).
+
+				// Triangle 0
+				indexData[0] = 0;
+				indexData[1] = 1;
+				indexData[2] = 2;
+
+				// Triangle 1
+				indexData[3] = 0;
+				indexData[4] = 2;
+				indexData[5] = 3;
+			}
+
+			const eae6320::Graphics::SETINDEXBUFFERCONTEXT setIndexBufferContext = { bufferSize };
+			const eae6320::Graphics::INDEXBUFFERDATA indexBufferData = { reinterpret_cast<GLvoid*>(indexData) };
+			if (!eae6320::Graphics::MeshHelper::SetIndexBuffer(s_mesh, indexBufferData, setIndexBufferContext))
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+		}
+
+		{
+			if (!eae6320::Graphics::MeshHelper::UnlockIndexBuffer(s_mesh))
+			{
+				wereThereErrors = true;
+				goto OnExit;
 			}
 		}
 
 	OnExit:
 
-		// Delete the buffer object
-		// (the vertex array will hold a reference to it)
-		if ( s_vertexArrayId != 0 )
+		const GLsizei vertexBufferCount = 1;
+		const GLsizei indexBufferCount = 1;
+		const eae6320::Graphics::CLEANUPCONTEXT cleanUpContext = { vertexBufferCount, indexBufferCount };
+		if (!eae6320::Graphics::MeshHelper::CleanUp(s_mesh, cleanUpContext))
 		{
-			// Unbind the vertex array
-			// (this must be done before deleting the vertex buffer)
-			glBindVertexArray( 0 );
-			const GLenum errorCode = glGetError();
-			if ( errorCode == GL_NO_ERROR )
-			{
-				if ( vertexBufferId != 0 )
-				{
-					// NOTE: If you delete the vertex buffer object here, as I recommend,
-					// then gDEBugger won't know about it and you won't be able to examine the data.
-					// If you find yourself in a situation where you want to see the buffer object data in gDEBugger
-					// comment out this block of code temporarily
-					// (doing this will cause a memory leak so make sure to restore the deletion code after you're done debugging).
-					const GLsizei bufferCount = 1;
-					glDeleteBuffers( bufferCount, &vertexBufferId );
-					const GLenum errorCode = glGetError();
-					if ( errorCode != GL_NO_ERROR )
-					{
-						wereThereErrors = true;
-						std::stringstream errorMessage;
-						errorMessage << "OpenGL failed to delete the vertex buffer: " <<
-							reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-						eae6320::UserOutput::Print( errorMessage.str() );
-						goto OnExit;
-					}
-					vertexBufferId = 0;
-				}
-			}
-			else
-			{
-				wereThereErrors = true;
-				std::stringstream errorMessage;
-				errorMessage << "OpenGL failed to unbind the vertex array: " <<
-					reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-				eae6320::UserOutput::Print( errorMessage.str() );
-				goto OnExit;
-			}
+			wereThereErrors = true;
 		}
 
 		return !wereThereErrors;
