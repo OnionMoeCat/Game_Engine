@@ -19,12 +19,13 @@
     <ClCompile Include="Direct3D\MeshHelper.d3d.cpp">
       <Filter>Direct3D</Filter>
     </ClCompile>
+    <ClCompile Include="MeshHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshHelper.h" />
-    <ClInclude Include="Define.h" />
+    <ClInclude Include="CrossPlatformDefine.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="OpenGL">

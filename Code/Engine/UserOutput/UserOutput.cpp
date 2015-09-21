@@ -3,14 +3,30 @@
 #include <Windows.h>
 
 #include "UserOutput.h"
+#include <gl/GL.h>
 
-namespace eae6320
+// Static Data Initialization
+//===========================
+
+namespace
 {
-	namespace UserOutput
+	HWND s_renderingWindow = NULL;
+}
+
+void eae6320::UserOutput::Print(std::string i_errorMessage, std::string i_errorCaption /*= "Error!"*/)
+{
+	if (s_renderingWindow)
 	{
-		void Print(std::string i_str)
-		{
-			OutputDebugStringA(i_str.c_str());
-		}
+		MessageBox(s_renderingWindow, i_errorMessage.c_str(), i_errorCaption.c_str(), MB_OK | MB_ICONERROR);
 	}
+}
+
+void eae6320::UserOutput::Initialize(const HWND& i_renderingWindow)
+{
+	s_renderingWindow = i_renderingWindow;
+}
+
+void eae6320::UserOutput::Finalize()
+{
+	s_renderingWindow = NULL;
 }

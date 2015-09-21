@@ -11,7 +11,6 @@ This file contains the function declarations for mesh
 
 #if defined( EAE6320_PLATFORM_D3D )
 #include <d3d9.h>
-//QUESTION: why d3d9xshader.h doesn't work here
 #elif defined( EAE6320_PLATFORM_GL )
 #include <gl/GL.h>
 #include <gl/GLU.h>
@@ -34,6 +33,8 @@ namespace eae6320
 			GLuint m_vertexBufferId = 0;
 			GLuint m_indexBufferId = 0;
 #endif
+			unsigned int m_vertexCount = 0;
+			unsigned int m_primitiveCount = 0;
 		};
 	}
 }

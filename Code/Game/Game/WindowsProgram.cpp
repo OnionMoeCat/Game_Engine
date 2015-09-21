@@ -15,6 +15,8 @@
 #include "../../Engine/Windows/Functions.h"
 // Graphics.h is Graphics system
 #include "../../Engine/Graphics/Graphics.h"
+// UserOutput.h is UserOutput system
+#include "../../Engine/UserOutput/UserOutput.h"
 
 // Static Data Initialization
 //===========================
@@ -36,7 +38,7 @@ namespace
 	// If you don't change the name below from the default then
 	// your program could have problems when it is run at the same time on the same computer
 	// as one of your classmate's
-	const char* s_mainWindowClass_name = "[YOUR NAME HERE]'s Main Window Class";
+	const char* s_mainWindowClass_name = "Yuchen Zhang's Main Window Class";
 }
 
 // Main Function
@@ -47,10 +49,14 @@ int CreateMainWindowAndReturnExitCodeWhenItCloses( const HINSTANCE i_thisInstanc
 	// Try to create the main window
 	if ( CreateMainWindow( i_thisInstanceOfTheProgram, i_initialWindowDisplayState ) )
 	{
+		// Pass UserOutput the window to attach MessageBox to
+		eae6320::UserOutput::Initialize(s_mainWindow);
 		// Once we get the window, initialize Graphics system
 		eae6320::Graphics::Initialize(s_mainWindow);
 		// If the main window was successfully created wait for it to be closed
 		const int exitCode = WaitForMainWindowToCloseAndReturnExitCode( i_thisInstanceOfTheProgram );
+		// UserOutput no longer need the window 
+		eae6320::UserOutput::Finalize();
 		return exitCode;
 	}
 	else
@@ -138,7 +144,7 @@ HWND CreateMainWindowHandle( const HINSTANCE i_thisInstanceOfTheProgram, const i
 	{
 		// The window's "caption"
 		// (The text that is displayed in the title bar)
-		const char* windowCaption = "[YOUR NAME HERE]'s EAE6320 Game";
+		const char* windowCaption = "Yuchen Zhang's EAE6320 Game";
 		// The window's style
 		const DWORD windowStyle =
 			// "Overlapped" is basically the same as "top-level"

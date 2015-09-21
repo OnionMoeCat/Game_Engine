@@ -31,6 +31,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="MeshHelper.cpp" />
     <ClCompile Include="OpenGL\Graphics.gl.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -45,7 +46,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Define.h" />
+    <ClInclude Include="CrossPlatformDefine.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshHelper.h" />
@@ -138,7 +139,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>UserOutput.lib;Opengl32.lib;OpenGlExtensions.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Lua.lib;UserOutput.lib;Opengl32.lib;OpenGlExtensions.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -156,7 +157,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>UserOutput.lib;d3d9.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Lua.lib;UserOutput.lib;d3d9.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221</AdditionalOptions>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x64\;$(LibDir)</AdditionalLibraryDirectories>
     </Lib>
@@ -178,7 +179,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>UserOutput.lib;Opengl32.lib;OpenGlExtensions.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Lua.lib;UserOutput.lib;Opengl32.lib;OpenGlExtensions.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221</AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
@@ -200,7 +201,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>UserOutput.lib;d3d9.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Lua.lib;UserOutput.lib;d3d9.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4006,4221</AdditionalOptions>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x64\;$(LibDir)</AdditionalLibraryDirectories>
     </Lib>

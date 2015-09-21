@@ -23,19 +23,6 @@ namespace
 	HDC s_deviceContext = NULL;
 	HGLRC s_openGlRenderingContext = NULL;
 
-	// This struct determines the layout of the data that the CPU will send to the GPU
-	struct sVertex
-	{
-		// POSITION
-		// 2 floats == 8 bytes
-		// Offset = 0
-		float x, y;
-		// COLOR0
-		// 4 uint8_ts == 4 bytes
-		// Offset = 8
-		uint8_t r, g, b, a;	// 8 bits [0,255] per RGBA channel (the alpha channel is unused but is present so that color uses a full 4 bytes)
-	};
-
 	eae6320::Graphics::Mesh s_mesh;
 
 	// OpenGL encapsulates a matching vertex shader and fragment shader into what it calls a "program".
@@ -67,9 +54,10 @@ namespace
 {
 	bool CreateProgram();
 	bool CreateRenderingContext();
-	bool CreateVertexArray();
+	bool CreateVertexDeclaration();
 	bool LoadAndAllocateShaderProgram( const char* i_path, void*& o_shader, size_t& o_size, std::string* o_errorMessage );
 	bool LoadFragmentShader( const GLuint i_programId );
+	bool LoadMeshes();
 	bool LoadVertexShader( const GLuint i_programId );
 
 	// This helper struct exists to be able to dynamically allocate memory to get "log info"
@@ -105,8 +93,12 @@ bool eae6320::Graphics::Initialize( const HWND i_renderingWindow )
 		}
 	}
 
+	if (!LoadMeshes())
+	{
+		goto OnError;
+	}
 	// Initialize the graphics objects
-	if ( !CreateVertexArray() )
+	if ( !CreateVertexDeclaration() )
 	{
 		goto OnError;
 	}
@@ -153,20 +145,7 @@ void eae6320::Graphics::Render()
 		}
 		// Render objects from the current streams
 		{
-			// We are using triangles as the "primitive" type,
-			// and we have defined the vertex buffer as a triangle list
-			// (meaning that every triangle is defined by three vertices)
-			const GLenum mode = GL_TRIANGLES;
-			// We'll use 32-bit indices in this class to keep things simple
-			// (i.e. every index will be a 32 bit unsigned integer)
-			const GLenum indexType = GL_UNSIGNED_INT;
-			// It is possible to start rendering in the middle of an index buffer
-			const GLvoid* const offset = 0;
-			// We are drawing a square
-			const GLsizei primitiveCountToRender = 2;	// How many triangles will be drawn?
-			const GLsizei vertexCountPerTriangle = 3;
-			const GLsizei vertexCountToRender = primitiveCountToRender * vertexCountPerTriangle;
-			const RENDERCONTEXT renderContext = { mode, indexType, offset, vertexCountToRender };
+			const RenderContext renderContext = {};
 			if (!MeshHelper::DrawMesh(s_mesh, renderContext))
 			{
 				assert(false);
@@ -205,8 +184,8 @@ bool eae6320::Graphics::ShutDown()
 
 		{
 			const GLsizei arrayCount = 1;
-			eae6320::Graphics::FINALIZECONTEXT finalizeContext = { arrayCount };
-			eae6320::Graphics::MeshHelper::Finalize(s_mesh, finalizeContext);
+			eae6320::Graphics::CleanUpContext cleanUpContext = {};
+			eae6320::Graphics::MeshHelper::CleanUp(s_mesh, cleanUpContext);
 		}
 
 		if ( wglMakeCurrent( s_deviceContext, NULL ) != FALSE )
@@ -420,122 +399,14 @@ namespace
 		return true;
 	}
 
-	bool CreateVertexArray()
+	bool CreateVertexDeclaration()
 	{
-		bool wereThereErrors = false;
-
-		// Create a vertex array object and make it active
-		{
-			const GLsizei arrayCount = 1;
-			const eae6320::Graphics::INITIALIZECONTEXT initializeContext = { arrayCount };
-			if (!eae6320::Graphics::MeshHelper::Initialize(s_mesh, initializeContext))
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-		}
-
-		// Create a vertex buffer object and make it active
-		{
-			const GLsizei bufferCount = 1;
-			const eae6320::Graphics::CREATEVERTEXBUFFERCONTEXT createVertexBufferContext = { bufferCount };
-			if (!eae6320::Graphics::MeshHelper::CreateVertexBuffer(s_mesh, createVertexBufferContext))
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-		}
-
-		{
-			const eae6320::Graphics::LOCKVERTEXBUFFERCONTEXT lockVertexBufferContext = {};
-			eae6320::Graphics::VERTEXBUFFERDATA vertexBufferData = { NULL };
-			if (!eae6320::Graphics::MeshHelper::LockVertexBuffer(s_mesh, vertexBufferData, lockVertexBufferContext))
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-		}
-
-		// Assign the data to the buffer
-		{
-			// We are drawing a square
-			const unsigned int vertexCount = 4;	// What is the minimum number of vertices a square needs (so that no data is duplicated)?
-			const unsigned int bufferSize = vertexCount * sizeof(sVertex);
-			sVertex vertexData[vertexCount];
-			// Fill in the data for the triangle
-			{
-				// You will need to fill in two pieces of information for each vertex:
-				//	* 2 floats for the POSITION
-				//	* 4 uint8_ts for the COLOR
-
-				// The floats for POSITION are for the X and Y coordinates, like in Assignment 02.
-				// The difference this time is that there should be fewer (because we are sharing data).
-
-				// The uint8_ts for COLOR are "RGBA", where "RGB" stands for "Red Green Blue" and "A" for "Alpha".
-				// Conceptually each of these values is a [0,1] value, but we store them as an 8-bit value to save space
-				// (color doesn't need as much precision as position),
-				// which means that the data we send to the GPU will be [0,255].
-				// For now the alpha value should _always_ be 255, and so you will choose color by changing the first three RGB values.
-				// To make white you should use (255, 255, 255), to make black (0, 0, 0).
-				// To make pure red you would use the max for R and nothing for G and B, so (1, 0, 0).
-				// Experiment with other values to see what happens!
-
-				vertexData[0].x = 0.0f;
-				vertexData[0].y = 0.0f;
-				// Red
-				vertexData[0].r = 255;
-				vertexData[0].g = 0;
-				vertexData[0].b = 0;
-				vertexData[0].a = 255;
-
-				vertexData[1].x = 1.0f;
-				vertexData[1].y = 0.0f;
-				// Green
-				vertexData[1].r = 0;
-				vertexData[1].g = 255;
-				vertexData[1].b = 0;
-				vertexData[1].a = 255;
-
-				vertexData[2].x = 1.0f;
-				vertexData[2].y = 1.0f;
-				// White
-				vertexData[2].r = 255;
-				vertexData[2].g = 255;
-				vertexData[2].b = 255;
-				vertexData[2].a = 255;
-
-				vertexData[3].x = 0.0f;
-				vertexData[3].y = 1.0f;
-				// Blue
-				vertexData[3].r = 0;
-				vertexData[3].g = 0;
-				vertexData[3].b = 255;
-				vertexData[3].a = 255;
-			}
-			const eae6320::Graphics::SETVERTEXBUFFERCONTEXT setVertexBufferContext = { bufferSize };
-			const eae6320::Graphics::VERTEXBUFFERDATA vertexBufferData = { reinterpret_cast<GLvoid*>(vertexData) };
-			if (!eae6320::Graphics::MeshHelper::SetVertexBuffer(s_mesh, vertexBufferData, setVertexBufferContext))
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-		}
-
-		{
-			if (!eae6320::Graphics::MeshHelper::UnlockVertexBuffer(s_mesh))
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-		}
-
 		// Initialize the vertex format
 		{
-			const unsigned int vertexElementsCount = 2;
 			// Position (0)
 			// 2 floats == 8 bytes
 			// Offset = 0
-			const GLsizei stride_e1 = sizeof(sVertex);
+			const GLsizei stride_e1 = sizeof(eae6320::Graphics::sVertex);
 			GLvoid* offset_e1 = 0;
 			const GLuint vertexElementLocation_e1 = 0;
 			const GLint elementCount_e1 = 2;
@@ -544,7 +415,7 @@ namespace
 			// Color (1)
 			// 4 uint8_ts == 4 bytes
 			// Offset = 8
-			const GLsizei stride_e2 = sizeof(sVertex);
+			const GLsizei stride_e2 = sizeof(eae6320::Graphics::sVertex);
 			GLvoid* offset_e2 = reinterpret_cast<GLvoid*>(reinterpret_cast<uint8_t*>(offset_e1) + (elementCount_e1 * sizeof(float)));;
 			const GLuint vertexElementLocation_e2 = 1;
 			const GLint elementCount_e2 = 4;
@@ -555,101 +426,25 @@ namespace
 			// and that is what the shader code will interpret them as
 			// (in other words, we could change the values provided here in C code
 			// to be floats and sent GL_FALSE instead and the shader code wouldn't need to change)
-			eae6320::Graphics::VERTEXDECLARATIONCONTEXT vertexDeclarationContext[] =
+			eae6320::Graphics::VertexDeclarationSpec vertexDeclarationSpec[] =
 			{
 				{ stride_e1, offset_e1, vertexElementLocation_e1, elementCount_e1, notNormalized_e1, type_e1 },
 				{ stride_e2, offset_e2, vertexElementLocation_e2, elementCount_e2, notNormalized_e2, type_e2 }
 			};
+			const unsigned int vertexElementsCount = 2;
 
-			eae6320::Graphics::VERTEXDECLARATIONCONTEXTPTR vertexDeclarationContextPTR = { vertexDeclarationContext };
+			eae6320::Graphics::VertexDeclarationContext vertexDeclarationContext = { vertexElementsCount };
 
-			if (!eae6320::Graphics::MeshHelper::SetVertexDeclaration(s_mesh, vertexDeclarationContextPTR, vertexElementsCount))
+			if (!eae6320::Graphics::MeshHelper::SetVertexDeclaration(s_mesh, vertexDeclarationSpec, vertexDeclarationContext))
 			{
-				wereThereErrors = true;
-				goto OnExit;
+				return false;
 			}
 		}
 
-		// Create an index buffer object and make it active
-		{
-			const GLsizei bufferCount = 1;
-			const eae6320::Graphics::CREATEINDEXBUFFERCONTEXT createIndexBufferContext = { bufferCount };
-			if (!eae6320::Graphics::MeshHelper::CreateIndexBuffer(s_mesh, createIndexBufferContext))
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-		}
-
-		{
-			const eae6320::Graphics::LOCKINDEXBUFFERCONTEXT lockVertexBufferContext = {};
-			eae6320::Graphics::INDEXBUFFERDATA indexBufferData = { NULL }; 
-			if (!eae6320::Graphics::MeshHelper::LockIndexBuffer(s_mesh, indexBufferData, lockVertexBufferContext))
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-		}
-
-		// Allocate space and copy the triangle data into the index buffer
-		{
-			// We are drawing a square
-			const unsigned int triangleCount = 2;	// How many triangles does a square have?
-			const unsigned int vertexCountPerTriangle = 3;
-			const GLsizeiptr bufferSize = triangleCount * vertexCountPerTriangle * sizeof(uint32_t);
-			uint32_t indexData[triangleCount * vertexCountPerTriangle];
-			// Fill in the data for the triangle
-			{
-				// EAE6320_TODO:
-				// You will need to fill in 3 indices for each triangle that needs to be drawn.
-				// Each index will be a 32-bit unsigned integer,
-				// and will index into the vertex buffer array that you have created.
-				// The order of indices is important, but the correct order will depend on
-				// which vertex you have assigned to which spot in your vertex buffer
-				// (also remember to maintain the correct handedness for the triangle winding order).
-
-				// Triangle 0
-				indexData[0] = 0;
-				indexData[1] = 1;
-				indexData[2] = 2;
-
-				// Triangle 1
-				indexData[3] = 0;
-				indexData[4] = 2;
-				indexData[5] = 3;
-			}
-
-			const eae6320::Graphics::SETINDEXBUFFERCONTEXT setIndexBufferContext = { bufferSize };
-			const eae6320::Graphics::INDEXBUFFERDATA indexBufferData = { reinterpret_cast<GLvoid*>(indexData) };
-			if (!eae6320::Graphics::MeshHelper::SetIndexBuffer(s_mesh, indexBufferData, setIndexBufferContext))
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-		}
-
-		{
-			if (!eae6320::Graphics::MeshHelper::UnlockIndexBuffer(s_mesh))
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-		}
-
-	OnExit:
-
-		const GLsizei vertexBufferCount = 1;
-		const GLsizei indexBufferCount = 1;
-		const eae6320::Graphics::CLEANUPCONTEXT cleanUpContext = { vertexBufferCount, indexBufferCount };
-		if (!eae6320::Graphics::MeshHelper::CleanUp(s_mesh, cleanUpContext))
-		{
-			wereThereErrors = true;
-		}
-
-		return !wereThereErrors;
+		return true;
 	}
 
-	bool LoadAndAllocateShaderProgram( const char* i_path, void*& o_shader, size_t& o_size, std::string* o_errorMessage )
+	bool LoadAndAllocateShaderProgram(const char* i_path, void*& o_shader, size_t& o_size, std::string* o_errorMessage)
 	{
 		bool wereThereErrors = false;
 
@@ -665,16 +460,16 @@ namespace
 				const DWORD onlySucceedIfFileExists = OPEN_EXISTING;
 				const DWORD useDefaultAttributes = FILE_ATTRIBUTE_NORMAL;
 				const HANDLE dontUseTemplateFile = NULL;
-				fileHandle = CreateFile( i_path, desiredAccess, otherProgramsCanStillReadTheFile,
-					useDefaultSecurity, onlySucceedIfFileExists, useDefaultAttributes, dontUseTemplateFile );
-				if ( fileHandle == INVALID_HANDLE_VALUE )
+				fileHandle = CreateFile(i_path, desiredAccess, otherProgramsCanStillReadTheFile,
+					useDefaultSecurity, onlySucceedIfFileExists, useDefaultAttributes, dontUseTemplateFile);
+				if (fileHandle == INVALID_HANDLE_VALUE)
 				{
 					wereThereErrors = true;
-					if ( o_errorMessage )
+					if (o_errorMessage)
 					{
+						std::string windowsErrorMessage = eae6320::GetLastWindowsError();
 						std::stringstream errorMessage;
-						errorMessage << "Windows failed to open the shader file: " <<
-							eae6320::GetLastWindowsError();
+						errorMessage << "Windows failed to open the shader file: " << windowsErrorMessage;
 						*o_errorMessage = errorMessage.str();
 					}
 					goto OnExit;
@@ -683,39 +478,41 @@ namespace
 			// Get the file's size
 			{
 				LARGE_INTEGER fileSize_integer;
-				if ( GetFileSizeEx( fileHandle, &fileSize_integer ) != FALSE )
+				if (GetFileSizeEx(fileHandle, &fileSize_integer) != FALSE)
 				{
-					assert( fileSize_integer.QuadPart <= SIZE_MAX );
-					o_size = static_cast<size_t>( fileSize_integer.QuadPart );
+					assert(fileSize_integer.QuadPart <= SIZE_MAX);
+					o_size = static_cast<size_t>(fileSize_integer.QuadPart);
 				}
 				else
 				{
 					wereThereErrors = true;
-					if ( o_errorMessage )
+					if (o_errorMessage)
 					{
+						std::string windowsErrorMessage = eae6320::GetLastWindowsError();
 						std::stringstream errorMessage;
-						errorMessage << "Windows failed to get the size of shader: " <<
-							eae6320::GetLastWindowsError();
+						errorMessage << "Windows failed to get the size of shader: " << windowsErrorMessage;
 						*o_errorMessage = errorMessage.str();
 					}
 					goto OnExit;
 				}
+				// Add an extra byte for a NULL terminator
+				o_size += 1;
 			}
 			// Read the file's contents into temporary memory
-			o_shader = malloc( o_size );
-			if ( o_shader )
+			o_shader = malloc(o_size);
+			if (o_shader)
 			{
 				DWORD bytesReadCount;
 				OVERLAPPED* readSynchronously = NULL;
-				if ( ReadFile( fileHandle, o_shader, o_size,
-					&bytesReadCount, readSynchronously ) == FALSE )
+				if (ReadFile(fileHandle, o_shader, o_size,
+					&bytesReadCount, readSynchronously) == FALSE)
 				{
 					wereThereErrors = true;
-					if ( o_errorMessage )
+					if (o_errorMessage)
 					{
+						std::string windowsErrorMessage = eae6320::GetLastWindowsError();
 						std::stringstream errorMessage;
-						errorMessage << "Windows failed to read the contents of shader: " <<
-							eae6320::GetLastWindowsError();
+						errorMessage << "Windows failed to read the contents of shader: " << windowsErrorMessage;
 						*o_errorMessage = errorMessage.str();
 					}
 					goto OnExit;
@@ -724,7 +521,7 @@ namespace
 			else
 			{
 				wereThereErrors = true;
-				if ( o_errorMessage )
+				if (o_errorMessage)
 				{
 					std::stringstream errorMessage;
 					errorMessage << "Failed to allocate " << o_size << " bytes to read in the shader program " << i_path;
@@ -732,24 +529,26 @@ namespace
 				}
 				goto OnExit;
 			}
+			// Add the NULL terminator
+			reinterpret_cast<char*>(o_shader)[o_size - 1] = '\0';
 		}
 
 	OnExit:
 
-		if ( wereThereErrors && o_shader )
+		if (wereThereErrors && o_shader)
 		{
-			free( o_shader );
+			free(o_shader);
 			o_shader = NULL;
 		}
-		if ( fileHandle != INVALID_HANDLE_VALUE )
+		if (fileHandle != INVALID_HANDLE_VALUE)
 		{
-			if ( CloseHandle( fileHandle ) == FALSE )
+			if (CloseHandle(fileHandle) == FALSE)
 			{
-				if ( !wereThereErrors && o_errorMessage )
+				if (!wereThereErrors && o_errorMessage)
 				{
+					std::string windowsError = eae6320::GetLastWindowsError();
 					std::stringstream errorMessage;
-					errorMessage << "Windows failed to close the shader file handle: " <<
-						eae6320::GetLastWindowsError();
+					errorMessage << "Windows failed to close the shader file handle: " << windowsError;
 					*o_errorMessage = errorMessage.str();
 				}
 				wereThereErrors = true;
@@ -782,7 +581,7 @@ namespace
 			// Load the shader source code
 			size_t fileSize;
 			{
-				const char* sourceCodeFileName = "data/fragmentShader.glsl";
+				const char* sourceCodeFileName = "data/fragment.shader";
 				std::string errorMessage;
 				if ( !LoadAndAllocateShaderProgram( sourceCodeFileName, shaderSource, fileSize, &errorMessage ) )
 				{
@@ -813,9 +612,15 @@ namespace
 			}
 			// Set the source code into the shader
 			{
-				const GLsizei shaderSourceCount = 1;
-				const GLint length = static_cast<GLuint>( fileSize );
-				glShaderSource( fragmentShaderId, shaderSourceCount, reinterpret_cast<GLchar**>( &shaderSource ), &length );
+				const GLsizei shaderSourceCount = 3;
+				const GLchar* shaderSources[] =
+				{
+					"#version 330// The version of GLSL to use must come first\n",
+					"#define EAE6320_PLATFORM_GL\n",
+					reinterpret_cast<GLchar*>(shaderSource)
+				};
+				const GLint* sourcesAreNullTerminated = NULL;
+				glShaderSource( fragmentShaderId, shaderSourceCount, shaderSources, sourcesAreNullTerminated);
 				const GLenum errorCode = glGetError();
 				if ( errorCode != GL_NO_ERROR )
 				{
@@ -952,15 +757,22 @@ namespace
 		return !wereThereErrors;
 	}
 
-	bool LoadVertexShader( const GLuint i_programId )
+	bool LoadMeshes()
+	{
+		eae6320::Graphics::LoadMeshContext loadMeshContext = {};
+		eae6320::Graphics::MeshHelper::ReadMeshFromFile(s_mesh, "data/square.mesh.raw", loadMeshContext);
+		return true;
+	}
+
+	bool LoadVertexShader(const GLuint i_programId)
 	{
 		// Verify that compiling shaders at run-time is supported
 		{
 			GLboolean isShaderCompilingSupported;
-			glGetBooleanv( GL_SHADER_COMPILER, &isShaderCompilingSupported );
-			if ( !isShaderCompilingSupported )
+			glGetBooleanv(GL_SHADER_COMPILER, &isShaderCompilingSupported);
+			if (!isShaderCompilingSupported)
 			{
-				eae6320::UserOutput::Print( "Compiling shaders at run-time isn't supported on this implementation (this should never happen)" );
+				eae6320::UserOutput::Print("Compiling shaders at run-time isn't supported on this implementation (this should never happen)");
 				return false;
 			}
 		}
@@ -974,57 +786,63 @@ namespace
 			// Load the shader source code
 			size_t fileSize;
 			{
-				const char* sourceCodeFileName = "data/vertexShader.glsl";
+				const char* sourceCodeFileName = "data/vertex.shader";
 				std::string errorMessage;
-				if ( !LoadAndAllocateShaderProgram( sourceCodeFileName, shaderSource, fileSize, &errorMessage ) )
+				if (!LoadAndAllocateShaderProgram(sourceCodeFileName, shaderSource, fileSize, &errorMessage))
 				{
 					wereThereErrors = true;
-					eae6320::UserOutput::Print( errorMessage );
+					eae6320::UserOutput::Print(errorMessage);
 					goto OnExit;
 				}
 			}
 			// Generate a shader
-			vertexShaderId = glCreateShader( GL_VERTEX_SHADER );
+			vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
 			{
 				const GLenum errorCode = glGetError();
-				if ( errorCode != GL_NO_ERROR )
+				if (errorCode != GL_NO_ERROR)
 				{
 					wereThereErrors = true;
 					std::stringstream errorMessage;
 					errorMessage << "OpenGL failed to get an unused vertex shader ID: " <<
-						reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-					eae6320::UserOutput::Print( errorMessage.str() );
+						reinterpret_cast<const char*>(gluErrorString(errorCode));
+					eae6320::UserOutput::Print(errorMessage.str());
 					goto OnExit;
 				}
-				else if ( vertexShaderId == 0 )
+				else if (vertexShaderId == 0)
 				{
 					wereThereErrors = true;
-					eae6320::UserOutput::Print( "OpenGL failed to get an unused vertex shader ID" );
+					eae6320::UserOutput::Print("OpenGL failed to get an unused vertex shader ID");
 					goto OnExit;
 				}
 			}
 			// Set the source code into the shader
 			{
-				const GLsizei shaderSourceCount = 1;
-				const GLint length = static_cast<GLuint>( fileSize );
-				glShaderSource( vertexShaderId, shaderSourceCount, reinterpret_cast<GLchar**>( &shaderSource ), &length );
+				const GLsizei shaderSourceCount = 3;
+				const GLchar* shaderSources[] =
+				{
+					"#version 330// The version of GLSL to use must come first\n",
+					"#define EAE6320_PLATFORM_GL\n",
+					reinterpret_cast<GLchar*>(shaderSource)
+				};
+				const GLint* sourcesAreNullTerminated = NULL;
+				glShaderSource(vertexShaderId, shaderSourceCount, shaderSources, sourcesAreNullTerminated);
 				const GLenum errorCode = glGetError();
-				if ( errorCode != GL_NO_ERROR )
+				if (errorCode != GL_NO_ERROR)
 				{
 					wereThereErrors = true;
 					std::stringstream errorMessage;
 					errorMessage << "OpenGL failed to set the vertex shader source code: " <<
-						reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-					eae6320::UserOutput::Print( errorMessage.str() );
+						reinterpret_cast<const char*>(gluErrorString(errorCode));
+					eae6320::UserOutput::Print(errorMessage.str());
 					goto OnExit;
 				}
 			}
 		}
 		// Compile the shader source code
 		{
-			glCompileShader( vertexShaderId );
+			glCompileShader(vertexShaderId);
 			GLenum errorCode = glGetError();
-			if ( errorCode == GL_NO_ERROR )
+			if (errorCode == GL_NO_ERROR)
 			{
 				// Get compilation info
 				// (this won't be used unless compilation fails
@@ -1032,15 +850,15 @@ namespace
 				std::string compilationInfo;
 				{
 					GLint infoSize;
-					glGetShaderiv( vertexShaderId, GL_INFO_LOG_LENGTH, &infoSize );
+					glGetShaderiv(vertexShaderId, GL_INFO_LOG_LENGTH, &infoSize);
 					errorCode = glGetError();
-					if ( errorCode == GL_NO_ERROR )
+					if (errorCode == GL_NO_ERROR)
 					{
-						sLogInfo info( static_cast<size_t>( infoSize ) );
+						sLogInfo info(static_cast<size_t>(infoSize));
 						GLsizei* dontReturnLength = NULL;
-						glGetShaderInfoLog( vertexShaderId, static_cast<GLsizei>( infoSize ), dontReturnLength, info.memory );
+						glGetShaderInfoLog(vertexShaderId, static_cast<GLsizei>(infoSize), dontReturnLength, info.memory);
 						errorCode = glGetError();
-						if ( errorCode == GL_NO_ERROR )
+						if (errorCode == GL_NO_ERROR)
 						{
 							compilationInfo = info.memory;
 						}
@@ -1049,8 +867,8 @@ namespace
 							wereThereErrors = true;
 							std::stringstream errorMessage;
 							errorMessage << "OpenGL failed to get compilation info of the vertex shader source code: " <<
-								reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-							eae6320::UserOutput::Print( errorMessage.str() );
+								reinterpret_cast<const char*>(gluErrorString(errorCode));
+							eae6320::UserOutput::Print(errorMessage.str());
 							goto OnExit;
 						}
 					}
@@ -1059,24 +877,24 @@ namespace
 						wereThereErrors = true;
 						std::stringstream errorMessage;
 						errorMessage << "OpenGL failed to get the length of the vertex shader compilation info: " <<
-							reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-						eae6320::UserOutput::Print( errorMessage.str() );
+							reinterpret_cast<const char*>(gluErrorString(errorCode));
+						eae6320::UserOutput::Print(errorMessage.str());
 						goto OnExit;
 					}
 				}
 				// Check to see if there were compilation errors
 				GLint didCompilationSucceed;
 				{
-					glGetShaderiv( vertexShaderId, GL_COMPILE_STATUS, &didCompilationSucceed );
+					glGetShaderiv(vertexShaderId, GL_COMPILE_STATUS, &didCompilationSucceed);
 					errorCode = glGetError();
-					if ( errorCode == GL_NO_ERROR )
+					if (errorCode == GL_NO_ERROR)
 					{
-						if ( didCompilationSucceed == GL_FALSE )
+						if (didCompilationSucceed == GL_FALSE)
 						{
 							wereThereErrors = true;
 							std::stringstream errorMessage;
 							errorMessage << "The vertex shader failed to compile:\n" << compilationInfo;
-							eae6320::UserOutput::Print( errorMessage.str() );
+							eae6320::UserOutput::Print(errorMessage.str());
 							goto OnExit;
 						}
 					}
@@ -1085,8 +903,8 @@ namespace
 						wereThereErrors = true;
 						std::stringstream errorMessage;
 						errorMessage << "OpenGL failed to find out if compilation of the vertex shader source code succeeded: " <<
-							reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-						eae6320::UserOutput::Print( errorMessage.str() );
+							reinterpret_cast<const char*>(gluErrorString(errorCode));
+						eae6320::UserOutput::Print(errorMessage.str());
 						goto OnExit;
 					}
 				}
@@ -1096,48 +914,48 @@ namespace
 				wereThereErrors = true;
 				std::stringstream errorMessage;
 				errorMessage << "OpenGL failed to compile the vertex shader source code: " <<
-					reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-				eae6320::UserOutput::Print( errorMessage.str() );
+					reinterpret_cast<const char*>(gluErrorString(errorCode));
+				eae6320::UserOutput::Print(errorMessage.str());
 				goto OnExit;
 			}
 		}
 		// Attach the shader to the program
 		{
-			glAttachShader( i_programId, vertexShaderId );
+			glAttachShader(i_programId, vertexShaderId);
 			const GLenum errorCode = glGetError();
-			if ( errorCode != GL_NO_ERROR )
+			if (errorCode != GL_NO_ERROR)
 			{
 				wereThereErrors = true;
 				std::stringstream errorMessage;
 				errorMessage << "OpenGL failed to attach the vertex shader to the program: " <<
-					reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-				eae6320::UserOutput::Print( errorMessage.str() );
+					reinterpret_cast<const char*>(gluErrorString(errorCode));
+				eae6320::UserOutput::Print(errorMessage.str());
 				goto OnExit;
 			}
 		}
 
 	OnExit:
 
-		if ( vertexShaderId != 0 )
+		if (vertexShaderId != 0)
 		{
 			// Even if the shader was successfully compiled
 			// once it has been attached to the program we can (and should) delete our reference to it
 			// (any associated memory that OpenGL has allocated internally will be freed
 			// once the program is deleted)
-			glDeleteShader( vertexShaderId );
+			glDeleteShader(vertexShaderId);
 			const GLenum errorCode = glGetError();
-			if ( errorCode != GL_NO_ERROR )
+			if (errorCode != GL_NO_ERROR)
 			{
 				std::stringstream errorMessage;
 				errorMessage << "OpenGL failed to delete the vertex shader ID: " <<
-					reinterpret_cast<const char*>( gluErrorString( errorCode ) );
-				eae6320::UserOutput::Print( errorMessage.str() );
+					reinterpret_cast<const char*>(gluErrorString(errorCode));
+				eae6320::UserOutput::Print(errorMessage.str());
 			}
 			vertexShaderId = 0;
 		}
-		if ( shaderSource != NULL )
+		if (shaderSource != NULL)
 		{
-			free( shaderSource );
+			free(shaderSource);
 			shaderSource = NULL;
 		}
 

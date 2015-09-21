@@ -11,7 +11,7 @@
 #include "../Windows/Includes.h"
 #include "Mesh.h"
 #include "MeshHelper.h"
-#include "Define.h"
+#include "CrossPlatformDefine.h"
 
 // Interface
 //==========

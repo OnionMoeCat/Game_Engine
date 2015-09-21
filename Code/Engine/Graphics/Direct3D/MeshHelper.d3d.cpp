@@ -5,143 +5,180 @@
 
 #include "../../Windows/Includes.h"
 
-#include <cassert>
-#include <cstdint>
 #include <d3d9.h>
-#include <d3dx9shader.h>
-#include <sstream>
 #include "../../UserOutput/UserOutput.h"
+
+// Helper Function Declarations
+//=============================
+
+namespace
+{
+	HRESULT GetVertexProcessingUsage(DWORD& o_usage, IDirect3DDevice9* i_device);
+}
 
 // Interface
 //==========
 
-bool eae6320::Graphics::MeshHelper::DrawMesh(const Mesh& i_mesh, const RENDERCONTEXT& i_rendercontext)
+bool eae6320::Graphics::MeshHelper::DrawMesh(const Mesh& i_mesh, const RenderContext& i_rendercontext)
 {
 	// We are using triangles as the "primitive" type,
 	// and we have defined the vertex buffer as a triangle list
 	// (meaning that every triangle is defined by three vertices)
-	const D3DPRIMITIVETYPE primitiveType = i_rendercontext.primitiveType;
+	const D3DPRIMITIVETYPE primitiveType = D3DPT_TRIANGLELIST;
 	// It's possible to start rendering primitives in the middle of the stream
-	const unsigned int indexOfFirstVertexToRender = i_rendercontext.indexOfFirstVertexToRender;
-	const unsigned int indexOfFirstIndexToUse = i_rendercontext.indexOfFirstIndexToUse;
+	const unsigned int indexOfFirstVertexToRender = 0;
+	const unsigned int indexOfFirstIndexToUse = 0;
 	// We are drawing a square
-	const unsigned int vertexCountToRender = i_rendercontext.vertexCountToRender;	// How vertices from the vertex buffer will be used?
-	const unsigned int primitiveCountToRender = i_rendercontext.primitiveCountToRender;	// How many triangles will be drawn?
+	const unsigned int vertexCountToRender = i_mesh.m_vertexCount;	// How vertices from the vertex buffer will be used?
+	const unsigned int primitiveCountToRender = i_mesh.m_primitiveCount;	// How many triangles will be drawn?
 	HRESULT result = i_rendercontext.device->DrawIndexedPrimitive(primitiveType,
 		indexOfFirstVertexToRender, indexOfFirstVertexToRender, vertexCountToRender,
 		indexOfFirstIndexToUse, primitiveCountToRender);
 	return (SUCCEEDED(result));
 }
 
-bool eae6320::Graphics::MeshHelper::CreateVertexBuffer(Mesh& i_mesh, const CREATEVERTEXBUFFERCONTEXT& i_createVertexBufferContext)
+bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDataPtr& i_vertexBufferData, const SetVertexBufferContext& i_setVertexBufferContext)
 {
 	// The usage tells Direct3D how this vertex buffer will be used
-	const DWORD usage = i_createVertexBufferContext.usage;
-	// We are drawing one square
-	const unsigned int bufferSize = i_createVertexBufferContext.bufferSize;
-	// We will define our own vertex format
-	const DWORD useSeparateVertexDeclaration = i_createVertexBufferContext.useSeparateVertexDeclaration;
-	// Place the vertex buffer into memory that Direct3D thinks is the most appropriate
-	const D3DPOOL useDefaultPool = i_createVertexBufferContext.useDefaultPool;
-	HANDLE* const notUsed = i_createVertexBufferContext.notUsed;
-	const HRESULT result = i_createVertexBufferContext.device->CreateVertexBuffer(bufferSize, usage, 
-		useSeparateVertexDeclaration, useDefaultPool, &i_mesh.m_vertexBuffer, notUsed);
-	if (FAILED(result))
+	DWORD usage = 0;
 	{
-		eae6320::UserOutput::Print("Direct3D failed to create a vertex buffer");
-		return false;
+		// The type of vertex processing should match what was specified when the device interface was created with CreateDevice()
+		const HRESULT result = GetVertexProcessingUsage(usage, i_setVertexBufferContext.device);
+		if (FAILED(result))
+		{
+			return false;
+		}
+		// Our code will only ever write to the buffer
+		usage |= D3DUSAGE_WRITEONLY;
 	}
-	return true;
-}
 
-bool eae6320::Graphics::MeshHelper::LockVertexBuffer(Mesh& i_mesh, VERTEXBUFFERDATA& o_vertexBufferData, const LOCKVERTEXBUFFERCONTEXT& i_lockVertexBufferContext)
-{
-	// Before the vertex buffer can be changed it must be "locked"
-	const unsigned int lockEntireBuffer = i_lockVertexBufferContext.lockEntireBuffer;
-	const DWORD useDefaultLockingBehavior = i_lockVertexBufferContext.useDefaultLockingBehavior;
-	const HRESULT result = i_mesh.m_vertexBuffer->Lock(lockEntireBuffer, lockEntireBuffer,
-		&o_vertexBufferData.data, useDefaultLockingBehavior);
-	if (FAILED(result))
+	unsigned int bufferSize;
+	// Create a vertex buffer
 	{
-		eae6320::UserOutput::Print("Direct3D failed to lock the vertex buffer");
-		return false;
+		// Assign number of vertices which we get from load mesh file
+		i_mesh.m_vertexCount = i_setVertexBufferContext.vertexCount;
+		// Calculate buffersize by multiply count with size
+		bufferSize = i_mesh.m_vertexCount * sizeof(sVertex);
+		// We will define our own vertex format
+		const DWORD useSeparateVertexDeclaration = 0;
+		// Place the vertex buffer into memory that Direct3D thinks is the most appropriate
+		const D3DPOOL useDefaultPool = D3DPOOL_DEFAULT;
+		HANDLE* const notUsed = NULL;
+		const HRESULT result = i_setVertexBufferContext.device->CreateVertexBuffer(bufferSize, usage, useSeparateVertexDeclaration, useDefaultPool,
+			&i_mesh.m_vertexBuffer, notUsed);
+		if (FAILED(result))
+		{
+			eae6320::UserOutput::Print("Direct3D failed to create a vertex buffer");
+			return false;
+		}
 	}
-	return true;
-}
-
-bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const VERTEXBUFFERDATA& i_vertexBufferData, const SETVERTEXBUFFERCONTEXT& i_setVertexBufferContext)
-{
-	return true;
-}
-
-bool eae6320::Graphics::MeshHelper::UnlockVertexBuffer(Mesh& i_mesh)
-{
-	// The buffer must be "unlocked" before it can be used
-	const HRESULT result = i_mesh.m_vertexBuffer->Unlock();
-	if (FAILED(result))
+	
+	// Fill the vertex buffer with the triangle's vertices
 	{
-		eae6320::UserOutput::Print("Direct3D failed to unlock the vertex buffer");
-		return false;
+		// Before the vertex buffer can be changed it must be "locked"
+		sVertex* vertexData;
+		{
+			const unsigned int lockEntireBuffer = 0;
+			const DWORD useDefaultLockingBehavior = 0;
+			const HRESULT result = i_mesh.m_vertexBuffer->Lock(lockEntireBuffer, lockEntireBuffer,
+				reinterpret_cast<void**>(&vertexData), useDefaultLockingBehavior);
+			if (FAILED(result))
+			{
+				eae6320::UserOutput::Print("Direct3D failed to lock the vertex buffer");
+				return false;
+			}
+		}
+		// Fill the buffer
+		{
+			memcpy(vertexData, i_vertexBufferData, bufferSize);
+		}
+		// The buffer must be "unlocked" before it can be used
+		{
+			const HRESULT result = i_mesh.m_vertexBuffer->Unlock();
+			if (FAILED(result))
+			{
+				eae6320::UserOutput::Print("Direct3D failed to unlock the vertex buffer");
+				return false;
+			}
+		}
 	}
+
 	return true;
 }
 
-bool eae6320::Graphics::MeshHelper::CreateIndexBuffer(Mesh& i_mesh, const CREATEINDEXBUFFERCONTEXT& i_createIndexBufferData)
+bool eae6320::Graphics::MeshHelper::SetIndexBuffer(Mesh& i_mesh, const BufferDataPtr& i_indexBufferData, const SetIndexBufferContext& i_setIndexBufferContext)
 {
 	// The usage tells Direct3D how this vertex buffer will be used
-	const DWORD usage = i_createIndexBufferData.usage;
-	// We are drawing a square
-	const unsigned int bufferSize = i_createIndexBufferData.bufferSize;
-	// We'll use 32-bit indices in this class to keep things simple
-	// (i.e. every index will be a 32 bit unsigned integer)
-	const D3DFORMAT format = i_createIndexBufferData.format;
-	// Place the index buffer into memory that Direct3D thinks is the most appropriate
-	const D3DPOOL useDefaultPool = i_createIndexBufferData.useDefaultPool;
-	HANDLE* notUsed = i_createIndexBufferData.notUsed;
-	const HRESULT result = i_createIndexBufferData.device->CreateIndexBuffer(bufferSize, usage, format, useDefaultPool,
-		&i_mesh.m_indexBuffer, notUsed);
-	if (FAILED(result))
+	DWORD usage = 0;
 	{
-		eae6320::UserOutput::Print("Direct3D failed to create an index buffer");
-		return false;
+		// The type of vertex processing should match what was specified when the device interface was created with CreateDevice()
+		const HRESULT result = GetVertexProcessingUsage(usage, i_setIndexBufferContext.device);
+		if (FAILED(result))
+		{
+			return false;
+		}
+		// Our code will only ever write to the buffer
+		usage |= D3DUSAGE_WRITEONLY;
 	}
-	return true;
-}
 
-bool eae6320::Graphics::MeshHelper::LockIndexBuffer(Mesh& i_mesh, INDEXBUFFERDATA& o_vertexBufferData, const LOCKINDEXBUFFERCONTEXT& i_lockIndexBufferContext)
-{
-	const unsigned int lockEntireBuffer = i_lockIndexBufferContext.lockEntireBuffer;
-	const DWORD useDefaultLockingBehavior = i_lockIndexBufferContext.useDefaultLockingBehavior;
-	const HRESULT result = i_mesh.m_indexBuffer->Lock(lockEntireBuffer, lockEntireBuffer,
-		&o_vertexBufferData.data, useDefaultLockingBehavior);
-	if (FAILED(result))
+	// Create an index buffer
+	unsigned int bufferSize;
 	{
-		eae6320::UserOutput::Print("Direct3D failed to lock the index buffer");
-		return false;
+		// Assign number of primitives which we get from load mesh file
+		i_mesh.m_primitiveCount = i_setIndexBufferContext.primitiveCount;
+		const unsigned int vertexPerPrimitive = 3;
+		// Calculate buffersize by multiply primitivecount with number of vertex per primitive with size
+		bufferSize = i_mesh.m_primitiveCount * vertexPerPrimitive * sizeof(uint32_t);
+		// We'll use 32-bit indices in this class to keep things simple
+		// (i.e. every index will be a 32 bit unsigned integer)
+		const D3DFORMAT format = D3DFMT_INDEX32;
+		// Place the index buffer into memory that Direct3D thinks is the most appropriate
+		const D3DPOOL useDefaultPool = D3DPOOL_DEFAULT;
+		HANDLE* notUsed = NULL;
+		const HRESULT result = i_setIndexBufferContext.device->CreateIndexBuffer(bufferSize, usage, format, useDefaultPool,
+			&i_mesh.m_indexBuffer, notUsed);
+		if (FAILED(result))
+		{
+			eae6320::UserOutput::Print("Direct3D failed to create an index buffer");
+			return false;
+		}
 	}
-	return true;
-}
-
-bool eae6320::Graphics::MeshHelper::SetIndexBuffer(Mesh& i_mesh, const INDEXBUFFERDATA& i_indexBufferData, const SETINDEXBUFFERCONTEXT& i_setIndexBufferContext)
-{
-	return true;
-}
-
-bool eae6320::Graphics::MeshHelper::UnlockIndexBuffer(Mesh& i_mesh)
-{
-	const HRESULT result = i_mesh.m_indexBuffer->Unlock();
-	if (FAILED(result))
+	// Fill the index buffer with the triangles' connectivity data
 	{
-		eae6320::UserOutput::Print("Direct3D failed to unlock the index buffer");
-		return false;
+		// Before the index buffer can be changed it must be "locked"
+		uint32_t* indexData;
+		{
+			const unsigned int lockEntireBuffer = 0;
+			const DWORD useDefaultLockingBehavior = 0;
+			const HRESULT result = i_mesh.m_indexBuffer->Lock(lockEntireBuffer, lockEntireBuffer,
+				reinterpret_cast<void**>(&indexData), useDefaultLockingBehavior);
+			if (FAILED(result))
+			{
+				eae6320::UserOutput::Print("Direct3D failed to lock the index buffer");
+				return false;
+			}
+		}
+		// Fill the buffer
+		{
+			memcpy(indexData, i_indexBufferData, bufferSize);
+		}
+		// The buffer must be "unlocked" before it can be used
+		{
+			const HRESULT result = i_mesh.m_indexBuffer->Unlock();
+			if (FAILED(result))
+			{
+				eae6320::UserOutput::Print("Direct3D failed to unlock the index buffer");
+				return false;
+			}
+		}
 	}
+
 	return true;
 }
 
-bool eae6320::Graphics::MeshHelper::SetVertexDeclaration(Mesh& i_mesh, VERTEXDECLARATIONCONTEXTPTR i_vertexDeclarationContext, const unsigned int i_vertexElementsCount)
+bool eae6320::Graphics::MeshHelper::SetVertexDeclaration(Mesh& i_mesh, const VertexDeclarationSpec* i_vertexDeclarationSpec, const VertexDeclarationContext& i_vertexDeclarationContext)
 {
-	// Initialize the vertex format
-	HRESULT result = i_vertexDeclarationContext.device->CreateVertexDeclaration(i_vertexDeclarationContext.vertexElement, &i_mesh.m_vertexDeclaration);
+	HRESULT result = i_vertexDeclarationContext.device->CreateVertexDeclaration(i_vertexDeclarationSpec, &i_mesh.m_vertexDeclaration);
 	if (SUCCEEDED(result))
 	{
 		result = i_vertexDeclarationContext.device->SetVertexDeclaration(i_mesh.m_vertexDeclaration);
@@ -159,17 +196,7 @@ bool eae6320::Graphics::MeshHelper::SetVertexDeclaration(Mesh& i_mesh, VERTEXDEC
 	return true;
 }
 
-bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh, const CLEANUPCONTEXT& i_cleanUpContext)
-{
-	return true;
-}
-
-bool eae6320::Graphics::MeshHelper::Initialize(Mesh& i_mesh, const INITIALIZECONTEXT& i_numVertexArray)
-{
-	return true;
-}
-
-bool eae6320::Graphics::MeshHelper::Finalize(Mesh& i_mesh, const FINALIZECONTEXT& i_finalizeContext)
+bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh, const CleanUpContext& i_cleanUpContext)
 {
 	if (i_mesh.m_vertexBuffer)
 	{
@@ -183,9 +210,34 @@ bool eae6320::Graphics::MeshHelper::Finalize(Mesh& i_mesh, const FINALIZECONTEXT
 	}
 	if (i_mesh.m_vertexDeclaration)
 	{
-		i_finalizeContext.device->SetVertexDeclaration(NULL);
+		i_cleanUpContext.device->SetVertexDeclaration(NULL);
 		i_mesh.m_vertexDeclaration->Release();
 		i_mesh.m_vertexDeclaration = NULL;
 	}
 	return true;
 }
+
+// Helper Function Definitions
+//============================
+
+namespace
+{
+	HRESULT GetVertexProcessingUsage(DWORD& o_usage, IDirect3DDevice9* i_device)
+	{
+		D3DDEVICE_CREATION_PARAMETERS deviceCreationParameters;
+		const HRESULT result = i_device->GetCreationParameters(&deviceCreationParameters);
+		if (SUCCEEDED(result))
+		{
+			DWORD vertexProcessingType = deviceCreationParameters.BehaviorFlags &
+				(D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_MIXED_VERTEXPROCESSING | D3DCREATE_SOFTWARE_VERTEXPROCESSING);
+			o_usage = (vertexProcessingType != D3DCREATE_SOFTWARE_VERTEXPROCESSING) ? 0 : D3DUSAGE_SOFTWAREPROCESSING;
+		}
+		else
+		{
+			eae6320::UserOutput::Print("Direct3D failed to get the device's creation parameters");
+		}
+		return result;
+	}
+}
+
+
