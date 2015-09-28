@@ -23,7 +23,8 @@ namespace
 	HDC s_deviceContext = NULL;
 	HGLRC s_openGlRenderingContext = NULL;
 
-	eae6320::Graphics::Mesh s_mesh;
+	eae6320::Graphics::Mesh s_squareMesh;
+	eae6320::Graphics::Mesh s_triangleMesh;
 
 	// OpenGL encapsulates a matching vertex shader and fragment shader into what it calls a "program".
 
@@ -97,11 +98,7 @@ bool eae6320::Graphics::Initialize( const HWND i_renderingWindow )
 	{
 		goto OnError;
 	}
-	// Initialize the graphics objects
-	if ( !CreateVertexDeclaration() )
-	{
-		goto OnError;
-	}
+
 	if ( !CreateProgram() )
 	{
 		goto OnError;
@@ -138,15 +135,14 @@ void eae6320::Graphics::Render()
 			glUseProgram( s_programId );
 			assert( glGetError() == GL_NO_ERROR );
 		}
-		// Bind a specific vertex buffer to the device as a data source
-		{
-			glBindVertexArray( s_mesh.m_vertexArrayId );
-			assert( glGetError() == GL_NO_ERROR );
-		}
 		// Render objects from the current streams
 		{
 			const RenderContext renderContext = {};
-			if (!MeshHelper::DrawMesh(s_mesh, renderContext))
+			if (!MeshHelper::DrawMesh(s_squareMesh, renderContext))
+			{
+				assert(false);
+			}
+			if (!MeshHelper::DrawMesh(s_triangleMesh, renderContext))
 			{
 				assert(false);
 			}
@@ -185,7 +181,8 @@ bool eae6320::Graphics::ShutDown()
 		{
 			const GLsizei arrayCount = 1;
 			eae6320::Graphics::CleanUpContext cleanUpContext = {};
-			eae6320::Graphics::MeshHelper::CleanUp(s_mesh, cleanUpContext);
+			eae6320::Graphics::MeshHelper::CleanUp(s_squareMesh, cleanUpContext);
+			eae6320::Graphics::MeshHelper::CleanUp(s_triangleMesh, cleanUpContext);
 		}
 
 		if ( wglMakeCurrent( s_deviceContext, NULL ) != FALSE )
@@ -392,51 +389,6 @@ namespace
 				std::stringstream errorMessage;
 				errorMessage << "Windows failed to set the current OpenGL rendering context: " << eae6320::GetLastWindowsError();
 				eae6320::UserOutput::Print( errorMessage.str() );
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool CreateVertexDeclaration()
-	{
-		// Initialize the vertex format
-		{
-			// Position (0)
-			// 2 floats == 8 bytes
-			// Offset = 0
-			const GLsizei stride_e1 = sizeof(eae6320::Graphics::sVertex);
-			GLvoid* offset_e1 = 0;
-			const GLuint vertexElementLocation_e1 = 0;
-			const GLint elementCount_e1 = 2;
-			const GLboolean notNormalized_e1 = GL_FALSE;	// The given floats should be used as-is
-			const GLenum type_e1 = GL_FLOAT;
-			// Color (1)
-			// 4 uint8_ts == 4 bytes
-			// Offset = 8
-			const GLsizei stride_e2 = sizeof(eae6320::Graphics::sVertex);
-			GLvoid* offset_e2 = reinterpret_cast<GLvoid*>(reinterpret_cast<uint8_t*>(offset_e1) + (elementCount_e1 * sizeof(float)));;
-			const GLuint vertexElementLocation_e2 = 1;
-			const GLint elementCount_e2 = 4;
-			const GLboolean notNormalized_e2 = GL_TRUE;
-			const GLenum type_e2 = GL_UNSIGNED_BYTE;
-			// Each element will be sent to the GPU as an unsigned byte in the range [0,255]
-			// but these values should be understood as representing [0,1] values
-			// and that is what the shader code will interpret them as
-			// (in other words, we could change the values provided here in C code
-			// to be floats and sent GL_FALSE instead and the shader code wouldn't need to change)
-			eae6320::Graphics::VertexDeclarationSpec vertexDeclarationSpec[] =
-			{
-				{ stride_e1, offset_e1, vertexElementLocation_e1, elementCount_e1, notNormalized_e1, type_e1 },
-				{ stride_e2, offset_e2, vertexElementLocation_e2, elementCount_e2, notNormalized_e2, type_e2 }
-			};
-			const unsigned int vertexElementsCount = 2;
-
-			eae6320::Graphics::VertexDeclarationContext vertexDeclarationContext = { vertexElementsCount };
-
-			if (!eae6320::Graphics::MeshHelper::SetVertexDeclaration(s_mesh, vertexDeclarationSpec, vertexDeclarationContext))
-			{
 				return false;
 			}
 		}
@@ -760,7 +712,8 @@ namespace
 	bool LoadMeshes()
 	{
 		eae6320::Graphics::LoadMeshContext loadMeshContext = {};
-		eae6320::Graphics::MeshHelper::ReadMeshFromFile(s_mesh, "data/square.mesh.raw", loadMeshContext);
+		eae6320::Graphics::MeshHelper::ReadMeshFromFile(s_squareMesh, "data/square.mesh.raw", loadMeshContext);
+		eae6320::Graphics::MeshHelper::ReadMeshFromFile(s_triangleMesh, "data/triangle.mesh.raw", loadMeshContext);
 		return true;
 	}
 

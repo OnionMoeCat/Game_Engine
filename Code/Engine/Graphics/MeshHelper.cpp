@@ -39,22 +39,62 @@ namespace
 	bool LoadTableValues_triangle_indexes_array(lua_State& io_luaState, unsigned int i_count);
 	bool LoadTableValues_triangle_indexes_array_abc(lua_State& io_luaState, unsigned int i_index);
 
-	bool LoadMesh(eae6320::Graphics::Mesh& i_mesh, const char* const i_path, const eae6320::Graphics::LoadMeshContext& i_loadMeshContext);
+	bool LoadMesh(eae6320::Graphics::Mesh& i_mesh, const char* const i_path, eae6320::Graphics::sVertex** i_vertices, uint32_t** i_indices, unsigned int& i_vertexSize, unsigned int& i_primitiveSize);
 }
 
 bool eae6320::Graphics::MeshHelper::ReadMeshFromFile(Mesh& i_mesh, const char* const i_path, const LoadMeshContext& i_loadMeshContext)
 {
-	// The LoadAsset() function does _exactly_ what was shown
-	// in the LoadTableFromFile examples.
-	// After the table is loaded at the top of the stack, though,
-	// LoadTableValues() is called,
-	// so that is the function you should pay attention to.
-	if (!LoadMesh(i_mesh, i_path, i_loadMeshContext))
+	bool wereThereErrors = false;
+
+	sVertex* vertices = NULL;
+	uint32_t* indices = NULL;
+	unsigned int vertexSize = 0;
+	unsigned int primitiveSize = 0;
 	{
-		return false;
+		if (!LoadMesh(i_mesh, i_path, &vertices, &indices, vertexSize, primitiveSize))
+		{
+			return false;
+		}
 	}
 
-	return true;
+	{
+		eae6320::Graphics::SetVertexBufferContext setVertexBufferContext =
+		{
+#if defined( EAE6320_PLATFORM_D3D )
+			i_loadMeshContext.device,
+#endif
+			vertexSize
+		};
+
+		if (!eae6320::Graphics::MeshHelper::SetVertexBuffer(i_mesh, vertices, setVertexBufferContext))
+		{
+			wereThereErrors = true;
+			goto OnExit;
+		}
+	}
+
+	{
+		eae6320::Graphics::SetIndexBufferContext setIndexBufferContext =
+		{
+#if defined( EAE6320_PLATFORM_D3D )
+			i_loadMeshContext.device,
+#endif
+			primitiveSize
+		};
+
+		if (!eae6320::Graphics::MeshHelper::SetIndexBuffer(i_mesh, indices, setIndexBufferContext))
+		{
+			wereThereErrors = true;
+			goto OnExit;
+		}
+	}
+
+OnExit:
+	free(vertices);
+	free(indices);
+	vertexSize = 0;
+	primitiveSize = 0;
+	return !wereThereErrors;
 }
 
 // Helper Function Definitions
@@ -436,7 +476,7 @@ namespace
 		return true;
 	}
 
-	bool LoadMesh(eae6320::Graphics::Mesh& i_mesh, const char* const i_path, const eae6320::Graphics::LoadMeshContext& i_loadMeshContext)
+	bool LoadMesh(eae6320::Graphics::Mesh& i_mesh, const char* const i_path, eae6320::Graphics::sVertex** i_vertices, uint32_t** i_indices, unsigned int& i_vertexSize, unsigned int& i_primitiveSize)
 	{
 		bool wereThereErrors = false;
 
@@ -519,39 +559,10 @@ namespace
 			goto OnExit;
 		}
 
-		{
-			eae6320::Graphics::SetVertexBufferContext setVertexBufferContext =
-			{
-	#if defined( EAE6320_PLATFORM_D3D )
-				i_loadMeshContext.device,
-	#endif
-				vertexSize
-			};
-
-			if (!eae6320::Graphics::MeshHelper::SetVertexBuffer(i_mesh, vertices, setVertexBufferContext))
-			{
-				wereThereErrors = true;
-				lua_pop(luaState, 1);
-				goto OnExit;
-			}
-		}
-
-		{
-			eae6320::Graphics::SetIndexBufferContext setIndexBufferContext =
-			{
-	#if defined( EAE6320_PLATFORM_D3D )
-				i_loadMeshContext.device,
-	#endif
-				primitiveSize
-			};
-
-			if (!eae6320::Graphics::MeshHelper::SetIndexBuffer(i_mesh, indices, setIndexBufferContext))
-			{
-				wereThereErrors = true;
-				lua_pop(luaState, 1);
-				goto OnExit;
-			}
-		}
+		*i_vertices = vertices;
+		*i_indices = indices;
+		i_vertexSize = vertexSize;
+		i_primitiveSize = primitiveSize;
 
 		// Pop the table
 		lua_pop(luaState, 1);
@@ -570,16 +581,8 @@ namespace
 		}
 
 		// Verices and Indices need to assign to NULL
-		if (vertices)
-		{
-			free(vertices);
-		}
 		vertices = NULL;
 		vertexSize = 0;
-		if (indices)
-		{
-			free(indices);
-		}
 		indices = NULL;
 		primitiveSize = 0;
 

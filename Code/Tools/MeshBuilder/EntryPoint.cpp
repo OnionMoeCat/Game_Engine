@@ -5,20 +5,12 @@
 // Header Files
 //=============
 
-#include "AssetBuilder.h"
-#include <cstdlib>
+#include "cMeshBuilder.h"
 
 // Entry Point
 //============
 
 int main( int i_argumentCount, char** i_arguments )
 {
-	if ( eae6320::AssetBuilder::BuildAssets() )
-	{
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		return EXIT_FAILURE;
-	}
+	return eae6320::Build<eae6320::cMeshBuilder>( i_arguments, i_argumentCount );
 }

@@ -18,7 +18,8 @@ namespace
 	IDirect3D9* s_direct3dInterface = NULL;
 	IDirect3DDevice9* s_direct3dDevice = NULL;
 
-	eae6320::Graphics::Mesh s_mesh;
+	eae6320::Graphics::Mesh s_squareMesh;
+	eae6320::Graphics::Mesh s_triangleMesh;
 
 	// The vertex shader is a program that operates on vertices.
 	// Its input comes from a C/C++ "draw call" and is:
@@ -47,7 +48,6 @@ namespace
 {
 	bool CreateDevice();
 	bool CreateInterface();
-	bool CreateVertexDeclaration();
 	bool LoadFragmentShader();
 	bool LoadMeshes();
 	bool LoadVertexShader();
@@ -71,11 +71,6 @@ bool eae6320::Graphics::Initialize( const HWND i_renderingWindow )
 		goto OnError;
 	}
 	if ( !LoadMeshes() )
-	{
-		goto OnError;
-	}
-	// Initialize vertex declaration
-	if ( !CreateVertexDeclaration() )
 	{
 		goto OnError;
 	}
@@ -130,28 +125,15 @@ void eae6320::Graphics::Render()
 				result = s_direct3dDevice->SetPixelShader( s_fragmentShader );
 				assert( SUCCEEDED( result ) );
 			}
-			// Bind a specific vertex buffer to the device as a data source
-			{
-				// There can be multiple streams of data feeding the display adaptor at the same time
-				const unsigned int streamIndex = 0;
-				// It's possible to start streaming data in the middle of a vertex buffer
-				const unsigned int bufferOffset = 0;
-				// The "stride" defines how large a single vertex is in the stream of data
-				const unsigned int bufferStride = sizeof( sVertex );
-				result = s_direct3dDevice->SetStreamSource( streamIndex, s_mesh.m_vertexBuffer, bufferOffset, bufferStride );
-				assert( SUCCEEDED( result ) );
-			}
-			// Bind a specific index buffer to the device as a data source
-			{
-				result = s_direct3dDevice->SetIndices( s_mesh.m_indexBuffer );
-				assert( SUCCEEDED( result ) );
-			}
 			// Render objects from the current streams
 			{
 				const eae6320::Graphics::RenderContext renderContext =
 				{ s_direct3dDevice };
-
-				if (!MeshHelper::DrawMesh(s_mesh, renderContext))
+				if (!MeshHelper::DrawMesh(s_squareMesh, renderContext))
+				{
+					assert( false );
+				}
+				if (!MeshHelper::DrawMesh(s_triangleMesh, renderContext))
 				{
 					assert( false );
 				}
@@ -193,8 +175,8 @@ bool eae6320::Graphics::ShutDown()
 				s_fragmentShader = NULL;
 			}
 			const eae6320::Graphics::CleanUpContext finalizeContext = { s_direct3dDevice };
-			eae6320::Graphics::MeshHelper::CleanUp(s_mesh, finalizeContext);
-
+			eae6320::Graphics::MeshHelper::CleanUp(s_squareMesh, finalizeContext);
+			eae6320::Graphics::MeshHelper::CleanUp(s_triangleMesh, finalizeContext);
 			s_direct3dDevice->Release();
 			s_direct3dDevice = NULL;
 		}
@@ -262,44 +244,6 @@ namespace
 		}
 	}
 
-	bool CreateVertexDeclaration()
-	{
-		// Initialize the vertex format
-		{
-			// These elements must match the VertexFormat::sVertex layout struct exactly.
-			// They instruct Direct3D how to match the binary data in the vertex buffer
-			// to the input elements in a vertex shader
-			// (by using D3DDECLUSAGE enums here and semantics in the shader,
-			// so that, for example, D3DDECLUSAGE_POSITION here matches with POSITION in shader code).
-			// Note that OpenGL uses arbitrarily assignable number IDs to do the same thing.
-			eae6320::Graphics::VertexDeclarationSpec vertexElements[] =
-			{
-				// Stream 0
-
-				// POSITION
-				// 2 floats == 8 bytes
-				// Offset = 0
-				{ 0, 0, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-
-				// COLOR0
-				// D3DCOLOR == 4 bytes
-				// Offset = 8
-				{ 0, 8, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 },
-
-				// The following marker signals the end of the vertex declaration
-				D3DDECL_END()
-			};
-			const unsigned int vertexElementsCount = 2;
-			const eae6320::Graphics::VertexDeclarationContext vertexDeclarationContext = { s_direct3dDevice , vertexElementsCount };
-			if (!eae6320::Graphics::MeshHelper::SetVertexDeclaration(s_mesh, vertexElements, vertexDeclarationContext))
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
 	bool LoadFragmentShader()
 	{
 		// Load the source code from file and compile it
@@ -363,7 +307,8 @@ namespace
 	bool LoadMeshes()
 	{
 		eae6320::Graphics::LoadMeshContext loadMeshContext = {s_direct3dDevice};
-		eae6320::Graphics::MeshHelper::ReadMeshFromFile(s_mesh, "data/square.mesh.raw", loadMeshContext);
+		eae6320::Graphics::MeshHelper::ReadMeshFromFile(s_squareMesh, "data/square.mesh.raw", loadMeshContext);
+		eae6320::Graphics::MeshHelper::ReadMeshFromFile(s_triangleMesh, "data/triangle.mesh.raw", loadMeshContext);
 		return true;
 	}
 

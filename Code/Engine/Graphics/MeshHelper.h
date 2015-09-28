@@ -19,10 +19,11 @@ namespace eae6320
 	{
 		struct MeshHelper
 		{
-			bool static DrawMesh(const Mesh& i_mesh, const RenderContext& i_renderContext);
+		private:
 			bool static SetVertexBuffer(Mesh& i_mesh, const BufferDataPtr& i_vertexBufferData, const SetVertexBufferContext& i_setVertexBufferContext);
 			bool static SetIndexBuffer(Mesh& i_mesh, const BufferDataPtr& i_indexBufferData, const SetIndexBufferContext& i_setIndexBufferContext);
-			bool static SetVertexDeclaration(Mesh& i_mesh, const VertexDeclarationSpec* i_vertexDeclarationSpec, const VertexDeclarationContext& i_vertexDeclarationContext);
+		public:
+			bool static DrawMesh(const Mesh& i_mesh, const RenderContext& i_renderContext);
 			bool static CleanUp(Mesh& i_mesh, const CleanUpContext& i_cleanUpContext);
 			bool static ReadMeshFromFile(Mesh& i_mesh, const char* const i_path, const LoadMeshContext& i_loadMeshContext);
 		};
