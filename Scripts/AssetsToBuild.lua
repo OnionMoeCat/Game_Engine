@@ -5,11 +5,11 @@ return
 		assets = {
 			{
 				source = "square.mesh.raw",
-				target = "square.mesh.raw",
+				target = "square.mesh",
 			},
 			{
 				source = "triangle.mesh.raw",
-				target = "triangle.mesh.raw",
+				target = "triangle.mesh",
 			},
 		},
 	},
