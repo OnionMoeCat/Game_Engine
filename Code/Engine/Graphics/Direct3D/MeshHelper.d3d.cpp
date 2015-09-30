@@ -249,7 +249,7 @@ bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDa
 }
 
 
-bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh, const CleanUpContext& i_cleanUpContext)
+bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh, const CleanUpMeshContext& i_cleanUpContext)
 {
 	if (i_mesh.m_vertexBuffer)
 	{

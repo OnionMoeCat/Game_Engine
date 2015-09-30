@@ -20,12 +20,20 @@
       <Filter>Direct3D</Filter>
     </ClCompile>
     <ClCompile Include="MeshHelper.cpp" />
+    <ClCompile Include="OpenGL\EffectHelper.gl.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Direct3D\EffectHelper.d3d.cpp">
+      <Filter>Direct3D</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshHelper.h" />
     <ClInclude Include="CrossPlatformDefine.h" />
+    <ClInclude Include="Effect.h" />
+    <ClInclude Include="EffectHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="OpenGL">

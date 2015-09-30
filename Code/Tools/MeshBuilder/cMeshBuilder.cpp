@@ -623,14 +623,18 @@ namespace
 			goto OnExit;
 		}
 
-OnExit:
+	OnExit:
 
-		if (!CloseHandle(fileHandle))
+		if (fileHandle != INVALID_HANDLE_VALUE)
 		{
-			std::stringstream errorMessage;
-			errorMessage << "Fail to close file \"" << i_path << "\": " << eae6320::GetLastWindowsError();
-			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
-			return false;
+			if (!CloseHandle(fileHandle))
+			{
+				std::stringstream errorMessage;
+				errorMessage << "Fail to close file \"" << i_path << "\": " << eae6320::GetLastWindowsError();
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				return false;
+			}
+			fileHandle = INVALID_HANDLE_VALUE;
 		}
 
 		return !wereThereErrors;

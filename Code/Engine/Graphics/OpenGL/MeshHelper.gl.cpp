@@ -5,15 +5,12 @@
 
 #include "../../Windows/Includes.h"
 
-#include <cassert>
 #include <cstdint>
-#include <cstdlib>
 #include <gl/GL.h>
 #include <gl/GLU.h>
 #include <string>
 #include <sstream>
 #include "../../UserOutput/UserOutput.h"
-#include "../../Windows/Functions.h"
 #include "../../../External/OpenGlExtensions/OpenGlExtensions.h"
 
 namespace
@@ -291,7 +288,7 @@ OnExit:
 	return !wereThereErrors;
 }
 
-bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh, const CleanUpContext& i_cleanUpContext)
+bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh, const CleanUpMeshContext& i_cleanUpContext)
 {
 	if (i_mesh.m_vertexArrayId != 0)
 	{

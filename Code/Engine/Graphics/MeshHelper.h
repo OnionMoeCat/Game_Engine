@@ -24,8 +24,8 @@ namespace eae6320
 			bool static SetIndexBuffer(Mesh& i_mesh, const BufferDataPtr& i_indexBufferData, const SetIndexBufferContext& i_setIndexBufferContext);
 		public:
 			bool static DrawMesh(const Mesh& i_mesh, const RenderContext& i_renderContext);
-			bool static CleanUp(Mesh& i_mesh, const CleanUpContext& i_cleanUpContext);
-			bool static ReadMeshFromFile(Mesh& i_mesh, const char* const i_path, const LoadMeshContext& i_loadMeshContext);
+			bool static CleanUp(Mesh& i_mesh, const CleanUpMeshContext& i_cleanUpContext);
+			bool static LoadMeshFromFile(Mesh& i_mesh, const char* const i_path, const LoadMeshContext& i_loadMeshContext);
 		};
 	}
 }

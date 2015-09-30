@@ -63,34 +63,29 @@ namespace eae6320
 			unsigned int primitiveCount;
 		};
 
-		struct VertexDeclarationContext
+		struct CleanUpMeshContext
 		{
 #if defined( EAE6320_PLATFORM_D3D )
 			IDirect3DDevice9* device;
 #endif
-			unsigned int vertexElementsCount;
 		};
 
-#if defined( EAE6320_PLATFORM_D3D )
-		typedef D3DVERTEXELEMENT9 VertexDeclarationSpec;
-#elif defined( EAE6320_PLATFORM_GL )
-		struct VertexDeclarationSpec_GL
-		{
-			const GLsizei stride;
-			const GLvoid* offset;
-			const GLuint vertexElementLocation;
-			const GLint elementCount;
-			const GLboolean notNormalized;
-			const GLenum type;
-		};
-		typedef VertexDeclarationSpec_GL VertexDeclarationSpec;
-#endif
-
-		struct CleanUpContext
+		struct LoadEffectContext
 		{
 #if defined( EAE6320_PLATFORM_D3D )
 			IDirect3DDevice9* device;
-#endif
+#endif			
+		};
+
+		struct BindEffectContext
+		{
+#if defined( EAE6320_PLATFORM_D3D )
+			IDirect3DDevice9* device;
+#endif				
+		};
+
+		struct CleanUpEffectContext
+		{	
 		};
 
 		// This struct determines the layout of the data that the CPU will send to the GPU

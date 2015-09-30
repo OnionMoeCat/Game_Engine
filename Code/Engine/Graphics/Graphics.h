@@ -12,6 +12,8 @@
 #include "Mesh.h"
 #include "MeshHelper.h"
 #include "CrossPlatformDefine.h"
+#include "Effect.h"
+#include "EffectHelper.h"
 
 // Interface
 //==========

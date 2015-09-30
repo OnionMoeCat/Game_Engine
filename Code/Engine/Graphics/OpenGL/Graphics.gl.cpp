@@ -712,8 +712,8 @@ namespace
 	bool LoadMeshes()
 	{
 		eae6320::Graphics::LoadMeshContext loadMeshContext = {};
-		eae6320::Graphics::MeshHelper::ReadMeshFromFile(s_squareMesh, "data/square.mesh.raw", loadMeshContext);
-		eae6320::Graphics::MeshHelper::ReadMeshFromFile(s_triangleMesh, "data/triangle.mesh.raw", loadMeshContext);
+		eae6320::Graphics::MeshHelper::ReadMeshFromFile(s_squareMesh, "data/square.mesh", loadMeshContext);
+		eae6320::Graphics::MeshHelper::ReadMeshFromFile(s_triangleMesh, "data/triangle.mesh", loadMeshContext);
 		return true;
 	}
 
