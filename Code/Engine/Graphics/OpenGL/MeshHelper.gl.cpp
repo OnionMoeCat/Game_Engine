@@ -309,6 +309,9 @@ bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh, const CleanUpMeshConte
 	return true;
 }
 
+// Helper Function Declarations
+//=============================
+
 namespace
 {
 	bool CreateVertexArray(eae6320::Graphics::Mesh& i_mesh)

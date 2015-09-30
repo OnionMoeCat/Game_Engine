@@ -5,6 +5,7 @@
 
 #include "../../Windows/Includes.h"
 
+#include <d3dx9shader.h>
 #include <sstream>
 #include "../../UserOutput/UserOutput.h"
 
@@ -23,7 +24,7 @@ bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const
 	{
 		return false;
 	}
-	if (!LoadVertexShader(i_effect, i_fragmentPath, i_loadEffectContext.device))
+	if (!LoadFragmentShader(i_effect, i_fragmentPath, i_loadEffectContext.device))
 	{
 		return false;
 	}

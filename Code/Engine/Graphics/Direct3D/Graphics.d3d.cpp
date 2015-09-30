@@ -6,7 +6,6 @@
 #include <cassert>
 #include <cstdint>
 #include <d3d9.h>
-#include <d3dx9shader.h>
 #include <sstream>
 #include "../../UserOutput/UserOutput.h"
 
@@ -142,19 +141,23 @@ bool eae6320::Graphics::ShutDown()
 	{
 		if ( s_direct3dDevice )
 		{
-			const CleanUpEffectContext cleanUpEffectContext = {};
-			if (!EffectHelper::CleanUp(s_effect, cleanUpEffectContext))
 			{
-				wereThereErrors = true;
+				const CleanUpEffectContext cleanUpEffectContext = {};
+				if (!EffectHelper::CleanUp(s_effect, cleanUpEffectContext))
+				{
+					wereThereErrors = true;
+				}
 			}
-			const CleanUpMeshContext cleanUpMeshContext = { s_direct3dDevice };
-			if (!MeshHelper::CleanUp(s_squareMesh, cleanUpMeshContext))
 			{
-				wereThereErrors = true;
-			}
-			if (!MeshHelper::CleanUp(s_triangleMesh, cleanUpMeshContext))
-			{
-				wereThereErrors = true;
+				const CleanUpMeshContext cleanUpMeshContext = { s_direct3dDevice };
+				if (!MeshHelper::CleanUp(s_squareMesh, cleanUpMeshContext))
+				{
+					wereThereErrors = true;
+				}
+				if (!MeshHelper::CleanUp(s_triangleMesh, cleanUpMeshContext))
+				{
+					wereThereErrors = true;
+				}
 			}
 			s_direct3dDevice->Release();
 			s_direct3dDevice = NULL;
