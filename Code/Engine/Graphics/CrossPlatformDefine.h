@@ -8,6 +8,7 @@ This file contains the function declarations for graphics
 // Header Files
 //=============
 #include "../Windows/Includes.h"
+
 #include <cstdint>
 
 #if defined( EAE6320_PLATFORM_D3D )
@@ -25,68 +26,18 @@ namespace eae6320
 {
 	namespace Graphics
 	{
-		struct LoadMeshContext
+		struct Context
 		{
 #if defined( EAE6320_PLATFORM_D3D )
 			IDirect3DDevice9* device;
 #endif
 		};
-
-		struct RenderContext
-		{
-#if defined( EAE6320_PLATFORM_D3D )
-			IDirect3DDevice9* device;
-#elif defined( EAE6320_PLATFORM_GL )
-#endif
-		};
-
 
 #if defined( EAE6320_PLATFORM_D3D )
 		typedef void* BufferDataPtr;
 #elif defined( EAE6320_PLATFORM_GL )
 		typedef GLvoid* BufferDataPtr;
 #endif
-
-		struct SetVertexBufferContext
-		{
-#if defined( EAE6320_PLATFORM_D3D )
-			IDirect3DDevice9* device;
-#endif
-			unsigned int vertexCount;
-		};
-
-		struct SetIndexBufferContext
-		{
-#if defined( EAE6320_PLATFORM_D3D )
-			IDirect3DDevice9* device;
-#endif
-			unsigned int primitiveCount;
-		};
-
-		struct CleanUpMeshContext
-		{
-#if defined( EAE6320_PLATFORM_D3D )
-			IDirect3DDevice9* device;
-#endif
-		};
-
-		struct LoadEffectContext
-		{
-#if defined( EAE6320_PLATFORM_D3D )
-			IDirect3DDevice9* device;
-#endif			
-		};
-
-		struct BindEffectContext
-		{
-#if defined( EAE6320_PLATFORM_D3D )
-			IDirect3DDevice9* device;
-#endif				
-		};
-
-		struct CleanUpEffectContext
-		{	
-		};
 
 		// This struct determines the layout of the data that the CPU will send to the GPU
 		struct sVertex

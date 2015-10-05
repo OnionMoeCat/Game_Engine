@@ -22,7 +22,7 @@ namespace
 // Interface
 //==========
 
-bool eae6320::Graphics::MeshHelper::DrawMesh(const Mesh& i_mesh, const RenderContext& i_rendercontext)
+bool eae6320::Graphics::MeshHelper::DrawMesh(const Mesh& i_mesh, const Context& i_context)
 {
 	// Bind a specific vertex buffer to the device as a data source
 	{
@@ -56,7 +56,7 @@ bool eae6320::Graphics::MeshHelper::DrawMesh(const Mesh& i_mesh, const RenderCon
 	return true;
 }
 
-bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDataPtr& i_verftexBufferData, const SetVertexBufferContext& i_setVertexBufferContext)
+bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDataPtr& i_verftexBufferData, const unsigned int i_vertexCount, const Context& i_context)
 {
 	bool wereThereErrors = false;
 
@@ -102,7 +102,7 @@ bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDa
 	// Assign the data to the buffer
 	{
 		// Assign number of vertices which we get from load mesh file
-		i_mesh.m_vertexCount = i_setVertexBufferContext.vertexCount;
+		i_mesh.m_vertexCount = i_vertexCount;
 		// Calculate buffersize by multiply vertexcount with size
 		const GLsizeiptr bufferSize = static_cast<GLsizeiptr>(i_mesh.m_vertexCount * sizeof(sVertex));
 
@@ -219,7 +219,7 @@ OnExit:
 	return !wereThereErrors;
 }
 
-bool eae6320::Graphics::MeshHelper::SetIndexBuffer(Mesh& i_mesh, const BufferDataPtr& i_indexBufferData, const SetIndexBufferContext& i_setIndexBufferContext)
+bool eae6320::Graphics::MeshHelper::SetIndexBuffer(Mesh& i_mesh, const BufferDataPtr& i_indexBufferData, const unsigned int i_primitiveCount, const Context& i_context)
 {
 	bool wereThereErrors = false;
 
@@ -265,7 +265,7 @@ bool eae6320::Graphics::MeshHelper::SetIndexBuffer(Mesh& i_mesh, const BufferDat
 	// Allocate space and copy the triangle data into the index buffer
 	{
 		// Assign number of primitives which we get from load mesh file
-		i_mesh.m_primitiveCount = i_setIndexBufferContext.primitiveCount;
+		i_mesh.m_primitiveCount = i_primitiveCount;
 		const unsigned int vertexPerPrimitive = 3;
 		// Calculate buffersize by multiply primitivecount with vertex per primitive with size
 		const GLsizeiptr bufferSize = static_cast<GLsizeiptr>(i_mesh.m_primitiveCount * vertexPerPrimitive * sizeof(uint32_t));
@@ -288,7 +288,7 @@ OnExit:
 	return !wereThereErrors;
 }
 
-bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh, const CleanUpMeshContext& i_cleanUpContext)
+bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh, const Context& i_context)
 {
 	if (i_mesh.m_vertexArrayId != 0)
 	{

@@ -18,33 +18,33 @@ namespace
 	bool LoadFragmentShader(eae6320::Graphics::Effect& i_effect, const char* const i_fragmentPath, IDirect3DDevice9* i_device);
 }
 
-bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const LoadEffectContext& i_loadEffectContext)
+bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const Context& i_context)
 {
-	if (!LoadVertexShader(i_effect, i_vertexPath, i_loadEffectContext.device))
+	if (!LoadVertexShader(i_effect, i_vertexPath, i_context.device))
 	{
 		return false;
 	}
-	if (!LoadFragmentShader(i_effect, i_fragmentPath, i_loadEffectContext.device))
+	if (!LoadFragmentShader(i_effect, i_fragmentPath, i_context.device))
 	{
 		return false;
 	}
 	return true;
 }
-bool eae6320::Graphics::EffectHelper::Bind(Effect& i_effect, const BindEffectContext& i_bindEffectContext)
+bool eae6320::Graphics::EffectHelper::Bind(Effect& i_effect, const Context& i_context)
 {
-	HRESULT result = i_bindEffectContext.device->SetVertexShader(i_effect.m_vertexShader);
+	HRESULT result = i_context.device->SetVertexShader(i_effect.m_vertexShader);
 	if (FAILED(result))
 	{
 		return false;
 	}
-	result = i_bindEffectContext.device->SetPixelShader(i_effect.m_fragmentShader);
+	result = i_context.device->SetPixelShader(i_effect.m_fragmentShader);
 	if (FAILED(result))
 	{
 		return false;
 	}
 	return true;
 }
-bool eae6320::Graphics::EffectHelper::CleanUp(Effect& i_mesh, const CleanUpEffectContext& i_cleanUpEffectContext)
+bool eae6320::Graphics::EffectHelper::CleanUp(Effect& i_mesh, const Context& i_context)
 {
 	if (i_mesh.m_vertexShader)
 	{

@@ -19,7 +19,7 @@ namespace
 // Interface
 //==========
 
-bool eae6320::Graphics::MeshHelper::DrawMesh(const Mesh& i_mesh, const RenderContext& i_rendercontext)
+bool eae6320::Graphics::MeshHelper::DrawMesh(const Mesh& i_mesh, const Context& i_context)
 {
 	// Bind a specific vertex buffer to the device as a data source
 	{
@@ -29,7 +29,7 @@ bool eae6320::Graphics::MeshHelper::DrawMesh(const Mesh& i_mesh, const RenderCon
 		const unsigned int bufferOffset = 0;
 		// The "stride" defines how large a single vertex is in the stream of data
 		const unsigned int bufferStride = sizeof(sVertex);
-		HRESULT result = i_rendercontext.device->SetStreamSource(streamIndex, i_mesh.m_vertexBuffer, bufferOffset, bufferStride);
+		HRESULT result = i_context.device->SetStreamSource(streamIndex, i_mesh.m_vertexBuffer, bufferOffset, bufferStride);
 		if (FAILED(result))
 		{
 			return false;
@@ -37,7 +37,7 @@ bool eae6320::Graphics::MeshHelper::DrawMesh(const Mesh& i_mesh, const RenderCon
 	}
 	// Bind a specific index buffer to the device as a data source
 	{
-		HRESULT result = i_rendercontext.device->SetIndices(i_mesh.m_indexBuffer);
+		HRESULT result = i_context.device->SetIndices(i_mesh.m_indexBuffer);
 		if (FAILED(result))
 		{
 			return false;
@@ -56,7 +56,7 @@ bool eae6320::Graphics::MeshHelper::DrawMesh(const Mesh& i_mesh, const RenderCon
 		// We are drawing a square
 		const unsigned int vertexCountToRender = i_mesh.m_vertexCount;	// How vertices from the vertex buffer will be used?
 		const unsigned int primitiveCountToRender = i_mesh.m_primitiveCount;	// How many triangles will be drawn?
-		HRESULT result = i_rendercontext.device->DrawIndexedPrimitive(primitiveType,
+		HRESULT result = i_context.device->DrawIndexedPrimitive(primitiveType,
 			indexOfFirstVertexToRender, indexOfFirstVertexToRender, vertexCountToRender,
 			indexOfFirstIndexToUse, primitiveCountToRender);
 		if (FAILED(result))
@@ -67,13 +67,13 @@ bool eae6320::Graphics::MeshHelper::DrawMesh(const Mesh& i_mesh, const RenderCon
 	return true;
 }
 
-bool eae6320::Graphics::MeshHelper::SetIndexBuffer(Mesh& i_mesh, const BufferDataPtr& i_indexBufferData, const SetIndexBufferContext& i_setIndexBufferContext)
+bool eae6320::Graphics::MeshHelper::SetIndexBuffer(Mesh& i_mesh, const BufferDataPtr& i_indexBufferData, const unsigned int i_primitiveCount, const Context& i_context)
 {
 	// The usage tells Direct3D how this vertex buffer will be used
 	DWORD usage = 0;
 	{
 		// The type of vertex processing should match what was specified when the device interface was created with CreateDevice()
-		const HRESULT result = GetVertexProcessingUsage(usage, i_setIndexBufferContext.device);
+		const HRESULT result = GetVertexProcessingUsage(usage, i_context.device);
 		if (FAILED(result))
 		{
 			return false;
@@ -86,7 +86,7 @@ bool eae6320::Graphics::MeshHelper::SetIndexBuffer(Mesh& i_mesh, const BufferDat
 	unsigned int bufferSize;
 	{
 		// Assign number of primitives which we get from load mesh file
-		i_mesh.m_primitiveCount = i_setIndexBufferContext.primitiveCount;
+		i_mesh.m_primitiveCount = i_primitiveCount;
 		const unsigned int vertexPerPrimitive = 3;
 		// Calculate buffersize by multiply primitivecount with number of vertex per primitive with size
 		bufferSize = i_mesh.m_primitiveCount * vertexPerPrimitive * sizeof(uint32_t);
@@ -96,7 +96,7 @@ bool eae6320::Graphics::MeshHelper::SetIndexBuffer(Mesh& i_mesh, const BufferDat
 		// Place the index buffer into memory that Direct3D thinks is the most appropriate
 		const D3DPOOL useDefaultPool = D3DPOOL_DEFAULT;
 		HANDLE* notUsed = NULL;
-		const HRESULT result = i_setIndexBufferContext.device->CreateIndexBuffer(bufferSize, usage, format, useDefaultPool,
+		const HRESULT result = i_context.device->CreateIndexBuffer(bufferSize, usage, format, useDefaultPool,
 			&i_mesh.m_indexBuffer, notUsed);
 		if (FAILED(result))
 		{
@@ -137,13 +137,13 @@ bool eae6320::Graphics::MeshHelper::SetIndexBuffer(Mesh& i_mesh, const BufferDat
 	return true;
 }
 
-bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDataPtr& i_vertexBufferData, const SetVertexBufferContext& i_setVertexBufferContext)
+bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDataPtr& i_vertexBufferData, const unsigned int i_vertexCount, const Context& i_context)
 {
 	// The usage tells Direct3D how this vertex buffer will be used
 	DWORD usage = 0;
 	{
 		// The type of vertex processing should match what was specified when the device interface was created with CreateDevice()
-		const HRESULT result = GetVertexProcessingUsage(usage, i_setVertexBufferContext.device);
+		const HRESULT result = GetVertexProcessingUsage(usage, i_context.device);
 		if (FAILED(result))
 		{
 			return false;
@@ -177,10 +177,10 @@ bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDa
 			// The following marker signals the end of the vertex declaration
 			D3DDECL_END()
 		};
-		HRESULT result = i_setVertexBufferContext.device->CreateVertexDeclaration(vertexElements, &i_mesh.m_vertexDeclaration);
+		HRESULT result = i_context.device->CreateVertexDeclaration(vertexElements, &i_mesh.m_vertexDeclaration);
 		if (SUCCEEDED(result))
 		{
-			result = i_setVertexBufferContext.device->SetVertexDeclaration(i_mesh.m_vertexDeclaration);
+			result = i_context.device->SetVertexDeclaration(i_mesh.m_vertexDeclaration);
 			if (FAILED(result))
 			{
 				eae6320::UserOutput::Print("Direct3D failed to set the vertex declaration");
@@ -198,7 +198,7 @@ bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDa
 	// Create a vertex buffer
 	{
 		// Assign number of vertices which we get from load mesh file
-		i_mesh.m_vertexCount = i_setVertexBufferContext.vertexCount;
+		i_mesh.m_vertexCount = i_vertexCount;
 		// Calculate buffersize by multiply count with size
 		bufferSize = i_mesh.m_vertexCount * sizeof(sVertex);
 		// We will define our own vertex format
@@ -206,7 +206,7 @@ bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDa
 		// Place the vertex buffer into memory that Direct3D thinks is the most appropriate
 		const D3DPOOL useDefaultPool = D3DPOOL_DEFAULT;
 		HANDLE* const notUsed = NULL;
-		const HRESULT result = i_setVertexBufferContext.device->CreateVertexBuffer(bufferSize, usage, useSeparateVertexDeclaration, useDefaultPool,
+		const HRESULT result = i_context.device->CreateVertexBuffer(bufferSize, usage, useSeparateVertexDeclaration, useDefaultPool,
 			&i_mesh.m_vertexBuffer, notUsed);
 		if (FAILED(result))
 		{
@@ -249,7 +249,7 @@ bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDa
 }
 
 
-bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh, const CleanUpMeshContext& i_cleanUpContext)
+bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh, const Context& i_context)
 {
 	if (i_mesh.m_vertexBuffer)
 	{
@@ -263,7 +263,7 @@ bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh, const CleanUpMeshConte
 	}
 	if (i_mesh.m_vertexDeclaration)
 	{
-		i_cleanUpContext.device->SetVertexDeclaration(NULL);
+		i_context.device->SetVertexDeclaration(NULL);
 		i_mesh.m_vertexDeclaration->Release();
 		i_mesh.m_vertexDeclaration = NULL;
 	}

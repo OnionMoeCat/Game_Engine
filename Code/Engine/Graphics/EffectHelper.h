@@ -19,9 +19,9 @@ namespace eae6320
 	{
 		struct EffectHelper
 		{
-			bool static LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const LoadEffectContext& i_loadEffectContext);
-			bool static Bind(Effect& i_effect, const BindEffectContext& i_bindEffectContext);
-			bool static CleanUp(Effect& i_mesh, const CleanUpEffectContext& i_cleanUpEffectContext);
+			bool static LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const Context& i_context);
+			bool static Bind(Effect& i_effect, const Context& i_context);
+			bool static CleanUp(Effect& i_mesh, const Context& i_context);
 		};
 	}
 }

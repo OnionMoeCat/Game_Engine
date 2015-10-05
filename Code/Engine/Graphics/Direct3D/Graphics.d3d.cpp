@@ -4,9 +4,7 @@
 #include "../Graphics.h"
 
 #include <cassert>
-#include <cstdint>
 #include <d3d9.h>
-#include <sstream>
 #include "../../UserOutput/UserOutput.h"
 
 // Static Data Initialization
@@ -20,6 +18,7 @@ namespace
 	eae6320::Graphics::Mesh s_squareMesh;
 	eae6320::Graphics::Mesh s_triangleMesh;
 	eae6320::Graphics::Effect s_effect;
+	eae6320::Graphics::Context s_context;
 }
 
 // Helper Function Declarations
@@ -27,6 +26,7 @@ namespace
 
 namespace
 {
+	bool CreateContext();
 	bool CreateDevice();
 	bool CreateInterface();
 	bool LoadEffect();
@@ -47,6 +47,10 @@ bool eae6320::Graphics::Initialize( const HWND i_renderingWindow )
 	}
 	// Create an interface to a Direct3D device
 	if ( !CreateDevice() )
+	{
+		goto OnError;
+	}
+	if ( !CreateContext() )
 	{
 		goto OnError;
 	}
@@ -96,21 +100,18 @@ void eae6320::Graphics::Render()
 		{
 			// Set the shaders
 			{
-				BindEffectContext bindEffectContext = { s_direct3dDevice };
-				if (!EffectHelper::Bind(s_effect, bindEffectContext))
+				if (!EffectHelper::Bind(s_effect, s_context))
 				{
 					assert(false);
 				}
 			}
 			// Render objects from the current streams
 			{
-				const RenderContext renderContext =
-				{ s_direct3dDevice };
-				if (!MeshHelper::DrawMesh(s_squareMesh, renderContext))
+				if (!MeshHelper::DrawMesh(s_squareMesh, s_context))
 				{
 					assert( false );
 				}
-				if (!MeshHelper::DrawMesh(s_triangleMesh, renderContext))
+				if (!MeshHelper::DrawMesh(s_triangleMesh, s_context))
 				{
 					assert( false );
 				}
@@ -142,19 +143,17 @@ bool eae6320::Graphics::ShutDown()
 		if ( s_direct3dDevice )
 		{
 			{
-				const CleanUpEffectContext cleanUpEffectContext = {};
-				if (!EffectHelper::CleanUp(s_effect, cleanUpEffectContext))
+				if (!EffectHelper::CleanUp(s_effect, s_context))
 				{
 					wereThereErrors = true;
 				}
 			}
 			{
-				const CleanUpMeshContext cleanUpMeshContext = { s_direct3dDevice };
-				if (!MeshHelper::CleanUp(s_squareMesh, cleanUpMeshContext))
+				if (!MeshHelper::CleanUp(s_squareMesh, s_context))
 				{
 					wereThereErrors = true;
 				}
-				if (!MeshHelper::CleanUp(s_triangleMesh, cleanUpMeshContext))
+				if (!MeshHelper::CleanUp(s_triangleMesh, s_context))
 				{
 					wereThereErrors = true;
 				}
@@ -176,6 +175,12 @@ bool eae6320::Graphics::ShutDown()
 
 namespace
 {
+	bool CreateContext()
+	{
+		s_context = {s_direct3dDevice};
+		return true;
+	}
+
 	bool CreateDevice()
 	{
 		const UINT useDefaultDevice = D3DADAPTER_DEFAULT;
@@ -228,16 +233,14 @@ namespace
 
 	bool LoadEffect()
 	{
-		eae6320::Graphics::LoadEffectContext loadEffectContext = { s_direct3dDevice };
-		eae6320::Graphics::EffectHelper::LoadEffectFromFile(s_effect, "data/vertex.shader", "data/fragment.shader", loadEffectContext);
+		eae6320::Graphics::EffectHelper::LoadEffectFromFile(s_effect, "data/vertex.shader", "data/fragment.shader", s_context);
 		return true;
 	}
 	
 	bool LoadMeshes()
 	{
-		eae6320::Graphics::LoadMeshContext loadMeshContext = {s_direct3dDevice};
-		eae6320::Graphics::MeshHelper::LoadMeshFromFile(s_squareMesh, "data/square.mesh", loadMeshContext);
-		eae6320::Graphics::MeshHelper::LoadMeshFromFile(s_triangleMesh, "data/triangle.mesh", loadMeshContext);
+		eae6320::Graphics::MeshHelper::LoadMeshFromFile(s_squareMesh, "data/square.mesh", s_context);
+		eae6320::Graphics::MeshHelper::LoadMeshFromFile(s_triangleMesh, "data/triangle.mesh", s_context);
 		return true;
 	}
 

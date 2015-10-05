@@ -4,9 +4,7 @@
 #include "MeshHelper.h"
 
 #include "../UserOutput/UserOutput.h"
-#include "../../External/Lua/Includes.h"
 #include <assert.h>
-#include <iostream>
 #include <sstream>
 #include "../Windows/Functions.h"
 
@@ -21,7 +19,7 @@ namespace
 // Interface
 //==========
 
-bool eae6320::Graphics::MeshHelper::LoadMeshFromFile(Mesh& i_mesh, const char* const i_path, const LoadMeshContext& i_loadMeshContext)
+bool eae6320::Graphics::MeshHelper::LoadMeshFromFile(Mesh& i_mesh, const char* const i_path, const Context& i_context)
 {
 	bool wereThereErrors = false;
 
@@ -51,15 +49,7 @@ bool eae6320::Graphics::MeshHelper::LoadMeshFromFile(Mesh& i_mesh, const char* c
 	}
 
 	{
-		eae6320::Graphics::SetVertexBufferContext setVertexBufferContext =
-		{
-#if defined( EAE6320_PLATFORM_D3D )
-			i_loadMeshContext.device,
-#endif
-			vertexSize
-		};
-
-		if (!eae6320::Graphics::MeshHelper::SetVertexBuffer(i_mesh, vertices, setVertexBufferContext))
+		if (!eae6320::Graphics::MeshHelper::SetVertexBuffer(i_mesh, vertices, vertexSize, i_context))
 		{
 			wereThereErrors = true;
 			goto OnExit;
@@ -67,15 +57,7 @@ bool eae6320::Graphics::MeshHelper::LoadMeshFromFile(Mesh& i_mesh, const char* c
 	}
 
 	{
-		eae6320::Graphics::SetIndexBufferContext setIndexBufferContext =
-		{
-#if defined( EAE6320_PLATFORM_D3D )
-			i_loadMeshContext.device,
-#endif
-			primitiveSize
-		};
-
-		if (!eae6320::Graphics::MeshHelper::SetIndexBuffer(i_mesh, indices, setIndexBufferContext))
+		if (!eae6320::Graphics::MeshHelper::SetIndexBuffer(i_mesh, indices, primitiveSize, i_context))
 		{
 			wereThereErrors = true;
 			goto OnExit;

@@ -29,7 +29,7 @@ namespace
 	};
 }
 
-bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const LoadEffectContext& i_loadEffectContext)
+bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const Context& i_context)
 {
 
 	// Create a program
@@ -138,7 +138,7 @@ bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const
 
 	return true;
 }
-bool eae6320::Graphics::EffectHelper::Bind(Effect& i_effect, const BindEffectContext& i_bindEffectContext)
+bool eae6320::Graphics::EffectHelper::Bind(Effect& i_effect, const Context& i_context)
 {
 	// Set the vertex and fragment shaders
 	glUseProgram(i_effect.m_programID);
@@ -148,7 +148,7 @@ bool eae6320::Graphics::EffectHelper::Bind(Effect& i_effect, const BindEffectCon
 	}
 	return true;
 }
-bool eae6320::Graphics::EffectHelper::CleanUp(Effect& i_effect, const CleanUpEffectContext& i_cleanUpEffectContext)
+bool eae6320::Graphics::EffectHelper::CleanUp(Effect& i_effect, const Context& i_context)
 {
 	if (i_effect.m_programID != 0)
 	{

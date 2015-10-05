@@ -1,9 +1,7 @@
 #include <stdarg.h>
 #include <stdio.h>
-#include <Windows.h>
 
 #include "UserOutput.h"
-#include <gl/GL.h>
 
 // Static Data Initialization
 //===========================
