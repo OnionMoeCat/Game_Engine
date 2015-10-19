@@ -177,7 +177,6 @@ bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, cons
 	}
 	else
 	{
-		eae6320::UserOutput::Print("Failed to get \"g_position_offset\" from effect");
 		return false;
 	}
 	return true;

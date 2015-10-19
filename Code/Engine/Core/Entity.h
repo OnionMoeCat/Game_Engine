@@ -7,20 +7,22 @@ This file contains the function declarations for mesh
 
 // Header Files
 //=============
-#include "../Windows/Includes.h"
+#include "../Graphics/Mesh.h"
+#include "../Graphics/Effect.h"
+#include "../Math/cVector.h"
 
 // Interface
 //==========
 
 namespace eae6320
 {
-	namespace Graphics
+	namespace Core
 	{
 		struct Entity
 		{
-			Mesh* m_mesh;
-			Effect* m_effect;
-			cVector cVector;
+			eae6320::Graphics::Mesh* m_mesh = NULL;
+			eae6320::Graphics::Effect* m_effect = NULLl;
+			eae6320::Math::cVector cVector;
 		};
 	}
 }

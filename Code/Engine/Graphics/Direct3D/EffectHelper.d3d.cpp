@@ -69,19 +69,16 @@ bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, cons
 			HRESULT result = i_effect.m_vertexShaderConstantTable->SetFloatArray(i_Context.device, handle, floatArray, floatCount);
 			if (FAILED(result))
 			{
-				eae6320::UserOutput::Print("Failed to set uniform to constant table.");
 				return false;
 			}
 		}
 		else
 		{
-			eae6320::UserOutput::Print("Failed to get constant \"g_position_offset\" from constant table.");
 			return false;
 		}
 	}
 	else
 	{
-		eae6320::UserOutput::Print("Failed to get constant table.");
 		return false;
 	}
 	return true;
