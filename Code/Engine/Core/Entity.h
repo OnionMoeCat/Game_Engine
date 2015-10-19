@@ -21,7 +21,7 @@ namespace eae6320
 		struct Entity
 		{
 			eae6320::Graphics::Mesh* m_mesh = NULL;
-			eae6320::Graphics::Effect* m_effect = NULLl;
+			eae6320::Graphics::Effect* m_effect = NULL;
 			eae6320::Math::cVector cVector;
 		};
 	}

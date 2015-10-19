@@ -2,14 +2,13 @@
 This file contains the function declarations for MeshHelper
 */
 
-#ifndef EAE6320_EFFECTHELPER_H
-#define EAE6320_EFFECTHELPER_H
+#ifndef EAE6320_ENTITYHELPER_H
+#define EAE6320_ENTITYHELPER_H
 
 // Header Files
 //=============
 #include "Entity.h"
-#include "CrossPlatformDefine.h"
-#include "../../Math/cVector.h"
+#include "../Math/cVector.h"
 
 // Interface
 //==========
@@ -20,7 +19,8 @@ namespace eae6320
 	{
 		struct EntityHelper
 		{
-			bool static LoadEffectFromFile(Entity& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const char* i_meshPath);
+			bool static LoadEntityFromFile(Entity& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const char* i_meshPath);
+			bool static OffsetPosition(Entity& i_entity, const eae6320::Math::cVector& i_offset_position);
 		};
 	}
 }
