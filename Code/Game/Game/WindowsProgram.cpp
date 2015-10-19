@@ -14,9 +14,19 @@
 // in this example program we just use it to get error messages
 #include "../../Engine/Windows/Functions.h"
 // Graphics.h is Graphics system
-#include "../../Engine/Graphics/Graphics.h"
+//#include "../../Engine/Graphics/Graphics.h"
 // UserOutput.h is UserOutput system
 #include "../../Engine/UserOutput/UserOutput.h"
+
+namespace eae6320
+{
+	namespace Graphics
+	{
+		bool Initialize(const HWND i_renderingWindow);
+		void Render();
+		bool ShutDown();
+	}
+}
 
 // Static Data Initialization
 //===========================

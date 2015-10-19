@@ -7,6 +7,7 @@
 // Entry Point
 //============
 
+uniform float2 g_position_offset;
 void main(
 
 	// Input
@@ -42,7 +43,7 @@ void main(
 		// When we move to 3D graphics the screen position that the vertex shader outputs
 		// will be different than the position that is input to it from C code,
 		// but for now the "out" position is set directly from the "in" position:
-		o_position = float4( i_position.x, i_position.y, 0.0, 1.0 );
+		o_position = float4( i_position + g_position_offset, 0.0, 1.0 );
 		// Or, equivalently:
 		// o_position = float4( i_position.xy, 0.0, 1.0 );
 		// o_position = float4( i_position, 0.0, 1.0 );
@@ -87,6 +88,7 @@ layout( location = 0 ) out vec4 o_color;
 // Entry Point
 //============
 
+uniform vec2 g_position_offset;
 void main()
 {
 	// Calculate position
@@ -94,7 +96,7 @@ void main()
 		// When we move to 3D graphics the screen position that the vertex shader outputs
 		// will be different than the position that is input to it from C code,
 		// but for now the "out" position is set directly from the "in" position:
-		gl_Position = vec4( i_position.x, i_position.y, 0.0, 1.0 );
+		gl_Position = vec4( i_position + g_position_offset, 0.0, 1.0 );
 		// Or, equivalently:
 		// gl_Position = vec4( i_position.xy, 0.0, 1.0 );
 		// gl_Position = vec4( i_position, 0.0, 1.0 );

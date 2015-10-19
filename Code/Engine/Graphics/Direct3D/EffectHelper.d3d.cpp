@@ -5,7 +5,6 @@
 
 #include "../../Windows/Includes.h"
 
-#include <d3dx9shader.h>
 #include <sstream>
 #include "../../UserOutput/UserOutput.h"
 
@@ -58,6 +57,35 @@ bool eae6320::Graphics::EffectHelper::CleanUp(Effect& i_mesh, const Context& i_c
 	}
 	return true;
 }
+bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, const eae6320::Math::cVector& i_vector, const Context& i_Context)
+{
+	if (i_effect.m_vertexShaderConstantTable != NULL)
+	{
+		D3DXHANDLE handle = i_effect.m_vertexShaderConstantTable->GetConstantByName(NULL, "g_position_offset");
+		if (handle != NULL)
+		{
+			const unsigned int floatCount = 2;
+			const float floatArray[floatCount] = { i_vector.x, i_vector.y };
+			HRESULT result = i_effect.m_vertexShaderConstantTable->SetFloatArray(i_Context.device, handle, floatArray, floatCount);
+			if (FAILED(result))
+			{
+				eae6320::UserOutput::Print("Failed to set uniform to constant table.");
+				return false;
+			}
+		}
+		else
+		{
+			eae6320::UserOutput::Print("Failed to get constant \"g_position_offset\" from constant table.");
+			return false;
+		}
+	}
+	else
+	{
+		eae6320::UserOutput::Print("Failed to get constant table.");
+		return false;
+	}
+	return true;
+}
 
 namespace
 {
@@ -76,15 +104,16 @@ namespace
 			const char* profile = "vs_3_0";
 			const DWORD noFlags = 0;
 			ID3DXBuffer* errorMessages = NULL;
-			ID3DXConstantTable** noConstants = NULL;
+			ID3DXConstantTable* vertexShaderConstantTable = NULL;
 			HRESULT result = D3DXCompileShaderFromFile(i_vertexPath, defines, noIncludes, entryPoint, profile, noFlags,
-				&compiledShader, &errorMessages, noConstants);
+				&compiledShader, &errorMessages, &vertexShaderConstantTable);
 			if (SUCCEEDED(result))
 			{
 				if (errorMessages)
 				{
 					errorMessages->Release();
 				}
+				i_effect.m_vertexShaderConstantTable = vertexShaderConstantTable;
 			}
 			else
 			{

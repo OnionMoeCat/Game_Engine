@@ -166,6 +166,22 @@ bool eae6320::Graphics::EffectHelper::CleanUp(Effect& i_effect, const Context& i
 	}
 	return true;
 }
+bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, const eae6320::Math::cVector& i_vector, const Context& i_Context)
+{
+	GLint location = glGetUniformLocation(i_effect.m_programID, "g_position_offset");
+	if (location != -1)
+	{
+		const unsigned int uniformCount = 1;
+		const float floatArray[2] = {i_vector.x, i_vector.y};
+		glUniform2fv(location, uniformCount, floatArray);
+	}
+	else
+	{
+		eae6320::UserOutput::Print("Failed to get \"g_position_offset\" from effect");
+		return false;
+	}
+	return true;
+}
 
 // Helper Function Declarations
 //=============================

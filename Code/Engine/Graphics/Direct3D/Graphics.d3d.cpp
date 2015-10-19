@@ -6,6 +6,7 @@
 #include <cassert>
 #include <d3d9.h>
 #include "../../UserOutput/UserOutput.h"
+#include "../../Math/cVector.h"
 
 // Static Data Initialization
 //===========================
@@ -16,9 +17,13 @@ namespace
 	IDirect3DDevice9* s_direct3dDevice = NULL;
 
 	eae6320::Graphics::Mesh s_squareMesh;
-	eae6320::Graphics::Mesh s_triangleMesh;
+	eae6320::Graphics::Mesh s_triangleMesh1;
+	eae6320::Graphics::Mesh s_triangleMesh2;
 	eae6320::Graphics::Effect s_effect;
 	eae6320::Graphics::Context s_context;
+	eae6320::Math::cVector s_position_offset_triangleMesh1(0.1f, 0.1f);
+	eae6320::Math::cVector s_position_offset_triangleMesh2(-0.1f, 0.1f);
+	eae6320::Math::cVector s_position_offset_squareMesh(0.1f, 0.1f);
 }
 
 // Helper Function Declarations
@@ -107,13 +112,29 @@ void eae6320::Graphics::Render()
 			}
 			// Render objects from the current streams
 			{
+				if (!EffectHelper::SetDrawCallUniforms(s_effect, s_position_offset_squareMesh, s_context))
+				{
+					assert(false);
+				}
 				if (!MeshHelper::DrawMesh(s_squareMesh, s_context))
 				{
 					assert( false );
 				}
-				if (!MeshHelper::DrawMesh(s_triangleMesh, s_context))
+				if (!EffectHelper::SetDrawCallUniforms(s_effect, s_position_offset_triangleMesh1, s_context))
+				{
+					assert(false);
+				}
+				if (!MeshHelper::DrawMesh(s_triangleMesh1, s_context))
 				{
 					assert( false );
+				}
+				if (!EffectHelper::SetDrawCallUniforms(s_effect, s_position_offset_triangleMesh2, s_context))
+				{
+					assert(false);
+				}
+				if (!MeshHelper::DrawMesh(s_triangleMesh2, s_context))
+				{
+					assert(false);
 				}
 			}
 		}
@@ -153,7 +174,7 @@ bool eae6320::Graphics::ShutDown()
 				{
 					wereThereErrors = true;
 				}
-				if (!MeshHelper::CleanUp(s_triangleMesh, s_context))
+				if (!MeshHelper::CleanUp(s_triangleMesh1, s_context))
 				{
 					wereThereErrors = true;
 				}
@@ -240,7 +261,8 @@ namespace
 	bool LoadMeshes()
 	{
 		eae6320::Graphics::MeshHelper::LoadMeshFromFile(s_squareMesh, "data/square.mesh", s_context);
-		eae6320::Graphics::MeshHelper::LoadMeshFromFile(s_triangleMesh, "data/triangle.mesh", s_context);
+		eae6320::Graphics::MeshHelper::LoadMeshFromFile(s_triangleMesh1, "data/triangle.mesh", s_context);
+		eae6320::Graphics::MeshHelper::LoadMeshFromFile(s_triangleMesh2, "data/triangle.mesh", s_context);
 		return true;
 	}
 
