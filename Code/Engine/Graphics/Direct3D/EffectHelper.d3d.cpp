@@ -19,6 +19,10 @@ namespace
 
 bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const Context& i_context)
 {
+	if (i_context.device == NULL)
+	{
+		return false;
+	}
 	if (!LoadVertexShader(i_effect, i_vertexPath, i_context.device))
 	{
 		return false;
@@ -31,6 +35,10 @@ bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const
 }
 bool eae6320::Graphics::EffectHelper::Bind(Effect& i_effect, const Context& i_context)
 {
+	if (i_context.device == NULL)
+	{
+		return false;
+	}
 	HRESULT result = i_context.device->SetVertexShader(i_effect.m_vertexShader);
 	if (FAILED(result))
 	{
@@ -43,17 +51,17 @@ bool eae6320::Graphics::EffectHelper::Bind(Effect& i_effect, const Context& i_co
 	}
 	return true;
 }
-bool eae6320::Graphics::EffectHelper::CleanUp(Effect& i_mesh, const Context& i_context)
+bool eae6320::Graphics::EffectHelper::CleanUp(Effect& i_effect, const Context& i_context)
 {
-	if (i_mesh.m_vertexShader)
+	if (i_effect.m_vertexShader)
 	{
-		i_mesh.m_vertexShader->Release();
-		i_mesh.m_vertexShader = NULL;
+		i_effect.m_vertexShader->Release();
+		i_effect.m_vertexShader = NULL;
 	}
-	if (i_mesh.m_fragmentShader)
+	if (i_effect.m_fragmentShader)
 	{
-		i_mesh.m_fragmentShader->Release();
-		i_mesh.m_fragmentShader = NULL;
+		i_effect.m_fragmentShader->Release();
+		i_effect.m_fragmentShader = NULL;
 	}
 	return true;
 }
@@ -66,6 +74,10 @@ bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, cons
 		{
 			const unsigned int floatCount = 2;
 			const float floatArray[floatCount] = { i_vector.x, i_vector.y };
+			if (i_Context.device == NULL)
+			{
+				return false;
+			}
 			HRESULT result = i_effect.m_vertexShaderConstantTable->SetFloatArray(i_Context.device, handle, floatArray, floatCount);
 			if (FAILED(result))
 			{
@@ -134,14 +146,22 @@ namespace
 		// Create the vertex shader object
 		bool wereThereErrors = false;
 		{
-			HRESULT result = i_device->CreateVertexShader(reinterpret_cast<DWORD*>(compiledShader->GetBufferPointer()),
-				&i_effect.m_vertexShader);
-			if (FAILED(result))
+			if (i_device != NULL)
 			{
-				eae6320::UserOutput::Print("Direct3D failed to create the vertex shader");
-				wereThereErrors = true;
+				HRESULT result = i_device->CreateVertexShader(reinterpret_cast<DWORD*>(compiledShader->GetBufferPointer()),
+					&i_effect.m_vertexShader);
+				if (FAILED(result))
+				{
+					eae6320::UserOutput::Print("Direct3D failed to create the vertex shader");
+					wereThereErrors = true;
+				}
+				compiledShader->Release();
 			}
-			compiledShader->Release();
+			else
+			{
+				wereThereErrors = true;
+				compiledShader->Release();
+			}
 		}
 		return !wereThereErrors;
 	}
@@ -192,14 +212,22 @@ namespace
 		// Create the fragment shader object
 		bool wereThereErrors = false;
 		{
-			HRESULT result = i_device->CreatePixelShader(reinterpret_cast<DWORD*>(compiledShader->GetBufferPointer()),
-				&i_effect.m_fragmentShader);
-			if (FAILED(result))
+			if (i_device != NULL)
 			{
-				eae6320::UserOutput::Print("Direct3D failed to create the fragment shader");
-				wereThereErrors = true;
+				HRESULT result = i_device->CreatePixelShader(reinterpret_cast<DWORD*>(compiledShader->GetBufferPointer()),
+					&i_effect.m_fragmentShader);
+				if (FAILED(result))
+				{
+					eae6320::UserOutput::Print("Direct3D failed to create the fragment shader");
+					wereThereErrors = true;
+				}
+				compiledShader->Release();
 			}
-			compiledShader->Release();
+			else
+			{
+				wereThereErrors = true;
+				compiledShader->Release();
+			}
 		}
 		return !wereThereErrors;
 	}

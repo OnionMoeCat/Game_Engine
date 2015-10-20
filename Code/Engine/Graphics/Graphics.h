@@ -14,6 +14,7 @@
 #include "CrossPlatformDefine.h"
 #include "Effect.h"
 #include "EffectHelper.h"
+#include "Context.h"
 
 // Interface
 //==========

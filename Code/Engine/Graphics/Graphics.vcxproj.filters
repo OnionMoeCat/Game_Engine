@@ -26,6 +26,10 @@
     <ClCompile Include="Direct3D\EffectHelper.d3d.cpp">
       <Filter>Direct3D</Filter>
     </ClCompile>
+    <ClCompile Include="Context.cpp" />
+    <ClCompile Include="EffectHelper.cpp" />
+    <ClCompile Include="RenderableHelper.cpp" />
+    <ClCompile Include="RenderableManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h" />
@@ -34,6 +38,10 @@
     <ClInclude Include="CrossPlatformDefine.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="EffectHelper.h" />
+    <ClInclude Include="Context.h" />
+    <ClInclude Include="Renderable.h" />
+    <ClInclude Include="RenderableHelper.h" />
+    <ClInclude Include="RenderableManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="OpenGL">

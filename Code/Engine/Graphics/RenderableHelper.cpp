@@ -1,8 +1,7 @@
 // Header Files
 //=============
 
-#include "EntityHelper.h"
-
+#include "RenderableHelper.h"
 
 #include "../UserOutput/UserOutput.h"
 #include "../Graphics/EffectHelper.h"
@@ -13,7 +12,7 @@
 // Interface
 //==========
 
-bool eae6320::Core::EntityHelper::LoadEntityFromFile(Entity& i_entity, const char* const i_vertexPath, const char* const i_fragmentPath, const char* i_meshPath)
+bool eae6320::Graphics::RenderableHelper::LoadEntityFromFile(Renderable& i_entity, const char* const i_vertexPath, const char* const i_fragmentPath, const char* i_meshPath)
 {
 	if (i_entity.m_effect == NULL)
 	{
@@ -21,7 +20,7 @@ bool eae6320::Core::EntityHelper::LoadEntityFromFile(Entity& i_entity, const cha
 	}
 	if (i_entity.m_effect)
 	{
-		if (!eae6320::Graphics::EffectHelper::LoadEffectFromFile(*i_entity.m_effect, i_vertexPath, i_fragmentPath, ))
+		if (!eae6320::Graphics::EffectHelper::LoadEffectFromFile(*i_entity.m_effect, i_vertexPath, i_fragmentPath))
 		{
 			std::stringstream errorMessage;
 			errorMessage << "Fail to load effect from vertex shader file: " << i_vertexPath << " and fragment shader file: " << i_fragmentPath;
@@ -56,7 +55,33 @@ bool eae6320::Core::EntityHelper::LoadEntityFromFile(Entity& i_entity, const cha
 	return true;
 }
 
-bool eae6320::Core::EntityHelper::OffsetPosition(Entity& i_entity, const eae6320::Math::cVector& i_offset_position)
+void eae6320::Graphics::RenderableHelper::OffsetPosition(Renderable& i_entity, const eae6320::Math::cVector& i_offset_position)
 {
-	i_entity.cVector = i_offset_position;
+	i_entity.cVector += i_offset_position;
+}
+
+bool eae6320::Graphics::RenderableHelper::CleanUp(Renderable& i_entity)
+{
+	if (i_entity.m_effect)
+	{
+		if (!eae6320::Graphics::EffectHelper::CleanUp(*i_entity.m_effect))
+		{
+			std::stringstream errorMessage;
+			eae6320::UserOutput::Print("Fail to clean up effect");
+			return false;
+		}
+		i_entity.m_effect = NULL;
+	}
+
+	if (i_entity.m_mesh)
+	{
+		if (!eae6320::Graphics::MeshHelper::CleanUp(*i_entity.m_mesh))
+		{
+			std::stringstream errorMessage;
+			eae6320::UserOutput::Print("Fail to clean up mesh");
+			return false;
+		}
+		i_entity.m_mesh = NULL;
+	}
+	return true;
 }

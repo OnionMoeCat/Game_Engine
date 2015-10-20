@@ -11,6 +11,9 @@
 #include "../../Windows/Functions.h"
 #include "../../../External/OpenGlExtensions/OpenGlExtensions.h"
 #include "../../Math/cVector.h"
+#include "../Renderable.h"
+#include "../RenderableHelper.h"
+#include "../RenderableManager.h"
 
 // Static Data Initialization
 //===========================
@@ -20,15 +23,6 @@ namespace
 	HWND s_renderingWindow = NULL;
 	HDC s_deviceContext = NULL;
 	HGLRC s_openGlRenderingContext = NULL;
-
-	eae6320::Graphics::Mesh s_squareMesh;
-	eae6320::Graphics::Mesh s_triangleMesh1;
-	eae6320::Graphics::Mesh s_triangleMesh2;
-	eae6320::Graphics::Effect s_effect;
-	eae6320::Graphics::Context s_context;
-	eae6320::Math::cVector s_position_offset_triangleMesh1(0.1f, 0.1f);
-	eae6320::Math::cVector s_position_offset_triangleMesh2(-0.1f, 0.1f);
-	eae6320::Math::cVector s_position_offset_squareMesh(0.1f, 0.1f);
 }
 
 // Helper Function Declarations
@@ -36,7 +30,6 @@ namespace
 
 namespace
 {
-	bool CreateContext();
 	bool CreateRenderingContext();
 	bool LoadEffect();
 	bool LoadMeshes();
@@ -63,21 +56,6 @@ bool eae6320::Graphics::Initialize( const HWND i_renderingWindow )
 			UserOutput::Print( errorMessage );
 			goto OnError;
 		}
-	}
-
-	if (!CreateContext())
-	{
-		goto OnError;
-	}
-
-	if (!LoadMeshes())
-	{
-		goto OnError;
-	}
-
-	if ( !LoadEffect() )
-	{
-		goto OnError;
 	}
 
 	return true;
@@ -108,37 +86,23 @@ void eae6320::Graphics::Render()
 	{
 		// Set the vertex and fragment shaders
 		{
-			if (!EffectHelper::Bind(s_effect, s_context))
+			for (unsigned int i = 0; i < RenderableManager::Get().m_list.size(); i++)
 			{
-				assert(false);
+				Renderable& renderable = RenderableManager::Get().m_list[i];
+				if (!EffectHelper::Bind(*renderable.m_effect, Context::Get()))
+				{
+					assert(false);
+				}
+				if (!EffectHelper::SetDrawCallUniforms(*renderable.m_effect, renderable.cVector, Context::Get()))
+				{
+					assert(false);
+				}
+				if (!MeshHelper::DrawMesh(*renderable.m_mesh, Context::Get()))
+				{
+					assert(false);
+				}
 			}
-		}
-		// Render objects from the current streams
-		{
-			if (!EffectHelper::SetDrawCallUniforms(s_effect, s_position_offset_squareMesh, s_context))
-			{
-				assert(false);
-			}
-			if (!MeshHelper::DrawMesh(s_squareMesh, s_context))
-			{
-				assert(false);
-			}
-			if (!EffectHelper::SetDrawCallUniforms(s_effect, s_position_offset_triangleMesh1, s_context))
-			{
-				assert(false);
-			}
-			if (!MeshHelper::DrawMesh(s_triangleMesh1, s_context))
-			{
-				assert(false);
-			}
-			if (!EffectHelper::SetDrawCallUniforms(s_effect, s_position_offset_triangleMesh2, s_context))
-			{
-				assert(false);
-			}
-			if (!MeshHelper::DrawMesh(s_triangleMesh2, s_context))
-			{
-				assert(false);
-			}
+			RenderableManager::Get().CleanUp();
 		}
 	}
 
@@ -157,23 +121,6 @@ bool eae6320::Graphics::ShutDown()
 
 	if ( s_openGlRenderingContext != NULL )
 	{
-		{
-			if (!EffectHelper::CleanUp(s_effect, s_context))
-			{
-				wereThereErrors = true;
-			}
-		}
-
-		{
-			if (!MeshHelper::CleanUp(s_squareMesh, s_context))
-			{
-				wereThereErrors = true;
-			}
-			if (!MeshHelper::CleanUp(s_triangleMesh1, s_context))
-			{
-				wereThereErrors = true;
-			}
-		}
 
 		if ( wglMakeCurrent( s_deviceContext, NULL ) != FALSE )
 		{
@@ -212,11 +159,6 @@ bool eae6320::Graphics::ShutDown()
 
 namespace
 {
-	bool CreateContext()
-	{
-		s_context = {};
-		return true;
-	}
 
 	bool CreateRenderingContext()
 	{
@@ -284,19 +226,4 @@ namespace
 
 		return true;
 	}
-
-	bool LoadEffect()
-	{
-		eae6320::Graphics::EffectHelper::LoadEffectFromFile(s_effect, "data/vertex.shader", "data/fragment.shader", s_context);
-		return true;
-	}
-
-	bool LoadMeshes()
-	{
-		eae6320::Graphics::MeshHelper::LoadMeshFromFile(s_squareMesh, "data/square.mesh", s_context);
-		eae6320::Graphics::MeshHelper::LoadMeshFromFile(s_triangleMesh1, "data/triangle.mesh", s_context);
-		eae6320::Graphics::MeshHelper::LoadMeshFromFile(s_triangleMesh2, "data/triangle.mesh", s_context);
-		return true;
-	}
-
 }

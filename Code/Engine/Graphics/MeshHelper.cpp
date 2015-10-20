@@ -80,6 +80,16 @@ OnExit:
 	return !wereThereErrors;
 }
 
+bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh)
+{
+	return CleanUp(i_mesh, Context::Get());
+}
+
+bool eae6320::Graphics::MeshHelper::LoadMeshFromFile(Mesh& i_mesh, const char* const i_path)
+{
+	return LoadMeshFromFile(i_mesh, i_path, Context::Get());
+}
+
 // Helper Function Definitions
 //============================
 

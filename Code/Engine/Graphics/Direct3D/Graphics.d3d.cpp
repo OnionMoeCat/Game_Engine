@@ -7,6 +7,9 @@
 #include <d3d9.h>
 #include "../../UserOutput/UserOutput.h"
 #include "../../Math/cVector.h"
+#include "../Renderable.h"
+#include "../RenderableHelper.h"
+#include "../RenderableManager.h"
 
 // Static Data Initialization
 //===========================
@@ -15,15 +18,6 @@ namespace
 	HWND s_renderingWindow = NULL;
 	IDirect3D9* s_direct3dInterface = NULL;
 	IDirect3DDevice9* s_direct3dDevice = NULL;
-
-	eae6320::Graphics::Mesh s_squareMesh;
-	eae6320::Graphics::Mesh s_triangleMesh1;
-	eae6320::Graphics::Mesh s_triangleMesh2;
-	eae6320::Graphics::Effect s_effect;
-	eae6320::Graphics::Context s_context;
-	eae6320::Math::cVector s_position_offset_triangleMesh1(0.1f, 0.1f);
-	eae6320::Math::cVector s_position_offset_triangleMesh2(-0.1f, 0.1f);
-	eae6320::Math::cVector s_position_offset_squareMesh(0.1f, 0.1f);
 }
 
 // Helper Function Declarations
@@ -56,14 +50,6 @@ bool eae6320::Graphics::Initialize( const HWND i_renderingWindow )
 		goto OnError;
 	}
 	if ( !CreateContext() )
-	{
-		goto OnError;
-	}
-	if ( !LoadMeshes() )
-	{
-		goto OnError;
-	}
-	if ( !LoadEffect() )
 	{
 		goto OnError;
 	}
@@ -103,40 +89,23 @@ void eae6320::Graphics::Render()
 		HRESULT result = s_direct3dDevice->BeginScene();
 		assert( SUCCEEDED( result ) );
 		{
-			// Set the shaders
+			for (unsigned int i = 0; i < RenderableManager::Get().m_list.size(); i++)
 			{
-				if (!EffectHelper::Bind(s_effect, s_context))
+				Renderable& renderable = RenderableManager::Get().m_list[i];
+				if (!EffectHelper::Bind(*renderable.m_effect, Context::Get()))
+				{
+					assert(false);
+				}
+				if (!EffectHelper::SetDrawCallUniforms(*renderable.m_effect, renderable.cVector, Context::Get()))
+				{
+					assert(false);
+				}
+				if (!MeshHelper::DrawMesh(*renderable.m_mesh, Context::Get()))
 				{
 					assert(false);
 				}
 			}
-			// Render objects from the current streams
-			{
-				if (!EffectHelper::SetDrawCallUniforms(s_effect, s_position_offset_squareMesh, s_context))
-				{
-					assert(false);
-				}
-				if (!MeshHelper::DrawMesh(s_squareMesh, s_context))
-				{
-					assert( false );
-				}
-				if (!EffectHelper::SetDrawCallUniforms(s_effect, s_position_offset_triangleMesh1, s_context))
-				{
-					assert(false);
-				}
-				if (!MeshHelper::DrawMesh(s_triangleMesh1, s_context))
-				{
-					assert( false );
-				}
-				if (!EffectHelper::SetDrawCallUniforms(s_effect, s_position_offset_triangleMesh2, s_context))
-				{
-					assert(false);
-				}
-				if (!MeshHelper::DrawMesh(s_triangleMesh2, s_context))
-				{
-					assert(false);
-				}
-			}
+			RenderableManager::Get().CleanUp();
 		}
 		result = s_direct3dDevice->EndScene();
 		assert( SUCCEEDED( result ) );
@@ -161,24 +130,10 @@ bool eae6320::Graphics::ShutDown()
 
 	if ( s_direct3dInterface )
 	{
-		if ( s_direct3dDevice )
+		if (s_direct3dDevice)
 		{
-			{
-				if (!EffectHelper::CleanUp(s_effect, s_context))
-				{
-					wereThereErrors = true;
-				}
-			}
-			{
-				if (!MeshHelper::CleanUp(s_squareMesh, s_context))
-				{
-					wereThereErrors = true;
-				}
-				if (!MeshHelper::CleanUp(s_triangleMesh1, s_context))
-				{
-					wereThereErrors = true;
-				}
-			}
+			RenderableManager::Get().CleanUp();	
+
 			s_direct3dDevice->Release();
 			s_direct3dDevice = NULL;
 		}
@@ -198,7 +153,7 @@ namespace
 {
 	bool CreateContext()
 	{
-		s_context = {s_direct3dDevice};
+		eae6320::Graphics::Context::Get().device = s_direct3dDevice;
 		return true;
 	}
 
@@ -251,19 +206,4 @@ namespace
 			return false;
 		}
 	}
-
-	bool LoadEffect()
-	{
-		eae6320::Graphics::EffectHelper::LoadEffectFromFile(s_effect, "data/vertex.shader", "data/fragment.shader", s_context);
-		return true;
-	}
-	
-	bool LoadMeshes()
-	{
-		eae6320::Graphics::MeshHelper::LoadMeshFromFile(s_squareMesh, "data/square.mesh", s_context);
-		eae6320::Graphics::MeshHelper::LoadMeshFromFile(s_triangleMesh1, "data/triangle.mesh", s_context);
-		eae6320::Graphics::MeshHelper::LoadMeshFromFile(s_triangleMesh2, "data/triangle.mesh", s_context);
-		return true;
-	}
-
 }

@@ -26,12 +26,6 @@ namespace eae6320
 {
 	namespace Graphics
 	{
-		struct Context
-		{
-#if defined( EAE6320_PLATFORM_D3D )
-			IDirect3DDevice9* device;
-#endif
-		};
 
 #if defined( EAE6320_PLATFORM_D3D )
 		typedef void* BufferDataPtr;

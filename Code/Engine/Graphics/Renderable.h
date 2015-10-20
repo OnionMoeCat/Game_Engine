@@ -16,9 +16,9 @@ This file contains the function declarations for mesh
 
 namespace eae6320
 {
-	namespace Core
+	namespace Graphics
 	{
-		struct Entity
+		struct Renderable
 		{
 			eae6320::Graphics::Mesh* m_mesh = NULL;
 			eae6320::Graphics::Effect* m_effect = NULL;

@@ -17,6 +17,12 @@
 //#include "../../Engine/Graphics/Graphics.h"
 // UserOutput.h is UserOutput system
 #include "../../Engine/UserOutput/UserOutput.h"
+#include "../../Engine/Math/cVector.h"
+#include "../../Engine/UserInput/UserInput.h"
+#include "../../Engine/Time/Time.h"
+#include "../../Engine/Graphics/Renderable.h"
+#include "../../Engine/Graphics/RenderableHelper.h"
+#include "../../Engine/Graphics/RenderableManager.h"
 
 namespace eae6320
 {
@@ -49,6 +55,19 @@ namespace
 	// your program could have problems when it is run at the same time on the same computer
 	// as one of your classmate's
 	const char* s_mainWindowClass_name = "Yuchen Zhang's Main Window Class";
+
+	eae6320::Graphics::Renderable s_entity_rectangle;
+	eae6320::Graphics::Renderable s_entity_triangle1;
+	eae6320::Graphics::Renderable s_entity_triangle2;
+}
+
+// Helper Functions
+//=================
+
+namespace
+{
+	void UpdateEntities();
+	bool Initialize();
 }
 
 // Main Function
@@ -63,6 +82,13 @@ int CreateMainWindowAndReturnExitCodeWhenItCloses( const HINSTANCE i_thisInstanc
 		eae6320::UserOutput::Initialize(s_mainWindow);
 		// Once we get the window, initialize Graphics system
 		eae6320::Graphics::Initialize(s_mainWindow);
+		// Initialize rectangle and triangles
+		if (!Initialize())
+		{
+			eae6320::Graphics::ShutDown();
+			eae6320::UserOutput::Finalize();
+			return -1;
+		}
 		// If the main window was successfully created wait for it to be closed
 		const int exitCode = WaitForMainWindowToCloseAndReturnExitCode( i_thisInstanceOfTheProgram );
 		// UserOutput no longer need the window 
@@ -120,6 +146,18 @@ int WaitForMainWindowToCloseAndReturnExitCode( const HINSTANCE i_thisInstanceOfT
 	// Wait for the main window to close
 	int exitCode;
 	bool wereThereErrors = WaitForMainWindowToClose( exitCode );
+	if (!eae6320::Graphics::RenderableHelper::CleanUp(s_entity_rectangle))
+	{
+		wereThereErrors = true;
+	}
+	if (!eae6320::Graphics::RenderableHelper::CleanUp(s_entity_triangle1))
+	{
+		wereThereErrors = true;
+	}
+	if (!eae6320::Graphics::RenderableHelper::CleanUp(s_entity_triangle2))
+	{
+		wereThereErrors = true;
+	}
 	// Shutdown Graphis system before closing the window
 	eae6320::Graphics::ShutDown();
 	// Clean up anything that was created/registered/initialized
@@ -506,6 +544,11 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			// A real game might have something like the following:
 			//	someGameClass.OnNewFrame();
 			// or similar, though.)
+			eae6320::Time::OnNewFrame();
+			UpdateEntities();
+			eae6320::Graphics::RenderableManager::Get().Submit(s_entity_rectangle);
+			eae6320::Graphics::RenderableManager::Get().Submit(s_entity_triangle1);
+			eae6320::Graphics::RenderableManager::Get().Submit(s_entity_triangle2);
 			eae6320::Graphics::Render();
 		}
 		else
@@ -533,3 +576,70 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 
 	return true;
 }
+
+namespace
+{
+	void UpdateEntities()
+	{
+		eae6320::Math::cVector offset(0.0f, 0.0f);
+		{
+			// Get the direction
+			{
+				if (eae6320::UserInput::IsKeyPressed(VK_LEFT))
+				{
+					offset.x -= 1.0f;
+				}
+				if (eae6320::UserInput::IsKeyPressed(VK_RIGHT))
+				{
+					offset.x += 1.0f;
+				}
+				if (eae6320::UserInput::IsKeyPressed(VK_UP))
+				{
+					offset.y += 1.0f;
+				}
+				if (eae6320::UserInput::IsKeyPressed(VK_DOWN))
+				{
+					offset.y -= 1.0f;
+				}
+			}
+			// Get the speed
+			const float unitsPerSecond = 1.0f;	// This is arbitrary
+			const float unitsToMove = unitsPerSecond * eae6320::Time::GetSecondsElapsedThisFrame();	// This makes the speed frame-rate-independent
+																									// Normalize the offset
+			offset *= unitsToMove;
+		}
+		// The following line assumes there is some "entity" for the rectangle that the game code controls
+		// that encapsulates a mesh, an effect, and a position offset.
+		// You don't have to do it this way for your assignment!
+		// You just need a way to update the position offset associated with the colorful rectangle.
+		eae6320::Graphics::RenderableHelper::OffsetPosition(s_entity_rectangle, offset);
+	}
+
+	bool Initialize()
+	{
+		if (!eae6320::Graphics::RenderableHelper::LoadEntityFromFile(s_entity_rectangle, "data/vertex.shader", "data/fragment.shader", "data/square.mesh"))
+		{
+			return false;
+		}
+		if (!eae6320::Graphics::RenderableHelper::LoadEntityFromFile(s_entity_triangle1, "data/vertex.shader", "data/fragment.shader", "data/triangle.mesh"))
+		{
+			eae6320::Graphics::RenderableHelper::CleanUp(s_entity_rectangle);
+			return false;
+		}
+		if (!eae6320::Graphics::RenderableHelper::LoadEntityFromFile(s_entity_triangle2, "data/vertex.shader", "data/fragment.shader", "data/triangle.mesh"))
+		{
+			eae6320::Graphics::RenderableHelper::CleanUp(s_entity_rectangle);
+			eae6320::Graphics::RenderableHelper::CleanUp(s_entity_triangle1);
+			return false;
+		}
+		eae6320::Math::cVector rectangle_position_offset(0.0f, 0.0f, 0.0f);
+		eae6320::Graphics::RenderableHelper::OffsetPosition(s_entity_rectangle, rectangle_position_offset);
+		eae6320::Math::cVector triangle1_position_offset(0.0f, -0.1f, 0.0f);
+		eae6320::Graphics::RenderableHelper::OffsetPosition(s_entity_triangle1, triangle1_position_offset);
+		eae6320::Math::cVector triangle2_position_offset(0.0f, 0.1f, 0.0f);
+		eae6320::Graphics::RenderableHelper::OffsetPosition(s_entity_triangle2, triangle2_position_offset);
+
+		return true;
+	}
+}
+

@@ -7,6 +7,7 @@ This file contains the function declarations for MeshHelper
 
 // Header Files
 //=============
+#include "Context.h"
 #include "Mesh.h"
 #include "CrossPlatformDefine.h"
 
@@ -22,10 +23,12 @@ namespace eae6320
 		private:
 			bool static SetVertexBuffer(Mesh& i_mesh, const BufferDataPtr& i_vertexBufferData, const unsigned int i_vertexCount, const Context& i_context);
 			bool static SetIndexBuffer(Mesh& i_mesh, const BufferDataPtr& i_indexBufferData, const unsigned int i_primitiveCount, const Context& i_context);
+			bool static LoadMeshFromFile(Mesh& i_mesh, const char* const i_path, const Context& i_context);
+			bool static CleanUp(Mesh& i_mesh, const Context& i_context);
 		public:
 			bool static DrawMesh(const Mesh& i_mesh, const Context& i_context);
-			bool static CleanUp(Mesh& i_mesh, const Context& i_context);
-			bool static LoadMeshFromFile(Mesh& i_mesh, const char* const i_path, const Context& i_context);
+			bool static CleanUp(Mesh& i_mesh);
+			bool static LoadMeshFromFile(Mesh& i_mesh, const char* const i_path);
 		};
 	}
 }

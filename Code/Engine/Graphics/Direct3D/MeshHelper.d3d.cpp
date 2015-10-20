@@ -21,6 +21,12 @@ namespace
 
 bool eae6320::Graphics::MeshHelper::DrawMesh(const Mesh& i_mesh, const Context& i_context)
 {
+	{
+		if (i_context.device == NULL)
+		{
+			return false;
+		}
+	}
 	// Bind a specific vertex buffer to the device as a data source
 	{
 		// There can be multiple streams of data feeding the display adaptor at the same time
@@ -69,6 +75,12 @@ bool eae6320::Graphics::MeshHelper::DrawMesh(const Mesh& i_mesh, const Context& 
 
 bool eae6320::Graphics::MeshHelper::SetIndexBuffer(Mesh& i_mesh, const BufferDataPtr& i_indexBufferData, const unsigned int i_primitiveCount, const Context& i_context)
 {
+	{
+		if (i_context.device == NULL)
+		{
+			return false;
+		}
+	}
 	// The usage tells Direct3D how this vertex buffer will be used
 	DWORD usage = 0;
 	{
@@ -139,6 +151,12 @@ bool eae6320::Graphics::MeshHelper::SetIndexBuffer(Mesh& i_mesh, const BufferDat
 
 bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDataPtr& i_vertexBufferData, const unsigned int i_vertexCount, const Context& i_context)
 {
+	{
+		if (i_context.device == NULL)
+		{
+			return false;
+		}
+	}
 	// The usage tells Direct3D how this vertex buffer will be used
 	DWORD usage = 0;
 	{
@@ -251,6 +269,12 @@ bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDa
 
 bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh, const Context& i_context)
 {
+	{
+		if (i_context.device == NULL)
+		{
+			return false;
+		}
+	}
 	if (i_mesh.m_vertexBuffer)
 	{
 		i_mesh.m_vertexBuffer->Release();
