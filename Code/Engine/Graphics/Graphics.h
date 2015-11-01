@@ -11,7 +11,7 @@
 #include "../Windows/Includes.h"
 #include "Mesh.h"
 #include "MeshHelper.h"
-#include "CrossPlatformDefine.h"
+#include "Includes.h"
 #include "Effect.h"
 #include "EffectHelper.h"
 #include "Context.h"

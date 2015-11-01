@@ -30,6 +30,7 @@ namespace
 
 namespace
 {
+	bool CreateContext();
 	bool CreateRenderingContext();
 	bool LoadEffect();
 	bool LoadMeshes();
@@ -58,61 +59,17 @@ bool eae6320::Graphics::Initialize( const HWND i_renderingWindow )
 		}
 	}
 
+	if (!CreateContext())
+	{
+		goto OnError;
+	}
+
 	return true;
 
 OnError:
 
 	ShutDown();
 	return false;
-}
-
-void eae6320::Graphics::Render()
-{
-	// Every frame an entirely new image will be created.
-	// Before drawing anything, then, the previous image will be erased
-	// by "clearing" the image buffer (filling it with a solid color)
-	{
-		// Black is usually used
-		glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-		assert( glGetError() == GL_NO_ERROR );
-		// In addition to the color, "depth" and "stencil" can also be cleared,
-		// but for now we only care about color
-		const GLbitfield clearColor = GL_COLOR_BUFFER_BIT;
-		glClear( clearColor );
-		assert( glGetError() == GL_NO_ERROR );
-	}
-
-	// The actual function calls that draw geometry
-	{
-		// Set the vertex and fragment shaders
-		{
-			for (unsigned int i = 0; i < RenderableManager::Get().m_list.size(); i++)
-			{
-				Renderable& renderable = RenderableManager::Get().m_list[i];
-				if (!EffectHelper::Bind(*renderable.m_effect, Context::Get()))
-				{
-					assert(false);
-				}
-				if (!EffectHelper::SetDrawCallUniforms(*renderable.m_effect, renderable.cVector, Context::Get()))
-				{
-					assert(false);
-				}
-				if (!MeshHelper::DrawMesh(*renderable.m_mesh, Context::Get()))
-				{
-					assert(false);
-				}
-			}
-			RenderableManager::Get().CleanUp();
-		}
-	}
-
-	// Everything has been drawn to the "back buffer", which is just an image in memory.
-	// In order to display it, the contents of the back buffer must be swapped with the "front buffer"
-	// (which is what the user sees)
-	{
-		BOOL result = SwapBuffers( s_deviceContext );
-		assert( result != FALSE );
-	}
 }
 
 bool eae6320::Graphics::ShutDown()
@@ -159,6 +116,11 @@ bool eae6320::Graphics::ShutDown()
 
 namespace
 {
+	bool CreateContext()
+	{
+		eae6320::Graphics::Context::Get().device = s_deviceContext;
+		return true;
+	}
 
 	bool CreateRenderingContext()
 	{
@@ -225,5 +187,45 @@ namespace
 		}
 
 		return true;
+	}
+
+	bool Clear(eae6320::Graphics::sColor color, eae6320::Graphics::Context context)
+	{
+		bool wereThereErrors = false;
+		// Black is usually used
+		glClearColor(color.r, color.g, color.b, color.a);
+		if (glGetError() != GL_NO_ERROR)
+		{
+			wereThereErrors = true;
+		}
+		// In addition to the color, "depth" and "stencil" can also be cleared,
+		// but for now we only care about color
+		const GLbitfield clearColor = GL_COLOR_BUFFER_BIT;
+		glClear(clearColor);
+		if (glGetError() != GL_NO_ERROR)
+		{
+			wereThereErrors = true;
+		}
+		return !wereThereErrors;
+	}
+
+	bool OnSubmitRenderCommands_start(eae6320::Graphics::Context context)
+	{
+		return true;
+	}
+
+	bool OnSubmitRenderCommands_end(eae6320::Graphics::Context context)
+	{
+		return true;
+	}
+
+	bool DisplayRenderedBuffer(eae6320::Graphics::Context context)
+	{
+		// Everything has been drawn to the "back buffer", which is just an image in memory.
+		// In order to display it, the contents of the back buffer must be swapped with the "front buffer"
+		// (which is what the user sees)
+		
+		BOOL result = SwapBuffers(context.device);
+		return result == TRUE;		
 	}
 }

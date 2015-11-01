@@ -30,12 +30,12 @@
     <ClCompile Include="EffectHelper.cpp" />
     <ClCompile Include="RenderableHelper.cpp" />
     <ClCompile Include="RenderableManager.cpp" />
+    <ClCompile Include="Graphics.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshHelper.h" />
-    <ClInclude Include="CrossPlatformDefine.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="EffectHelper.h" />
     <ClInclude Include="Context.h" />

@@ -62,68 +62,6 @@ OnError:
 	return false;
 }
 
-void eae6320::Graphics::Render()
-{
-	// Every frame an entirely new image will be created.
-	// Before drawing anything, then, the previous image will be erased
-	// by "clearing" the image buffer (filling it with a solid color)
-	{
-		const D3DRECT* subRectanglesToClear = NULL;
-		const DWORD subRectangleCount = 0;
-		const DWORD clearTheRenderTarget = D3DCLEAR_TARGET;
-		D3DCOLOR clearColor;
-		{
-			// Black is usually used:
-			clearColor = D3DCOLOR_XRGB( 0, 0, 0 );
-		}
-		const float noZBuffer = 0.0f;
-		const DWORD noStencilBuffer = 0;
-		HRESULT result = s_direct3dDevice->Clear( subRectangleCount, subRectanglesToClear,
-			clearTheRenderTarget, clearColor, noZBuffer, noStencilBuffer );
-		assert( SUCCEEDED( result ) );
-	}
-
-	// The actual function calls that draw geometry must be made between paired calls to
-	// BeginScene() and EndScene()
-	{
-		HRESULT result = s_direct3dDevice->BeginScene();
-		assert( SUCCEEDED( result ) );
-		{
-			for (unsigned int i = 0; i < RenderableManager::Get().m_list.size(); i++)
-			{
-				Renderable& renderable = RenderableManager::Get().m_list[i];
-				if (!EffectHelper::Bind(*renderable.m_effect, Context::Get()))
-				{
-					assert(false);
-				}
-				if (!EffectHelper::SetDrawCallUniforms(*renderable.m_effect, renderable.cVector, Context::Get()))
-				{
-					assert(false);
-				}
-				if (!MeshHelper::DrawMesh(*renderable.m_mesh, Context::Get()))
-				{
-					assert(false);
-				}
-			}
-			RenderableManager::Get().CleanUp();
-		}
-		result = s_direct3dDevice->EndScene();
-		assert( SUCCEEDED( result ) );
-	}
-
-	// Everything has been drawn to the "back buffer", which is just an image in memory.
-	// In order to display it, the contents of the back buffer must be "presented"
-	// (to the front buffer)
-	{
-		const RECT* noSourceRectangle = NULL;
-		const RECT* noDestinationRectangle = NULL;
-		const HWND useDefaultWindow = NULL;
-		const RGNDATA* noDirtyRegion = NULL;
-		HRESULT result = s_direct3dDevice->Present( noSourceRectangle, noDestinationRectangle, useDefaultWindow, noDirtyRegion );
-		assert( SUCCEEDED( result ) );
-	}
-}
-
 bool eae6320::Graphics::ShutDown()
 {
 	bool wereThereErrors = false;
@@ -205,5 +143,45 @@ namespace
 			eae6320::UserOutput::Print( "DirectX failed to create a Direct3D9 interface" );
 			return false;
 		}
+	}
+
+	bool Clear(eae6320::Graphics::sColor color, eae6320::Graphics::Context context)
+	{
+		const D3DRECT* subRectanglesToClear = NULL;
+		const DWORD subRectangleCount = 0;
+		const DWORD clearTheRenderTarget = D3DCLEAR_TARGET;
+		D3DCOLOR clearColor;
+		{
+			// Black is usually used:
+			clearColor = D3DCOLOR_RGBA(eae6320::Graphics::ColorHelper::ColorFloatToUint8(color.r),
+				eae6320::Graphics::ColorHelper::ColorFloatToUint8(color.g),
+				eae6320::Graphics::ColorHelper::ColorFloatToUint8(color.b),
+				eae6320::Graphics::ColorHelper::ColorFloatToUint8(color.a));
+		}
+		const float noZBuffer = 0.0f;
+		const DWORD noStencilBuffer = 0;
+		HRESULT result = context.device->Clear(subRectangleCount, subRectanglesToClear,
+			clearTheRenderTarget, clearColor, noZBuffer, noStencilBuffer);
+		return SUCCEEDED(result);
+	}
+
+	bool OnSubmitRenderCommands_start(eae6320::Graphics::Context context)
+	{
+		return context.device->BeginScene();
+	}
+	
+	bool OnSubmitRenderCommands_end(eae6320::Graphics::Context context)
+	{
+		return context.device->EndScene();
+	}
+	
+	bool DisplayRenderedBuffer(eae6320::Graphics::Context context)
+	{
+		const RECT* noSourceRectangle = NULL;
+		const RECT* noDestinationRectangle = NULL;
+		const HWND useDefaultWindow = NULL;
+		const RGNDATA* noDirtyRegion = NULL;
+		HRESULT result = s_direct3dDevice->Present(noSourceRectangle, noDestinationRectangle, useDefaultWindow, noDirtyRegion);
+		return SUCCEEDED(result);
 	}
 }

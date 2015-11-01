@@ -7,7 +7,7 @@
 #include <sstream>
 #include "../../Engine/Windows/Functions.h"
 #include "../../External/Lua/Includes.h"
-#include "../../Engine/Graphics/CrossPlatformDefine.h"
+#include "../../Engine/Graphics/Includes.h"
 
 // Static Data Initialization
 //===========================

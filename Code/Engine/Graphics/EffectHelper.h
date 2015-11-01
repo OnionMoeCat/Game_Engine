@@ -9,7 +9,7 @@ This file contains the function declarations for MeshHelper
 //=============
 #include "Context.h"
 #include "Effect.h"
-#include "CrossPlatformDefine.h"
+#include "Includes.h"
 #include "../Math/cVector.h"
 
 // Interface

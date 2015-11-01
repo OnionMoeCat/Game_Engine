@@ -37,6 +37,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="EffectHelper.cpp" />
+    <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="MeshHelper.cpp" />
     <ClCompile Include="OpenGL\EffectHelper.gl.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -59,7 +60,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.h" />
-    <ClInclude Include="CrossPlatformDefine.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="EffectHelper.h" />
     <ClInclude Include="Graphics.h" />
