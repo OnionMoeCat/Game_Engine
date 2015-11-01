@@ -19,7 +19,7 @@ namespace eae6320
 	{
 		struct RenderableHelper
 		{
-			bool static LoadEntityFromFile(Renderable& i_entity, const char* const i_vertexPath, const char* const i_fragmentPath, const char* i_meshPath);
+			bool static LoadEntityFromFile(Renderable& i_entity, const char* const i_effectPath, const char* i_meshPath);
 			void static OffsetPosition(Renderable& i_entity, const eae6320::Math::cVector& i_offset_position);
 			bool static CleanUp(Renderable& i_entity);
 		};

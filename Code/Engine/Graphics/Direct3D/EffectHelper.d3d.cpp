@@ -5,8 +5,10 @@
 
 #include "../../Windows/Includes.h"
 
-#include <sstream>
 #include "../../UserOutput/UserOutput.h"
+#include <assert.h>
+#include <sstream>
+#include "../../Windows/Functions.h"
 
 // Helper Function Declarations
 //=============================
@@ -15,6 +17,7 @@ namespace
 {
 	bool LoadVertexShader(eae6320::Graphics::Effect& i_effect, const char* const i_vertexPath, IDirect3DDevice9* i_device);
 	bool LoadFragmentShader(eae6320::Graphics::Effect& i_effect, const char* const i_fragmentPath, IDirect3DDevice9* i_device);
+	bool ReadDataFromFile(const char* const i_path, void** i_temporaryBuffer);
 }
 
 bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const Context& i_context)
@@ -100,135 +103,194 @@ namespace
 {
 	bool LoadVertexShader(eae6320::Graphics::Effect& i_effect, const char* const i_vertexPath, IDirect3DDevice9* i_device)
 	{
-		// Load the source code from file and compile it
-		ID3DXBuffer* compiledShader;
+		bool wereThereErrors = false;
+		// Load binary vertex shader file
+		void* temporaryBuffer = NULL;
 		{
-			const D3DXMACRO defines[] =
+			if (!ReadDataFromFile(i_vertexPath, &temporaryBuffer))
 			{
-				{ "EAE6320_PLATFORM_D3D", "1" },
-				{ NULL, NULL }
-			};
-			ID3DXInclude* noIncludes = NULL;
-			const char* entryPoint = "main";
-			const char* profile = "vs_3_0";
-			const DWORD noFlags = 0;
-			ID3DXBuffer* errorMessages = NULL;
-			ID3DXConstantTable* vertexShaderConstantTable = NULL;
-			HRESULT result = D3DXCompileShaderFromFile(i_vertexPath, defines, noIncludes, entryPoint, profile, noFlags,
-				&compiledShader, &errorMessages, &vertexShaderConstantTable);
-			if (SUCCEEDED(result))
-			{
-				if (errorMessages)
-				{
-					errorMessages->Release();
-				}
-				i_effect.m_vertexShaderConstantTable = vertexShaderConstantTable;
-			}
-			else
-			{
-				if (errorMessages)
-				{
-					std::stringstream errorMessage;
-					errorMessage << "Direct3D failed to compile the vertex shader from the file " << i_vertexPath
-						<< ":\n" << reinterpret_cast<char*>(errorMessages->GetBufferPointer());
-					eae6320::UserOutput::Print(errorMessage.str());
-					errorMessages->Release();
-				}
-				else
-				{
-					std::stringstream errorMessage;
-					errorMessage << "Direct3D failed to compile the vertex shader from the file " << i_vertexPath;
-					eae6320::UserOutput::Print(errorMessage.str());
-				}
-				return false;
+				wereThereErrors = true;
+				goto OnExit;
 			}
 		}
 		// Create the vertex shader object
-		bool wereThereErrors = false;
 		{
 			if (i_device != NULL)
 			{
-				HRESULT result = i_device->CreateVertexShader(reinterpret_cast<DWORD*>(compiledShader->GetBufferPointer()),
+				HRESULT result = i_device->CreateVertexShader(reinterpret_cast<DWORD*>(temporaryBuffer),
 					&i_effect.m_vertexShader);
 				if (FAILED(result))
 				{
 					eae6320::UserOutput::Print("Direct3D failed to create the vertex shader");
 					wereThereErrors = true;
+					goto OnExit;
 				}
-				compiledShader->Release();
+
+				ID3DXConstantTable* vertexShaderConstantTable = NULL;
+				result = D3DXGetShaderConstantTable(reinterpret_cast<const DWORD*>(temporaryBuffer), &vertexShaderConstantTable);
+				if (FAILED(result))
+				{
+					eae6320::UserOutput::Print("Direct3D failed to load constant table of vertex shader");
+					wereThereErrors = true;
+					goto OnExit;
+				}
+				else
+				{
+					i_effect.m_vertexShaderConstantTable = vertexShaderConstantTable;
+				}
 			}
 			else
 			{
 				wereThereErrors = true;
-				compiledShader->Release();
+				goto OnExit;
 			}
+		}
+
+	OnExit:
+
+		if (temporaryBuffer != NULL)
+		{
+			free(temporaryBuffer);
 		}
 		return !wereThereErrors;
 	}
 	bool LoadFragmentShader(eae6320::Graphics::Effect& i_effect, const char* const i_fragmentPath, IDirect3DDevice9* i_device)
 	{
-		// Load the source code from file and compile it
-		ID3DXBuffer* compiledShader;
+		bool wereThereErrors = false;
+		// Load binary fragment shader file
+		void* temporaryBuffer = NULL;
 		{
-			const D3DXMACRO defines[] =
+			if (!ReadDataFromFile(i_fragmentPath, &temporaryBuffer))
 			{
-				{ "EAE6320_PLATFORM_D3D", "1" },
-				{ NULL, NULL }
-			};
-			ID3DXInclude* noIncludes = NULL;
-			const char* entryPoint = "main";
-			const char* profile = "ps_3_0";
-			const DWORD noFlags = 0;
-			ID3DXBuffer* errorMessages = NULL;
-			ID3DXConstantTable** noConstants = NULL;
-			HRESULT result = D3DXCompileShaderFromFile(i_fragmentPath, defines, noIncludes, entryPoint, profile, noFlags,
-				&compiledShader, &errorMessages, noConstants);
-			if (SUCCEEDED(result))
-			{
-				if (errorMessages)
-				{
-					errorMessages->Release();
-				}
-			}
-			else
-			{
-				if (errorMessages)
-				{
-					std::stringstream errorMessage;
-					errorMessage << "Direct3D failed to compile the fragment shader from the file " << i_fragmentPath
-						<< ":\n" << reinterpret_cast<char*>(errorMessages->GetBufferPointer());
-					eae6320::UserOutput::Print(errorMessage.str());
-					errorMessages->Release();
-				}
-				else
-				{
-					std::stringstream errorMessage;
-					errorMessage << "Direct3D failed to compile the fragment shader from the file " << i_fragmentPath;
-					eae6320::UserOutput::Print(errorMessage.str());
-				}
-				return false;
+				wereThereErrors = true;
+				goto OnExit;
 			}
 		}
 		// Create the fragment shader object
-		bool wereThereErrors = false;
 		{
 			if (i_device != NULL)
 			{
-				HRESULT result = i_device->CreatePixelShader(reinterpret_cast<DWORD*>(compiledShader->GetBufferPointer()),
+				HRESULT result = i_device->CreatePixelShader(reinterpret_cast<DWORD*>(temporaryBuffer),
 					&i_effect.m_fragmentShader);
 				if (FAILED(result))
 				{
 					eae6320::UserOutput::Print("Direct3D failed to create the fragment shader");
 					wereThereErrors = true;
 				}
-				compiledShader->Release();
 			}
 			else
 			{
 				wereThereErrors = true;
-				compiledShader->Release();
 			}
 		}
+
+	OnExit:
+
+		if (temporaryBuffer != NULL)
+		{
+			free(temporaryBuffer);
+		}
+		return !wereThereErrors;
+	}
+}
+
+namespace
+{
+	bool ReadDataFromFile(const char* const i_path, void** i_temporaryBuffer)
+	{
+		bool wereThereErrors = false;
+
+		size_t size = 0;
+		HANDLE fileHandle = INVALID_HANDLE_VALUE;
+		void* temporaryBuffer = NULL;
+
+		// Open the file
+		{
+			const DWORD desiredAccess = FILE_GENERIC_READ;
+			const DWORD otherProgramsCanStillReadTheFile = FILE_SHARE_READ;
+			SECURITY_ATTRIBUTES* useDefaultSecurity = NULL;
+			const DWORD onlySucceedIfFileExists = OPEN_EXISTING;
+			const DWORD useDefaultAttributes = FILE_ATTRIBUTE_NORMAL;
+			const HANDLE dontUseTemplateFile = NULL;
+			fileHandle = CreateFile(i_path, desiredAccess, otherProgramsCanStillReadTheFile,
+				useDefaultSecurity, onlySucceedIfFileExists, useDefaultAttributes, dontUseTemplateFile);
+			if (fileHandle == INVALID_HANDLE_VALUE)
+			{
+				wereThereErrors = true;
+				std::string windowsErrorMessage = eae6320::GetLastWindowsError();
+				std::stringstream errorMessage;
+				errorMessage << "Windows failed to open file \"" << i_path << "\": " << windowsErrorMessage;
+				eae6320::UserOutput::Print(errorMessage.str());
+				goto OnExit;
+			}
+		}
+
+		// Get the file's size
+		{
+			LARGE_INTEGER fileSize_integer;
+			if (GetFileSizeEx(fileHandle, &fileSize_integer) != FALSE)
+			{
+				assert(fileSize_integer.QuadPart <= SIZE_MAX);
+				size = static_cast<size_t>(fileSize_integer.QuadPart);
+			}
+			else
+			{
+				wereThereErrors = true;
+				std::string windowsErrorMessage = eae6320::GetLastWindowsError();
+				std::stringstream errorMessage;
+				errorMessage << "Windows failed to get the size of file \"" << i_path << "\": " << windowsErrorMessage;
+				eae6320::UserOutput::Print(errorMessage.str());
+				goto OnExit;
+			}
+		}
+
+		// Read the file's contents into temporary memory and assign them to variables
+		{
+			temporaryBuffer = malloc(size);
+
+			if (temporaryBuffer)
+			{
+				DWORD bytesReadCount;
+				OVERLAPPED* readSynchronously = NULL;
+				if (ReadFile(fileHandle, temporaryBuffer, static_cast<DWORD>(size),
+					&bytesReadCount, readSynchronously) == FALSE)
+				{
+					wereThereErrors = true;
+					std::string windowsErrorMessage = eae6320::GetLastWindowsError();
+					std::stringstream errorMessage;
+					errorMessage << "Windows failed to read the contents of file \"" << i_path << "\": " << windowsErrorMessage;
+					eae6320::UserOutput::Print(errorMessage.str());
+					goto OnExit;
+				}
+				*i_temporaryBuffer = temporaryBuffer;
+			}
+			else
+			{
+				wereThereErrors = true;
+				std::stringstream errorMessage;
+				errorMessage << "Failed to allocate " << size << " bytes to read file \"" << i_path << "\"";
+				eae6320::UserOutput::Print(errorMessage.str());
+				goto OnExit;
+			}
+		}
+
+	OnExit:
+
+		if (fileHandle != INVALID_HANDLE_VALUE)
+		{
+			if (CloseHandle(fileHandle) == FALSE)
+			{
+				wereThereErrors = true;
+				std::string windowsError = eae6320::GetLastWindowsError();
+				std::stringstream errorMessage;
+				errorMessage << "Windows failed to close file \"" << i_path << "\": " << windowsError;
+				eae6320::UserOutput::Print(errorMessage.str());
+			}
+			fileHandle = INVALID_HANDLE_VALUE;
+		}
+
+		temporaryBuffer = NULL;
+
 		return !wereThereErrors;
 	}
 }

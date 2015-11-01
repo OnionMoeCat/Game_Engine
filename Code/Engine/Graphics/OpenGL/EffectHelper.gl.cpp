@@ -240,11 +240,9 @@ namespace
 			}
 			// Set the source code into the shader
 			{
-				const GLsizei shaderSourceCount = 3;
+				const GLsizei shaderSourceCount = 1;
 				const GLchar* shaderSources[] =
 				{
-					"#version 330// The version of GLSL to use must come first\n",
-					"#define EAE6320_PLATFORM_GL\n",
 					reinterpret_cast<GLchar*>(shaderSource)
 				};
 				const GLint* sourcesAreNullTerminated = NULL;
@@ -438,13 +436,12 @@ namespace
 			}
 			// Set the source code into the shader
 			{
-				const GLsizei shaderSourceCount = 3;
+				const GLsizei shaderSourceCount = 1;
 				const GLchar* shaderSources[] =
 				{
-					"#version 330// The version of GLSL to use must come first\n",
-					"#define EAE6320_PLATFORM_GL\n",
 					reinterpret_cast<GLchar*>(shaderSource)
 				};
+				//TODO: You could also change it to the way it was before so that you don't add a NULL terminator and pass in the explicit size, but this is not required.
 				const GLint* sourcesAreNullTerminated = NULL;
 				glShaderSource(fragmentShaderId, shaderSourceCount, shaderSources, sourcesAreNullTerminated);
 				const GLenum errorCode = glGetError();

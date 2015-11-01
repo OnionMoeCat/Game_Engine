@@ -38,7 +38,7 @@ namespace
 	bool LoadTableValues_triangle_indexes_array(lua_State& io_luaState, unsigned int i_count);
 	bool LoadTableValues_triangle_indexes_array_abc(lua_State& io_luaState, unsigned int i_index);
 
-	bool WriteBufferToFile(const char* const i_path, HANDLE i_fileHandle, void* i_buffer, DWORD i_bytesToWrite);
+	bool WriteBufferToFile(const char* const i_path, HANDLE i_fileHandle, const void* i_buffer, DWORD i_bytesToWrite);
 
 	bool LoadMesh(const char* const i_path);
 	bool WriteMesh(const char* const i_path);
@@ -554,7 +554,7 @@ namespace
 		return !wereThereErrors;
 	}
 
-	bool WriteBufferToFile(const char* const i_path, HANDLE i_fileHandle, void* i_buffer, DWORD i_bytesToWrite)
+	bool WriteBufferToFile(const char* const i_path, HANDLE i_fileHandle, const void* i_buffer, DWORD i_bytesToWrite)
 	{
 		DWORD bytesWritten = 0;
 		BOOL errorFlag = WriteFile(i_fileHandle, i_buffer, i_bytesToWrite, &bytesWritten, NULL);

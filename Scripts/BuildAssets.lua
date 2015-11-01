@@ -40,7 +40,7 @@ end
 -- Function Definitions
 --=====================
 
-local function BuildAsset( i_relativeSourcePath, i_relativeTargetPath, i_builderFileName )
+local function BuildAsset( i_relativeSourcePath, i_relativeTargetPath, i_builderFileName, i_optionalArguments )
 	-- Get the absolute paths to the source and target
 	local path_source = s_AuthoredAssetDir .. i_relativeSourcePath
 	local path_target = s_BuiltAssetDir .. i_relativeTargetPath
@@ -103,7 +103,9 @@ local function BuildAsset( i_relativeSourcePath, i_relativeTargetPath, i_builder
 			local arguments = "\"" .. path_source .. "\" \"" .. path_target .. "\""
 			-- If you create a mechanism so that some asset types could include extra arguments
 			-- you would concatenate them here, something like:
-			-- arguments = arguments .. " " .. i_optionalArguments
+			if i_optionalArguments ~= nil then
+				arguments = arguments .. " " .. table.concat( i_optionalArguments, " " )
+			end
 			-- IMPORTANT NOTE:
 			-- If you need to debug a builder you can put print statements here to
 			-- find out what the exact command line should be.
@@ -155,7 +157,7 @@ end
 local function BuildAssets( i_assetsToBuild )
 	local wereThereErrors = false
 
-	-- a rough skeleton of what this function might look like if you group assets accordin to their type might be:
+	-- a rough skeleton of what this function might look like if you group assets according to their type might be:
 	for i, assetInfo_singleType in ipairs( i_assetsToBuild ) do
 		local builderFileName = assetInfo_singleType.builder
 		local assets = assetInfo_singleType.assets
@@ -163,7 +165,8 @@ local function BuildAssets( i_assetsToBuild )
 			-- TODO
 			local sourceFileName = assetInfo.source;
 			local targetFileName = assetInfo.target;
-			if not BuildAsset(sourceFileName, targetFileName, builderFileName) then
+			local optionalArguments = assetInfo.optionalArguments;
+			if not BuildAsset(sourceFileName, targetFileName, builderFileName, optionalArguments) then
 				-- If there's an error then the asset build should fail,
 				-- but we can still try to build any remaining assets
 				wereThereErrors = true

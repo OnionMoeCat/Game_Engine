@@ -42,6 +42,7 @@
     <ClInclude Include="Renderable.h" />
     <ClInclude Include="RenderableHelper.h" />
     <ClInclude Include="RenderableManager.h" />
+    <ClInclude Include="Includes.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="OpenGL">

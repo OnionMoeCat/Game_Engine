@@ -25,7 +25,7 @@ namespace eae6320
 			bool static LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const Context& i_context);
 			bool static CleanUp(Effect& i_effect, const Context& i_context);
 		public:
-			bool static LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath);
+			bool static LoadEffectFromFile(Effect& i_effect, const char* const i_effectPath);
 			bool static CleanUp(Effect& i_effect);
 			bool static SetDrawCallUniforms(Effect& i_effect, const eae6320::Math::cVector& i_vector, const Context& i_Context);
 			bool static Bind(Effect& i_effect, const Context& i_context);

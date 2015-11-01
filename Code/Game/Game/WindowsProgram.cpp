@@ -14,6 +14,7 @@
 // in this example program we just use it to get error messages
 #include "../../Engine/Windows/Functions.h"
 // Graphics.h is Graphics system
+//TODO: find out the reason causing d3dx9shader.h loading failure and fix it
 //#include "../../Engine/Graphics/Graphics.h"
 // UserOutput.h is UserOutput system
 #include "../../Engine/UserOutput/UserOutput.h"
@@ -617,16 +618,16 @@ namespace
 
 	bool Initialize()
 	{
-		if (!eae6320::Graphics::RenderableHelper::LoadEntityFromFile(s_entity_rectangle, "data/vertex.shader", "data/fragment.shader", "data/square.mesh"))
+		if (!eae6320::Graphics::RenderableHelper::LoadEntityFromFile(s_entity_rectangle, "data/default.effect", "data/square.mesh"))
 		{
 			return false;
 		}
-		if (!eae6320::Graphics::RenderableHelper::LoadEntityFromFile(s_entity_triangle1, "data/vertex.shader", "data/fragment.shader", "data/triangle.mesh"))
+		if (!eae6320::Graphics::RenderableHelper::LoadEntityFromFile(s_entity_triangle1, "data/default.effect", "data/triangle.mesh"))
 		{
 			eae6320::Graphics::RenderableHelper::CleanUp(s_entity_rectangle);
 			return false;
 		}
-		if (!eae6320::Graphics::RenderableHelper::LoadEntityFromFile(s_entity_triangle2, "data/vertex.shader", "data/fragment.shader", "data/triangle.mesh"))
+		if (!eae6320::Graphics::RenderableHelper::LoadEntityFromFile(s_entity_triangle2, "data/default.effect", "data/triangle.mesh"))
 		{
 			eae6320::Graphics::RenderableHelper::CleanUp(s_entity_rectangle);
 			eae6320::Graphics::RenderableHelper::CleanUp(s_entity_triangle1);

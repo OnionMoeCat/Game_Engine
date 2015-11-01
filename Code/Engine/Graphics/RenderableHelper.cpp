@@ -12,7 +12,7 @@
 // Interface
 //==========
 
-bool eae6320::Graphics::RenderableHelper::LoadEntityFromFile(Renderable& i_entity, const char* const i_vertexPath, const char* const i_fragmentPath, const char* i_meshPath)
+bool eae6320::Graphics::RenderableHelper::LoadEntityFromFile(Renderable& i_entity, const char* const i_effectPath, const char* i_meshPath)
 {
 	if (i_entity.m_effect == NULL)
 	{
@@ -20,10 +20,10 @@ bool eae6320::Graphics::RenderableHelper::LoadEntityFromFile(Renderable& i_entit
 	}
 	if (i_entity.m_effect)
 	{
-		if (!eae6320::Graphics::EffectHelper::LoadEffectFromFile(*i_entity.m_effect, i_vertexPath, i_fragmentPath))
+		if (!eae6320::Graphics::EffectHelper::LoadEffectFromFile(*i_entity.m_effect, i_effectPath))
 		{
 			std::stringstream errorMessage;
-			errorMessage << "Fail to load effect from vertex shader file: " << i_vertexPath << " and fragment shader file: " << i_fragmentPath;
+			errorMessage << "Fail to load effect from effect file: " << i_effectPath;
 			eae6320::UserOutput::Print(errorMessage.str());
 			return false;
 		}

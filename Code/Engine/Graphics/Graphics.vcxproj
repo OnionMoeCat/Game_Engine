@@ -63,6 +63,7 @@
     <ClInclude Include="Effect.h" />
     <ClInclude Include="EffectHelper.h" />
     <ClInclude Include="Graphics.h" />
+    <ClInclude Include="Includes.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshHelper.h" />
     <ClInclude Include="Renderable.h" />
