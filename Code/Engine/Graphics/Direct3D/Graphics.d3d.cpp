@@ -84,6 +84,46 @@ bool eae6320::Graphics::ShutDown()
 	return !wereThereErrors;
 }
 
+bool eae6320::Graphics::Clear(eae6320::Graphics::sColor color, eae6320::Graphics::Context context)
+{
+	const D3DRECT* subRectanglesToClear = NULL;
+	const DWORD subRectangleCount = 0;
+	const DWORD clearTheRenderTarget = D3DCLEAR_TARGET;
+	D3DCOLOR clearColor;
+	{
+		// Black is usually used:
+		clearColor = D3DCOLOR_RGBA(eae6320::Graphics::ColorHelper::ColorFloatToUint8(color.r),
+			eae6320::Graphics::ColorHelper::ColorFloatToUint8(color.g),
+			eae6320::Graphics::ColorHelper::ColorFloatToUint8(color.b),
+			eae6320::Graphics::ColorHelper::ColorFloatToUint8(color.a));
+	}
+	const float noZBuffer = 0.0f;
+	const DWORD noStencilBuffer = 0;
+	HRESULT result = context.device->Clear(subRectangleCount, subRectanglesToClear,
+		clearTheRenderTarget, clearColor, noZBuffer, noStencilBuffer);
+	return SUCCEEDED(result);
+}
+
+bool eae6320::Graphics::OnSubmitRenderCommands_start(eae6320::Graphics::Context context)
+{
+	return SUCCEEDED(context.device->BeginScene());
+}
+
+bool eae6320::Graphics::OnSubmitRenderCommands_end(eae6320::Graphics::Context context)
+{
+	return SUCCEEDED(context.device->EndScene());
+}
+
+bool eae6320::Graphics::DisplayRenderedBuffer(eae6320::Graphics::Context context)
+{
+	const RECT* noSourceRectangle = NULL;
+	const RECT* noDestinationRectangle = NULL;
+	const HWND useDefaultWindow = NULL;
+	const RGNDATA* noDirtyRegion = NULL;
+	HRESULT result = s_direct3dDevice->Present(noSourceRectangle, noDestinationRectangle, useDefaultWindow, noDirtyRegion);
+	return SUCCEEDED(result);
+}
+
 // Helper Function Definitions
 //============================
 
@@ -145,43 +185,4 @@ namespace
 		}
 	}
 
-	bool Clear(eae6320::Graphics::sColor color, eae6320::Graphics::Context context)
-	{
-		const D3DRECT* subRectanglesToClear = NULL;
-		const DWORD subRectangleCount = 0;
-		const DWORD clearTheRenderTarget = D3DCLEAR_TARGET;
-		D3DCOLOR clearColor;
-		{
-			// Black is usually used:
-			clearColor = D3DCOLOR_RGBA(eae6320::Graphics::ColorHelper::ColorFloatToUint8(color.r),
-				eae6320::Graphics::ColorHelper::ColorFloatToUint8(color.g),
-				eae6320::Graphics::ColorHelper::ColorFloatToUint8(color.b),
-				eae6320::Graphics::ColorHelper::ColorFloatToUint8(color.a));
-		}
-		const float noZBuffer = 0.0f;
-		const DWORD noStencilBuffer = 0;
-		HRESULT result = context.device->Clear(subRectangleCount, subRectanglesToClear,
-			clearTheRenderTarget, clearColor, noZBuffer, noStencilBuffer);
-		return SUCCEEDED(result);
-	}
-
-	bool OnSubmitRenderCommands_start(eae6320::Graphics::Context context)
-	{
-		return context.device->BeginScene();
-	}
-	
-	bool OnSubmitRenderCommands_end(eae6320::Graphics::Context context)
-	{
-		return context.device->EndScene();
-	}
-	
-	bool DisplayRenderedBuffer(eae6320::Graphics::Context context)
-	{
-		const RECT* noSourceRectangle = NULL;
-		const RECT* noDestinationRectangle = NULL;
-		const HWND useDefaultWindow = NULL;
-		const RGNDATA* noDirtyRegion = NULL;
-		HRESULT result = s_direct3dDevice->Present(noSourceRectangle, noDestinationRectangle, useDefaultWindow, noDirtyRegion);
-		return SUCCEEDED(result);
-	}
 }

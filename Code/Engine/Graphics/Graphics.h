@@ -26,6 +26,10 @@ namespace eae6320
 		bool Initialize( const HWND i_renderingWindow );
 		void Render();
 		bool ShutDown();
+		bool Clear(sColor color, Context context);
+		bool OnSubmitRenderCommands_start(Context context);
+		bool OnSubmitRenderCommands_end(Context context);
+		bool DisplayRenderedBuffer(Context context);
 	}
 }
 

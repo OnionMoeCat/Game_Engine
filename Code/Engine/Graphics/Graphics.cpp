@@ -20,10 +20,7 @@
 
 namespace
 {
-	bool Clear(eae6320::Graphics::sColor color, eae6320::Graphics::Context context);
-	bool OnSubmitRenderCommands_start(eae6320::Graphics::Context context);
-	bool OnSubmitRenderCommands_end(eae6320::Graphics::Context context);
-	bool DisplayRenderedBuffer(eae6320::Graphics::Context context);
+
 }
 
 // Interface

@@ -111,6 +111,46 @@ bool eae6320::Graphics::ShutDown()
 	return !wereThereErrors;
 }
 
+bool eae6320::Graphics::Clear(eae6320::Graphics::sColor color, eae6320::Graphics::Context context)
+{
+	bool wereThereErrors = false;
+	// Black is usually used
+	glClearColor(color.r, color.g, color.b, color.a);
+	if (glGetError() != GL_NO_ERROR)
+	{
+		wereThereErrors = true;
+	}
+	// In addition to the color, "depth" and "stencil" can also be cleared,
+	// but for now we only care about color
+	const GLbitfield clearColor = GL_COLOR_BUFFER_BIT;
+	glClear(clearColor);
+	if (glGetError() != GL_NO_ERROR)
+	{
+		wereThereErrors = true;
+	}
+	return !wereThereErrors;
+}
+
+bool eae6320::Graphics::OnSubmitRenderCommands_start(eae6320::Graphics::Context context)
+{
+	return true;
+}
+
+bool eae6320::Graphics::OnSubmitRenderCommands_end(eae6320::Graphics::Context context)
+{
+	return true;
+}
+
+bool eae6320::Graphics::DisplayRenderedBuffer(eae6320::Graphics::Context context)
+{
+	// Everything has been drawn to the "back buffer", which is just an image in memory.
+	// In order to display it, the contents of the back buffer must be swapped with the "front buffer"
+	// (which is what the user sees)
+
+	BOOL result = SwapBuffers(context.device);
+	return result == TRUE;
+}
+
 // Helper Function Declarations
 //=============================
 
@@ -187,45 +227,5 @@ namespace
 		}
 
 		return true;
-	}
-
-	bool Clear(eae6320::Graphics::sColor color, eae6320::Graphics::Context context)
-	{
-		bool wereThereErrors = false;
-		// Black is usually used
-		glClearColor(color.r, color.g, color.b, color.a);
-		if (glGetError() != GL_NO_ERROR)
-		{
-			wereThereErrors = true;
-		}
-		// In addition to the color, "depth" and "stencil" can also be cleared,
-		// but for now we only care about color
-		const GLbitfield clearColor = GL_COLOR_BUFFER_BIT;
-		glClear(clearColor);
-		if (glGetError() != GL_NO_ERROR)
-		{
-			wereThereErrors = true;
-		}
-		return !wereThereErrors;
-	}
-
-	bool OnSubmitRenderCommands_start(eae6320::Graphics::Context context)
-	{
-		return true;
-	}
-
-	bool OnSubmitRenderCommands_end(eae6320::Graphics::Context context)
-	{
-		return true;
-	}
-
-	bool DisplayRenderedBuffer(eae6320::Graphics::Context context)
-	{
-		// Everything has been drawn to the "back buffer", which is just an image in memory.
-		// In order to display it, the contents of the back buffer must be swapped with the "front buffer"
-		// (which is what the user sees)
-		
-		BOOL result = SwapBuffers(context.device);
-		return result == TRUE;		
 	}
 }

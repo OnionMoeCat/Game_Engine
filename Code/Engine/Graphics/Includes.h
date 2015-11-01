@@ -8,6 +8,7 @@ This file contains the function declarations for graphics
 #include "../Windows/Includes.h"
 
 #include <cstdint>
+#include <cmath>
 
 #if defined( EAE6320_PLATFORM_D3D )
 #include <d3d9.h>
