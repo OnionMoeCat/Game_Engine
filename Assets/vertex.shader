@@ -29,7 +29,7 @@ void main(
 
 	// A POSITION value must always be output from every vertex shader
 	// so that the GPU can figure out which fragments need to be shaded
-	out float4 o_position : POSITION,
+	out float4 O_POSITION : POSITION,
 
 	// Any other data is optional; the GPU doesn't know or care what it is,
 	// and will merely interpolate it across the triangle
