@@ -32,7 +32,8 @@ void eae6320::Graphics::Render()
 	// Before drawing anything, then, the previous image will be erased
 	// by "clearing" the image buffer (filling it with a solid color)
 	{
-		sColor clearColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+		//Color in format of RGBA
+		sColor clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 		if (!Clear(clearColor, Context::Get()))
 		{
 			assert(false);

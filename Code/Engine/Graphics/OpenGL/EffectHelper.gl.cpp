@@ -441,9 +441,8 @@ namespace
 				{
 					reinterpret_cast<GLchar*>(shaderSource)
 				};
-				//TODO: You could also change it to the way it was before so that you don't add a NULL terminator and pass in the explicit size, but this is not required.
-				const GLint* sourcesAreNullTerminated = NULL;
-				glShaderSource(fragmentShaderId, shaderSourceCount, shaderSources, sourcesAreNullTerminated);
+				const GLint shaderSourcesLength[] = { static_cast<GLint>(fileSize) };
+				glShaderSource(fragmentShaderId, shaderSourceCount, shaderSources, shaderSourcesLength);
 				const GLenum errorCode = glGetError();
 				if (errorCode != GL_NO_ERROR)
 				{

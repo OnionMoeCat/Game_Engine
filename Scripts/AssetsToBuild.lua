@@ -15,6 +15,9 @@ return
 	},
 	{
 		builder = "ShaderBuilder.exe",
+		dependencies = {
+			"shaders.inc"
+		},
 		assets = {
 			{
 				source = "vertex.shader",

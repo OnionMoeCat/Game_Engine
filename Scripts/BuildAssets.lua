@@ -40,7 +40,7 @@ end
 -- Function Definitions
 --=====================
 
-local function BuildAsset( i_relativeSourcePath, i_relativeTargetPath, i_builderFileName, i_optionalArguments )
+local function BuildAsset( i_relativeSourcePath, i_relativeTargetPath, i_builderFileName, i_dependencies ,i_optionalArguments )
 	-- Get the absolute paths to the source and target
 	local path_source = s_AuthoredAssetDir .. i_relativeSourcePath
 	local path_target = s_BuiltAssetDir .. i_relativeTargetPath
@@ -70,6 +70,19 @@ local function BuildAsset( i_relativeSourcePath, i_relativeTargetPath, i_builder
 
 	-- Decide if the target needs to be built
 	local shouldTargetBeBuilt
+	local lastWriteTime_dependency;
+	if i_dependencies then
+		for i, dependency in ipairs( i_dependencies ) do
+			local path_dependency = s_AuthoredAssetDir .. dependency
+			local doesTargetExist = DoesFileExist( path_dependency )
+			if doesTargetExist then
+				-- Even if the target exists it may be out-of-date.
+				-- If the source has been modified more recently than the target
+				-- then the target should be re-built.
+				lastWriteTime_dependency = math.max(lastWriteTime_dependency, GetLastWriteTime(path_dependency))
+			end
+		end
+	end
 	do
 		-- The simplest reason a target should be built is if it doesn't exist
 		local doesTargetExist = DoesFileExist( path_target )
@@ -80,6 +93,9 @@ local function BuildAsset( i_relativeSourcePath, i_relativeTargetPath, i_builder
 			local lastWriteTime_source = GetLastWriteTime( path_source )
 			local lastWriteTime_target = GetLastWriteTime( path_target )
 			shouldTargetBeBuilt = lastWriteTime_source > lastWriteTime_target
+			if lastWriteTime_dependency and not shouldTargetBeBuilt then
+				shouldTargetBeBuilt = lastWriteTime_dependency > lastWriteTime_target;
+			end						
 			if not shouldTargetBeBuilt then
 				-- Even if the target was built from the current source
 				-- the builder may have changed which could cause different output
@@ -103,7 +119,7 @@ local function BuildAsset( i_relativeSourcePath, i_relativeTargetPath, i_builder
 			local arguments = "\"" .. path_source .. "\" \"" .. path_target .. "\""
 			-- If you create a mechanism so that some asset types could include extra arguments
 			-- you would concatenate them here, something like:
-			if i_optionalArguments ~= nil then
+			if i_optionalArguments then
 				arguments = arguments .. " " .. table.concat( i_optionalArguments, " " )
 			end
 			-- IMPORTANT NOTE:
@@ -162,11 +178,11 @@ local function BuildAssets( i_assetsToBuild )
 		local builderFileName = assetInfo_singleType.builder
 		local assets = assetInfo_singleType.assets
 		for j, assetInfo in ipairs( assets ) do
-			-- TODO
 			local sourceFileName = assetInfo.source;
 			local targetFileName = assetInfo.target;
 			local optionalArguments = assetInfo.optionalArguments;
-			if not BuildAsset(sourceFileName, targetFileName, builderFileName, optionalArguments) then
+			local dependencies = assetInfo.dependencies;
+			if not BuildAsset(sourceFileName, targetFileName, builderFileName, dependencies, optionalArguments) then
 				-- If there's an error then the asset build should fail,
 				-- but we can still try to build any remaining assets
 				wereThereErrors = true
@@ -174,7 +190,6 @@ local function BuildAssets( i_assetsToBuild )
 		end
 	end
 
-	-- End of TODO. The following should be the final line of the function:
 	return not wereThereErrors
 end
 

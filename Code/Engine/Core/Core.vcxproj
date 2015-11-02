@@ -109,7 +109,8 @@
     </Link>
     <Lib>
       <AdditionalDependencies>Graphics.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4006,4221</AdditionalOptions>
+      <AdditionalOptions>
+      </AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -127,7 +128,8 @@
     </Link>
     <Lib>
       <AdditionalDependencies>Graphics.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4006,4221</AdditionalOptions>
+      <AdditionalOptions>
+      </AdditionalOptions>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x64\;$(LibDir)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -149,7 +151,8 @@
     </Link>
     <Lib>
       <AdditionalDependencies>Graphics.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4006,4221</AdditionalOptions>
+      <AdditionalOptions>
+      </AdditionalOptions>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -171,7 +174,8 @@
     </Link>
     <Lib>
       <AdditionalDependencies>Graphics.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4006,4221</AdditionalOptions>
+      <AdditionalOptions>
+      </AdditionalOptions>
       <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x64\;$(LibDir)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>

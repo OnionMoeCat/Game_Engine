@@ -1,6 +1,9 @@
 /*
-	This is an example of a vertex shader
+	This is an example of a fragment shader
 */
+
+// Platform-specific setup
+#include "shaders.inc"
 
 #if defined( EAE6320_PLATFORM_D3D )
 
@@ -25,21 +28,8 @@ void main(
 	out float4 o_color : COLOR0
 
 	)
-{
-	// Set the fragment to the interpolated color that originated as per-vertex data
-	// (where color is represented by 4 floats representing "RGBA" == "Red/Green/Blue/Alpha")
-	{
-		o_color = i_color;
-	}
-}
 
 #elif defined( EAE6320_PLATFORM_GL )
-
-// The version of GLSL to use must come first
-#version 330
-
-// This extension is required in order to specify explicit locations for shader inputs and outputs
-#extension GL_ARB_separate_shader_objects : require
 
 // Input
 //======
@@ -60,6 +50,8 @@ out vec4 o_color;
 //============
 
 void main()
+
+#endif
 {
 	// Set the fragment to the interpolated color that originated as per-vertex data
 	// (where color is represented by 4 floats representing "RGBA" == "Red/Green/Blue/Alpha")
@@ -67,5 +59,3 @@ void main()
 		o_color = i_color;
 	}
 }
-
-#endif
