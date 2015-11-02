@@ -23,13 +23,19 @@ namespace eae6320
 {
 	namespace Graphics
 	{
-		bool Initialize( const HWND i_renderingWindow );
-		void Render();
-		bool ShutDown();
-		bool Clear(sColor color, Context context);
-		bool OnSubmitRenderCommands_start(Context context);
-		bool OnSubmitRenderCommands_end(Context context);
-		bool DisplayRenderedBuffer(Context context);
+		class Graphics
+		{
+		public:
+			bool static Initialize(const HWND i_renderingWindow);
+			void static Render();
+			bool static ShutDown();
+		private:
+			bool static Clear(sColor color, Context context);
+			bool static OnSubmitRenderCommands_start(Context context);
+			bool static OnSubmitRenderCommands_end(Context context);
+			bool static DisplayRenderedBuffer(Context context);
+		};
+
 	}
 }
 

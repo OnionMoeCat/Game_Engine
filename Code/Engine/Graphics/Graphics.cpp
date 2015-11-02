@@ -15,18 +15,10 @@
 #include "RenderableHelper.h"
 #include "RenderableManager.h"
 
-// Helper Function Declarations
-//=============================
-
-namespace
-{
-
-}
-
 // Interface
 //==========
 
-void eae6320::Graphics::Render()
+void eae6320::Graphics::Graphics::Render()
 {
 	// Every frame an entirely new image will be created.
 	// Before drawing anything, then, the previous image will be erased

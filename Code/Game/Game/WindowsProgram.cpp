@@ -15,7 +15,7 @@
 #include "../../Engine/Windows/Functions.h"
 // Graphics.h is Graphics system
 //TODO: find out the reason causing d3dx9shader.h loading failure and fix it
-//#include "../../Engine/Graphics/Graphics.h"
+#include "../../Engine/Graphics/Graphics.h"
 // UserOutput.h is UserOutput system
 #include "../../Engine/UserOutput/UserOutput.h"
 #include "../../Engine/Math/cVector.h"
@@ -24,16 +24,6 @@
 #include "../../Engine/Graphics/Renderable.h"
 #include "../../Engine/Graphics/RenderableHelper.h"
 #include "../../Engine/Graphics/RenderableManager.h"
-
-namespace eae6320
-{
-	namespace Graphics
-	{
-		bool Initialize(const HWND i_renderingWindow);
-		void Render();
-		bool ShutDown();
-	}
-}
 
 // Static Data Initialization
 //===========================
@@ -82,11 +72,11 @@ int CreateMainWindowAndReturnExitCodeWhenItCloses( const HINSTANCE i_thisInstanc
 		// Pass UserOutput the window to attach MessageBox to
 		eae6320::UserOutput::Initialize(s_mainWindow);
 		// Once we get the window, initialize Graphics system
-		eae6320::Graphics::Initialize(s_mainWindow);
+		eae6320::Graphics::Graphics::Initialize(s_mainWindow);
 		// Initialize rectangle and triangles
 		if (!Initialize())
 		{
-			eae6320::Graphics::ShutDown();
+			eae6320::Graphics::Graphics::ShutDown();
 			eae6320::UserOutput::Finalize();
 			return -1;
 		}
@@ -160,7 +150,7 @@ int WaitForMainWindowToCloseAndReturnExitCode( const HINSTANCE i_thisInstanceOfT
 		wereThereErrors = true;
 	}
 	// Shutdown Graphis system before closing the window
-	eae6320::Graphics::ShutDown();
+	eae6320::Graphics::Graphics::ShutDown();
 	// Clean up anything that was created/registered/initialized
 	if ( OnMainWindowClosed( i_thisInstanceOfTheProgram ) )
 	{
@@ -550,7 +540,7 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			eae6320::Graphics::RenderableManager::Get().Submit(s_entity_rectangle);
 			eae6320::Graphics::RenderableManager::Get().Submit(s_entity_triangle1);
 			eae6320::Graphics::RenderableManager::Get().Submit(s_entity_triangle2);
-			eae6320::Graphics::Render();
+			eae6320::Graphics::Graphics::Render();
 		}
 		else
 		{
