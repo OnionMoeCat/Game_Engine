@@ -18,24 +18,21 @@
 // Interface
 //==========
 
-void eae6320::Graphics::Graphics::Render()
+void eae6320::Graphics::Core::Render()
 {
 	// Every frame an entirely new image will be created.
 	// Before drawing anything, then, the previous image will be erased
 	// by "clearing" the image buffer (filling it with a solid color)
+	bool result;
 	{
 		//Color in format of RGBA
 		sColor clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-		if (!Clear(clearColor, Context::Get()))
-		{
-			assert(false);
-		}
+		result = Clear(clearColor, Context::Get());
+		assert(result);
 	}
 
-	if (!OnSubmitRenderCommands_start(Context::Get()))
-	{
-		assert(false);
-	}
+	result = OnSubmitRenderCommands_start(Context::Get());
+	assert(result);
 
 	// The actual function calls that draw geometry
 	{
@@ -44,33 +41,23 @@ void eae6320::Graphics::Graphics::Render()
 			for (unsigned int i = 0; i < RenderableManager::Get().m_list.size(); i++)
 			{
 				Renderable& renderable = RenderableManager::Get().m_list[i];
-				if (!EffectHelper::Bind(*renderable.m_effect, Context::Get()))
-				{
-					assert(false);
-				}
-				if (!EffectHelper::SetDrawCallUniforms(*renderable.m_effect, renderable.cVector, Context::Get()))
-				{
-					assert(false);
-				}
-				if (!MeshHelper::DrawMesh(*renderable.m_mesh, Context::Get()))
-				{
-					assert(false);
-				}
+				result = EffectHelper::Bind(*renderable.m_effect, Context::Get());
+				assert(result);
+				result = EffectHelper::SetDrawCallUniforms(*renderable.m_effect, renderable.cVector, Context::Get());
+				assert(result);
+				result = MeshHelper::DrawMesh(*renderable.m_mesh, Context::Get());
+				assert(result);
 			}
 			RenderableManager::Get().CleanUp();
 		}
 	}
 
-	if (!OnSubmitRenderCommands_end(Context::Get()))
-	{
-		assert(false);
-	}
+	result = OnSubmitRenderCommands_end(Context::Get());
+	assert(result);
 
 	// Everything has been drawn to the "back buffer", which is just an image in memory.
 	// In order to display it, the contents of the back buffer must be swapped with the "front buffer"
 	// (which is what the user sees)
-	if (!DisplayRenderedBuffer(Context::Get()))
-	{
-		assert(false);
-	}
+	result = DisplayRenderedBuffer(Context::Get());
+	assert(result);
 }

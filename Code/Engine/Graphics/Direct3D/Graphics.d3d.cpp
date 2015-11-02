@@ -35,7 +35,7 @@ namespace
 // Interface
 //==========
 
-bool eae6320::Graphics::Graphics::Initialize( const HWND i_renderingWindow )
+bool eae6320::Graphics::Core::Initialize( const HWND i_renderingWindow )
 {
 	s_renderingWindow = i_renderingWindow;
 
@@ -62,7 +62,7 @@ OnError:
 	return false;
 }
 
-bool eae6320::Graphics::Graphics::ShutDown()
+bool eae6320::Graphics::Core::ShutDown()
 {
 	bool wereThereErrors = false;
 
@@ -84,7 +84,7 @@ bool eae6320::Graphics::Graphics::ShutDown()
 	return !wereThereErrors;
 }
 
-bool eae6320::Graphics::Graphics::Clear(eae6320::Graphics::sColor color, eae6320::Graphics::Context context)
+bool eae6320::Graphics::Core::Clear(eae6320::Graphics::sColor color, eae6320::Graphics::Context context)
 {
 	const D3DRECT* subRectanglesToClear = NULL;
 	const DWORD subRectangleCount = 0;
@@ -104,17 +104,17 @@ bool eae6320::Graphics::Graphics::Clear(eae6320::Graphics::sColor color, eae6320
 	return SUCCEEDED(result);
 }
 
-bool eae6320::Graphics::Graphics::OnSubmitRenderCommands_start(eae6320::Graphics::Context context)
+bool eae6320::Graphics::Core::OnSubmitRenderCommands_start(eae6320::Graphics::Context context)
 {
 	return SUCCEEDED(context.device->BeginScene());
 }
 
-bool eae6320::Graphics::Graphics::OnSubmitRenderCommands_end(eae6320::Graphics::Context context)
+bool eae6320::Graphics::Core::OnSubmitRenderCommands_end(eae6320::Graphics::Context context)
 {
 	return SUCCEEDED(context.device->EndScene());
 }
 
-bool eae6320::Graphics::Graphics::DisplayRenderedBuffer(eae6320::Graphics::Context context)
+bool eae6320::Graphics::Core::DisplayRenderedBuffer(eae6320::Graphics::Context context)
 {
 	const RECT* noSourceRectangle = NULL;
 	const RECT* noDestinationRectangle = NULL;

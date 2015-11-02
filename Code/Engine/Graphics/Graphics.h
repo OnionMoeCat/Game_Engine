@@ -23,7 +23,7 @@ namespace eae6320
 {
 	namespace Graphics
 	{
-		class Graphics
+		struct Core
 		{
 		public:
 			bool static Initialize(const HWND i_renderingWindow);

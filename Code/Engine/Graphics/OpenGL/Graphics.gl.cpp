@@ -39,7 +39,7 @@ namespace
 // Interface
 //==========
 
-bool eae6320::Graphics::Graphics::Initialize( const HWND i_renderingWindow )
+bool eae6320::Graphics::Core::Initialize( const HWND i_renderingWindow )
 {
 	s_renderingWindow = i_renderingWindow;
 
@@ -72,7 +72,7 @@ OnError:
 	return false;
 }
 
-bool eae6320::Graphics::Graphics::ShutDown()
+bool eae6320::Graphics::Core::ShutDown()
 {
 	bool wereThereErrors = false;
 
@@ -111,7 +111,7 @@ bool eae6320::Graphics::Graphics::ShutDown()
 	return !wereThereErrors;
 }
 
-bool eae6320::Graphics::Graphics::Clear(eae6320::Graphics::sColor color, eae6320::Graphics::Context context)
+bool eae6320::Graphics::Core::Clear(eae6320::Graphics::sColor color, eae6320::Graphics::Context context)
 {
 	bool wereThereErrors = false;
 	// Black is usually used
@@ -131,17 +131,17 @@ bool eae6320::Graphics::Graphics::Clear(eae6320::Graphics::sColor color, eae6320
 	return !wereThereErrors;
 }
 
-bool eae6320::Graphics::Graphics::OnSubmitRenderCommands_start(eae6320::Graphics::Context context)
+bool eae6320::Graphics::Core::OnSubmitRenderCommands_start(eae6320::Graphics::Context context)
 {
 	return true;
 }
 
-bool eae6320::Graphics::Graphics::OnSubmitRenderCommands_end(eae6320::Graphics::Context context)
+bool eae6320::Graphics::Core::OnSubmitRenderCommands_end(eae6320::Graphics::Context context)
 {
 	return true;
 }
 
-bool eae6320::Graphics::Graphics::DisplayRenderedBuffer(eae6320::Graphics::Context context)
+bool eae6320::Graphics::Core::DisplayRenderedBuffer(eae6320::Graphics::Context context)
 {
 	// Everything has been drawn to the "back buffer", which is just an image in memory.
 	// In order to display it, the contents of the back buffer must be swapped with the "front buffer"
