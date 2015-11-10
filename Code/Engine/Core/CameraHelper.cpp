@@ -15,3 +15,9 @@ void eae6320::Core::CameraHelper::Initialize(Camera& i_camera, const eae6320::Ma
 	i_camera.m_nearZ = i_nearZ;
 	i_camera.m_farZ = i_farZ;
 }
+
+bool eae6320::Core::CameraHelper::OffsetPosition(Camera& i_camera, const eae6320::Math::cVector& i_offset_position)
+{
+	i_camera.m_position += i_offset_position;
+	return true;
+}

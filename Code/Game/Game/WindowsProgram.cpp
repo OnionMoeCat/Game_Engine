@@ -60,6 +60,7 @@ namespace
 namespace
 {
 	void UpdateEntities();
+	void UpdateCamera();
 	bool Initialize();
 }
 
@@ -531,6 +532,9 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			// or similar, though.)
 			eae6320::Time::OnNewFrame();
 			UpdateEntities();
+			UpdateCamera();
+			eae6320::Core::EntityHelper::ToCameraScreen(s_entity_floor, s_camera);
+			eae6320::Core::EntityHelper::ToCameraScreen(s_entity_box, s_camera);
 			//TODO: find a good way to show error message here
 			eae6320::Core::EntityHelper::Submit(s_entity_floor);
 			eae6320::Core::EntityHelper::Submit(s_entity_box);
@@ -598,9 +602,42 @@ namespace
 		// You don't have to do it this way for your assignment!
 		// You just need a way to update the position offset associated with the colorful rectangle.
 		eae6320::Core::EntityHelper::OffsetPosition(s_entity_box, offset);
+	}
 
-		eae6320::Core::EntityHelper::ToCameraScreen(s_entity_floor, s_camera);
-		eae6320::Core::EntityHelper::ToCameraScreen(s_entity_box, s_camera);
+	void UpdateCamera()
+	{
+		eae6320::Math::cVector offset(0.0f, 0.0f);
+		{
+			// Get the direction
+			{
+				if (eae6320::UserInput::IsKeyPressed('A'))
+				{
+					offset.x -= 1.0f;
+				}
+				if (eae6320::UserInput::IsKeyPressed('D'))
+				{
+					offset.x += 1.0f;
+				}
+				if (eae6320::UserInput::IsKeyPressed('W'))
+				{
+					offset.y += 1.0f;
+				}
+				if (eae6320::UserInput::IsKeyPressed('S'))
+				{
+					offset.y -= 1.0f;
+				}
+			}
+			// Get the speed
+			const float unitsPerSecond = 1.0f;	// This is arbitrary
+			const float unitsToMove = unitsPerSecond * eae6320::Time::GetSecondsElapsedThisFrame();	// This makes the speed frame-rate-independent
+																									// Normalize the offset
+			offset *= unitsToMove;
+		}
+		// The following line assumes there is some "entity" for the rectangle that the game code controls
+		// that encapsulates a mesh, an effect, and a position offset.
+		// You don't have to do it this way for your assignment!
+		// You just need a way to update the position offset associated with the colorful rectangle.
+		eae6320::Core::CameraHelper::OffsetPosition(s_camera, offset);
 	}
 
 	bool Initialize()
