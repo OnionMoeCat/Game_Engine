@@ -7,6 +7,10 @@ return
 				source = "box.mesh.raw",
 				target = "box.mesh",
 			},
+			{
+				source = "square.mesh.raw",
+				target = "square.mesh",
+			},
 		},
 	},
 	{

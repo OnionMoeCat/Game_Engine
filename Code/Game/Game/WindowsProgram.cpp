@@ -49,6 +49,8 @@ namespace
 	const char* s_mainWindowClass_name = "Yuchen Zhang's Main Window Class";
 
 	eae6320::Core::Entity s_entity_box;
+	eae6320::Core::Entity s_entity_floor;
+
 	eae6320::Core::Camera s_camera;
 }
 
@@ -530,6 +532,7 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			eae6320::Time::OnNewFrame();
 			UpdateEntities();
 			//TODO: find a good way to show error message here
+			eae6320::Core::EntityHelper::Submit(s_entity_floor);
 			eae6320::Core::EntityHelper::Submit(s_entity_box);
 			eae6320::Graphics::Core::Render();
 		}
@@ -595,27 +598,44 @@ namespace
 		// You don't have to do it this way for your assignment!
 		// You just need a way to update the position offset associated with the colorful rectangle.
 		eae6320::Core::EntityHelper::OffsetPosition(s_entity_box, offset);
+
+		eae6320::Core::EntityHelper::ToCameraScreen(s_entity_floor, s_camera);
 		eae6320::Core::EntityHelper::ToCameraScreen(s_entity_box, s_camera);
 	}
 
 	bool Initialize()
 	{
-		if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_box, "data/default.effect", "data/box.mesh"))
 		{
-			return false;
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_box, "data/default.effect", "data/box.mesh"))
+			{
+				//TODO: find a way to show error message
+				return false;
+			}
+			eae6320::Math::cVector box_position_offset(0.0f, 0.0f, 0.0f);
+			eae6320::Core::EntityHelper::OffsetPosition(s_entity_box, box_position_offset);
 		}
-		eae6320::Math::cVector box_position_offset(0.0f, 0.0f, 0.0f);
-		eae6320::Core::EntityHelper::OffsetPosition(s_entity_box, box_position_offset);
 
-		const int desiredWidth = 800;
-		const int desiredHeight = 600;
-		const eae6320::Math::cQuaternion identityRotation;
-		const eae6320::Math::cVector position(0.0f, 0.0f, 10.0f);
-		const float fov = 60.0f;
-		const float aspect = static_cast<float>(desiredWidth) / static_cast<float>(desiredHeight);
-		const float nearZ = 0.1f;
-		const float farZ = 100.0f;
-		eae6320::Core::CameraHelper::Initialize(s_camera, identityRotation, position, fov, aspect, nearZ, farZ);
+		{
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_floor, "data/default.effect", "data/square.mesh"))
+			{
+				//TODO: find a way to show error message
+				return false;
+			}
+			eae6320::Math::cVector floor_position_offset(0.0f, 0.0f, 0.0f);
+			eae6320::Core::EntityHelper::OffsetPosition(s_entity_floor, floor_position_offset);
+		}
+
+		{
+			const int desiredWidth = 800;
+			const int desiredHeight = 600;
+			const eae6320::Math::cQuaternion identityRotation;
+			const eae6320::Math::cVector position(0.0f, 0.0f, 10.0f);
+			const float fov = 60.0f;
+			const float aspect = static_cast<float>(desiredWidth) / static_cast<float>(desiredHeight);
+			const float nearZ = 0.1f;
+			const float farZ = 100.0f;
+			eae6320::Core::CameraHelper::Initialize(s_camera, identityRotation, position, fov, aspect, nearZ, farZ);
+		}
 
 		return true;
 	}

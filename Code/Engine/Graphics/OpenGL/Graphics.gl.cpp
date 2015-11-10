@@ -33,6 +33,7 @@ namespace
 	bool CreateRenderingContext();
 	bool LoadEffect();
 	bool LoadMeshes();
+	bool SetRenderState();
 }
 
 // Interface
@@ -69,6 +70,11 @@ bool eae6320::Graphics::Core::Initialize( const HWND i_renderingWindow )
 			eae6320::UserOutput::Print(errorMessage.str());
 			goto OnError;
 		}
+	}
+
+	if (!SetRenderState())
+	{
+		goto OnError;
 	}
 
 	if (!CreateContext())
@@ -123,7 +129,7 @@ bool eae6320::Graphics::Core::ShutDown()
 	return !wereThereErrors;
 }
 
-bool eae6320::Graphics::Core::Clear(eae6320::Graphics::sColor color, eae6320::Graphics::Context context)
+bool eae6320::Graphics::Core::Clear(eae6320::Graphics::sColor color, float depth, eae6320::Graphics::Context context)
 {
 	bool wereThereErrors = false;
 	// Black is usually used
@@ -132,10 +138,15 @@ bool eae6320::Graphics::Core::Clear(eae6320::Graphics::sColor color, eae6320::Gr
 	{
 		wereThereErrors = true;
 	}
+
+	glClearDepth(depth);
+	if (glGetError() != GL_NO_ERROR)
+	{
+		wereThereErrors = true;
+	}
 	// In addition to the color, "depth" and "stencil" can also be cleared,
-	// but for now we only care about color
-	const GLbitfield clearColor = GL_COLOR_BUFFER_BIT;
-	glClear(clearColor);
+	const GLbitfield clearColorAndDepth = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+	glClear(clearColorAndDepth);
 	if (glGetError() != GL_NO_ERROR)
 	{
 		wereThereErrors = true;
@@ -197,6 +208,7 @@ namespace
 					desiredPixelFormat.iPixelType = PFD_TYPE_RGBA;
 					desiredPixelFormat.cColorBits = 32;
 					desiredPixelFormat.iLayerType = PFD_MAIN_PLANE ;
+					desiredPixelFormat.cDepthBits = 16;
 				}
 				// Get the ID of the desired pixel format
 				int pixelFormatId;
@@ -239,5 +251,35 @@ namespace
 		}
 
 		return true;
+	}
+
+	bool SetRenderState()
+	{
+		bool wereThereErrors = false;
+
+		glEnable(GL_DEPTH_TEST);
+		GLenum errorCode = glGetError();
+		if (errorCode != GL_NO_ERROR)
+		{
+			wereThereErrors = true;
+		}
+		glDepthMask(GL_TRUE);
+		errorCode = glGetError();
+		if (errorCode != GL_NO_ERROR)
+		{
+			wereThereErrors = true;
+		}
+		glDepthFunc(GL_LEQUAL);
+		errorCode = glGetError();
+		if (errorCode != GL_NO_ERROR)
+		{
+			wereThereErrors = true;
+		}
+
+		if (wereThereErrors)
+		{
+			eae6320::UserOutput::Print("OpenGL failed to set render state");
+		}
+		return !wereThereErrors;
 	}
 }

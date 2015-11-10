@@ -25,7 +25,8 @@ void eae6320::Graphics::Core::Render()
 	{
 		//Color in format of RGBA
 		sColor clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
-		result = Clear(clearColor, Context::Get());
+		float depth = 1.0f;
+		result = Clear(clearColor, depth, Context::Get());
 		assert(result);
 	}
 

@@ -29,6 +29,7 @@ namespace
 	bool CreateInterface();
 	bool LoadEffect();
 	bool LoadMeshes();
+	bool SetRenderState();
 }
 
 // Interface
@@ -48,7 +49,11 @@ bool eae6320::Graphics::Core::Initialize( const HWND i_renderingWindow )
 	{
 		goto OnError;
 	}
-	if ( !CreateContext() )
+	if (!SetRenderState())
+	{
+		goto OnError;
+	}
+	if (!CreateContext())
 	{
 		goto OnError;
 	}
@@ -83,11 +88,11 @@ bool eae6320::Graphics::Core::ShutDown()
 	return !wereThereErrors;
 }
 
-bool eae6320::Graphics::Core::Clear(eae6320::Graphics::sColor color, eae6320::Graphics::Context context)
+bool eae6320::Graphics::Core::Clear(eae6320::Graphics::sColor color, float depth, eae6320::Graphics::Context context)
 {
 	const D3DRECT* subRectanglesToClear = NULL;
 	const DWORD subRectangleCount = 0;
-	const DWORD clearTheRenderTarget = D3DCLEAR_TARGET;
+	const DWORD clearTheRenderTargetAndZBuffer = D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER;
 	D3DCOLOR clearColor;
 	{
 		// Black is usually used:
@@ -96,10 +101,10 @@ bool eae6320::Graphics::Core::Clear(eae6320::Graphics::sColor color, eae6320::Gr
 			eae6320::Graphics::ColorHelper::ColorFloatToUint8(color.b),
 			eae6320::Graphics::ColorHelper::ColorFloatToUint8(color.a));
 	}
-	const float noZBuffer = 0.0f;
+	const float zBufferDepth = depth;
 	const DWORD noStencilBuffer = 0;
 	HRESULT result = context.device->Clear(subRectangleCount, subRectanglesToClear,
-		clearTheRenderTarget, clearColor, noZBuffer, noStencilBuffer);
+		clearTheRenderTargetAndZBuffer, clearColor, zBufferDepth, noStencilBuffer);
 	return SUCCEEDED(result);
 }
 
@@ -152,7 +157,8 @@ namespace
 			presentationParameters.SwapEffect = D3DSWAPEFFECT_DISCARD;
 			presentationParameters.hDeviceWindow = s_renderingWindow;
 			presentationParameters.Windowed = TRUE;
-			presentationParameters.EnableAutoDepthStencil = FALSE;
+			presentationParameters.EnableAutoDepthStencil = TRUE;
+			presentationParameters.AutoDepthStencilFormat = D3DFMT_D16;
 			presentationParameters.PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
 		}
 		HRESULT result = s_direct3dInterface->CreateDevice( useDefaultDevice, useHardwareRendering,
@@ -184,4 +190,30 @@ namespace
 		}
 	}
 
+	bool SetRenderState()
+	{
+		bool wereThereErrors = false;
+
+		HRESULT result = s_direct3dDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+		if (FAILED(result))
+		{
+			wereThereErrors = true;
+		}
+		result = s_direct3dDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+		if (FAILED(result))
+		{
+			wereThereErrors = true;
+		}
+		result = s_direct3dDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+		if (FAILED(result))
+		{
+			wereThereErrors = true;
+		}
+
+		if (wereThereErrors)
+		{
+			eae6320::UserOutput::Print("Direct3D failed to set render state");
+		}
+		return !wereThereErrors;
+	}
 }

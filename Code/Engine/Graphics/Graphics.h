@@ -30,7 +30,7 @@ namespace eae6320
 			void static Render();
 			bool static ShutDown();
 		private:
-			bool static Clear(sColor color, Context context);
+			bool static Clear(sColor color, float depth, Context context);
 			bool static OnSubmitRenderCommands_start(Context context);
 			bool static OnSubmitRenderCommands_end(Context context);
 			bool static DisplayRenderedBuffer(Context context);
