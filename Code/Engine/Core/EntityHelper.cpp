@@ -38,10 +38,18 @@ bool eae6320::Core::EntityHelper::OffsetPosition(Entity& i_entity, const eae6320
 {
 	if (i_entity.m_renderable == NULL)
 	{
+		std::stringstream errorMessage;
+		eae6320::UserOutput::Print("entity.m_renderable not null expected");
 		return false;
 	}
 	i_entity.m_position += i_offset_position;
-	return eae6320::Graphics::RenderableHelper::CreateLocalToWorldTransform(*i_entity.m_renderable, i_entity.m_rotation, i_entity.m_position);
+	if (!eae6320::Graphics::RenderableHelper::CreateLocalToWorldTransform(*i_entity.m_renderable, i_entity.m_rotation, i_entity.m_position))
+	{
+		std::stringstream errorMessage;
+		eae6320::UserOutput::Print("Fail to create local to world transform");
+		return false;
+	}
+	return true;
 }
 bool eae6320::Core::EntityHelper::CleanUp(Entity& i_entity)
 {
