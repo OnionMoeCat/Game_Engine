@@ -30,7 +30,7 @@ namespace
 	bool LoadTableValues_vertices_array(lua_State& io_luaState, unsigned int i_count);
 	bool LoadTableValues_array_count(lua_State& io_luaState, unsigned int& o_count);
 	bool LoadTableValues_vertices_array_position(lua_State& io_lua_state, unsigned int i_index);
-	bool LoadTableValues_vertices_array_position_xy(lua_State& io_luaState, unsigned int i_index);
+	bool LoadTableValues_vertices_array_position_xyz(lua_State& io_luaState, unsigned int i_index);
 	bool LoadTableValues_vertices_array_color(lua_State& io_luaState, unsigned int i_index);
 	bool LoadTableValues_vertices_array_color_rgba(lua_State& io_luaState, unsigned int i_index);
 
@@ -209,7 +209,7 @@ namespace
 			goto OnExit;
 		}
 
-		if (!LoadTableValues_vertices_array_position_xy(io_luaState, i_index))
+		if (!LoadTableValues_vertices_array_position_xyz(io_luaState, i_index))
 		{
 			std::stringstream errorMessage;
 			errorMessage << "Fail to get value of \"position\" for \"vertices\" at index: " << i_index;
@@ -256,21 +256,21 @@ namespace
 		return !wereThereErrors;
 	}
 
-	bool LoadTableValues_vertices_array_position_xy(lua_State& io_luaState, unsigned int i_index)
+	bool LoadTableValues_vertices_array_position_xyz(lua_State& io_luaState, unsigned int i_index)
 	{
-		const int xyLength = luaL_len(&io_luaState, -1);
-		const int LENGTH = 2;
-		const char charMap[LENGTH] = { 'x','y' };
+		const int xyzLength = luaL_len(&io_luaState, -1);
+		const int LENGTH = 3;
+		const char charMap[LENGTH] = { 'x','y','z' };
 
-		float tempXY[LENGTH];
-		if (xyLength != LENGTH)
+		float tempXYZ[LENGTH];
+		if (xyzLength != LENGTH)
 		{
 			std::stringstream errorMessage;
-			errorMessage << "2 elements (x, y) in key \"position\" expected for \"vertices\" at index: " << i_index;
+			errorMessage << "3 elements (x, y, z) in key \"position\" expected for \"vertices\" at index: " << i_index;
 			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
 			return false;
 		}
-		for (int i = 1; i <= xyLength; i++)
+		for (int i = 1; i <= xyzLength; i++)
 		{
 			lua_pushinteger(&io_luaState, i);
 			lua_gettable(&io_luaState, -2);
@@ -282,12 +282,13 @@ namespace
 				lua_pop(&io_luaState, 1);
 				return false;
 			}
-			tempXY[i - 1] = static_cast<float>(lua_tonumber(&io_luaState, -1));
+			tempXYZ[i - 1] = static_cast<float>(lua_tonumber(&io_luaState, -1));
 			lua_pop(&io_luaState, 1);
 		}
 
-		vertices[i_index - 1].x = tempXY[0];
-		vertices[i_index - 1].y = tempXY[1];
+		vertices[i_index - 1].x = tempXYZ[0];
+		vertices[i_index - 1].y = tempXYZ[1];
+		vertices[i_index - 1].z = tempXYZ[2];
 
 		return true;
 	}

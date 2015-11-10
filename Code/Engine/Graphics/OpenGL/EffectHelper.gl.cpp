@@ -172,8 +172,8 @@ bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, cons
 	if (location != -1)
 	{
 		const unsigned int uniformCount = 1;
-		const float floatArray[2] = {i_vector.x, i_vector.y};
-		glUniform2fv(location, uniformCount, floatArray);
+		const float floatArray[3] = {i_vector.x, i_vector.y, i_vector.z};
+		glUniform3fv(location, uniformCount, floatArray);
 	}
 	else
 	{

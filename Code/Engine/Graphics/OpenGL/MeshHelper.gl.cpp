@@ -127,11 +127,11 @@ bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDa
 		GLvoid* offset = 0;
 
 		// Position (0)
-		// 2 floats == 8 bytes
+		// 3 floats == 12 bytes
 		// Offset = 0
 		{
 			const GLuint vertexElementLocation = 0;
-			const GLint elementCount = 2;
+			const GLint elementCount = 3;
 			const GLboolean notNormalized = GL_FALSE;	// The given floats should be used as-is
 			glVertexAttribPointer(vertexElementLocation, elementCount, GL_FLOAT, notNormalized, stride, offset);
 			const GLenum errorCode = glGetError();
@@ -165,7 +165,7 @@ bool eae6320::Graphics::MeshHelper::SetVertexBuffer(Mesh& i_mesh, const BufferDa
 		}
 		// Color (1)
 		// 4 uint8_ts == 4 bytes
-		// Offset = 8
+		// Offset = 12
 		{
 			const GLuint vertexElementLocation = 1;
 			const GLint elementCount = 4;

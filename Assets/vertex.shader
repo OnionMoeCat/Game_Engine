@@ -5,7 +5,7 @@
 // Platform-specific setup
 #include "shaders.inc"
 
-uniform float2 g_position_offset;
+uniform float3 g_position_offset;
 
 #if defined( EAE6320_PLATFORM_D3D )
 
@@ -21,7 +21,7 @@ void main(
 	// but must match the C call to CreateVertexDeclaration()
 
 	// These values come from one of the sVertex that we filled the vertex buffer with in C code
-	in const float2 i_position : POSITION,
+	in const float3 i_position : POSITION,
 	in const float4 i_color : COLOR,
 
 	// Output
@@ -51,7 +51,7 @@ void main(
 // but must match the C calls to glVertexAttribPointer()
 
 // These values come from one of the sVertex that we filled the vertex buffer with in C code
-layout( location = 0 ) in vec2 i_position;
+layout( location = 0 ) in vec3 i_position;
 layout( location = 1 ) in vec4 i_color;
 
 // Output
@@ -84,7 +84,7 @@ void main()
 		// When we move to 3D graphics the screen position that the vertex shader outputs
 		// will be different than the position that is input to it from C code,
 		// but for now the "out" position is set directly from the "in" position:
-		O_POSITION = float4( i_position + g_position_offset, 0.0, 1.0 );
+		O_POSITION = float4( i_position + g_position_offset, 1.0 );
 		// Or, equivalently:
 		// O_POSITION = float4( i_position.xy, 0.0, 1.0 );
 		// O_POSITION = float4( i_position, 0.0, 1.0 );

@@ -40,9 +40,9 @@ namespace eae6320
 		struct sVertex
 		{
 			// POSITION
-			// 2 floats == 8 bytes
+			// 3 floats == 12 bytes
 			// Offset = 0
-			float x, y;
+			float x, y, z;
 			// COLOR0
 			// 4 uint8_ts == 4 bytes
 			// Offset = 8

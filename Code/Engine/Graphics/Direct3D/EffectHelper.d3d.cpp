@@ -72,8 +72,8 @@ bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, cons
 		D3DXHANDLE handle = i_effect.m_vertexShaderConstantTable->GetConstantByName(NULL, "g_position_offset");
 		if (handle != NULL)
 		{
-			const unsigned int floatCount = 2;
-			const float floatArray[floatCount] = { i_vector.x, i_vector.y };
+			const unsigned int floatCount = 3;
+			const float floatArray[floatCount] = { i_vector.x, i_vector.y, i_vector.z };
 			if (i_Context.device == NULL)
 			{
 				return false;
