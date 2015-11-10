@@ -59,6 +59,19 @@ bool eae6320::Graphics::Core::Initialize( const HWND i_renderingWindow )
 		}
 	}
 
+	{
+		glEnable(GL_CULL_FACE);
+		GLenum errorCode = glGetError();
+		if (errorCode != GL_NO_ERROR)
+		{
+			std::stringstream errorMessage;
+			errorMessage << "OpenGL failed to enable culling: " <<
+				reinterpret_cast<const char*>(gluErrorString(errorCode));
+			eae6320::UserOutput::Print(errorMessage.str());
+			goto OnError;
+		}
+	}
+
 	if (!CreateContext())
 	{
 		goto OnError;
