@@ -9,8 +9,6 @@
 #include <sstream>
 #include "../UserOutput/UserOutput.h"
 #include "../Windows/Functions.h"
-#include "../../External/OpenGlExtensions/OpenGlExtensions.h"
-#include "../Math/cVector.h"
 #include "Renderable.h"
 #include "RenderableHelper.h"
 #include "RenderableManager.h"

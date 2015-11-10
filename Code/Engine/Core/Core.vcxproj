@@ -18,6 +18,16 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraHelper.h" />
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityHelper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CameraHelper.cpp" />
+    <ClCompile Include="EntityHelper.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{62FF0FD9-07F8-4C55-81A2-56EEE70FCA7A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

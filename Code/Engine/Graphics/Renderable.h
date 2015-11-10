@@ -1,15 +1,12 @@
-/*
-This file contains the function declarations for mesh
-*/
-
-#ifndef EAE6320_ENTITY_H
-#define EAE6320_ENTITY_H
+#ifndef EAE6320_RENDERABLE_H
+#define EAE6320_RENDERABLE_H
 
 // Header Files
 //=============
 #include "../Graphics/Mesh.h"
 #include "../Graphics/Effect.h"
 #include "../Math/cVector.h"
+#include "../Math/cQuaternion.h"
 
 // Interface
 //==========

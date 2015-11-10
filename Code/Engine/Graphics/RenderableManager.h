@@ -2,8 +2,8 @@
 This file contains the function declarations for mesh
 */
 
-#ifndef EAE6320_ENTITY_MANAGER_H
-#define EAE6320_ENTITY_MANAGER_H
+#ifndef EAE6320_RENDERABLE_MANAGER_H
+#define EAE6320_RENDERABLE_MANAGER_H
 
 // Header Files
 //=============

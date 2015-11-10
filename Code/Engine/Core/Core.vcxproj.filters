@@ -1,2 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" />
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraHelper.h" />
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityHelper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CameraHelper.cpp" />
+    <ClCompile Include="EntityHelper.cpp" />
+  </ItemGroup>
+</Project>

@@ -21,9 +21,10 @@
 #include "../../Engine/Math/cVector.h"
 #include "../../Engine/UserInput/UserInput.h"
 #include "../../Engine/Time/Time.h"
-#include "../../Engine/Graphics/Renderable.h"
-#include "../../Engine/Graphics/RenderableHelper.h"
-#include "../../Engine/Graphics/RenderableManager.h"
+#include "../../Engine/Core/Camera.h"
+#include "../../Engine/Core/CameraHelper.h"
+#include "../../Engine/Core/Entity.h"
+#include "../../Engine/Core/EntityHelper.h"
 
 // Static Data Initialization
 //===========================
@@ -47,7 +48,8 @@ namespace
 	// as one of your classmate's
 	const char* s_mainWindowClass_name = "Yuchen Zhang's Main Window Class";
 
-	eae6320::Graphics::Renderable s_entity_box;
+	eae6320::Core::Entity s_entity_box;
+	eae6320::Core::Camera s_camera;
 }
 
 // Helper Functions
@@ -135,7 +137,7 @@ int WaitForMainWindowToCloseAndReturnExitCode( const HINSTANCE i_thisInstanceOfT
 	// Wait for the main window to close
 	int exitCode;
 	bool wereThereErrors = WaitForMainWindowToClose( exitCode );
-	if (!eae6320::Graphics::RenderableHelper::CleanUp(s_entity_box))
+	if (!eae6320::Core::EntityHelper::CleanUp(s_entity_box))
 	{
 		wereThereErrors = true;
 	}
@@ -527,7 +529,8 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			// or similar, though.)
 			eae6320::Time::OnNewFrame();
 			UpdateEntities();
-			eae6320::Graphics::RenderableManager::Get().Submit(s_entity_box);
+			//TODO: find a good way to show error message here
+			eae6320::Core::EntityHelper::Submit(s_entity_box);
 			eae6320::Graphics::Core::Render();
 		}
 		else
@@ -591,17 +594,28 @@ namespace
 		// that encapsulates a mesh, an effect, and a position offset.
 		// You don't have to do it this way for your assignment!
 		// You just need a way to update the position offset associated with the colorful rectangle.
-		eae6320::Graphics::RenderableHelper::OffsetPosition(s_entity_box, offset);
+		eae6320::Core::EntityHelper::OffsetPosition(s_entity_box, offset);
+		eae6320::Core::EntityHelper::ToCameraScreen(s_entity_box, s_camera);
 	}
 
 	bool Initialize()
 	{
-		if (!eae6320::Graphics::RenderableHelper::LoadEntityFromFile(s_entity_box, "data/default.effect", "data/box.mesh"))
+		if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_box, "data/default.effect", "data/box.mesh"))
 		{
 			return false;
 		}
-		eae6320::Math::cVector rectangle_position_offset(0.0f, 0.0f, 0.0f);
-		eae6320::Graphics::RenderableHelper::OffsetPosition(s_entity_box, rectangle_position_offset);
+		eae6320::Math::cVector box_position_offset(0.0f, 0.0f, 0.0f);
+		eae6320::Core::EntityHelper::OffsetPosition(s_entity_box, box_position_offset);
+
+		const int desiredWidth = 800;
+		const int desiredHeight = 600;
+		const eae6320::Math::cQuaternion identityRotation;
+		const eae6320::Math::cVector position(0.0f, 0.0f, 10.0f);
+		const float fov = 60.0f;
+		const float aspect = static_cast<float>(desiredWidth) / static_cast<float>(desiredHeight);
+		const float nearZ = 0.1f;
+		const float farZ = 100.0f;
+		eae6320::Core::CameraHelper::Initialize(s_camera, identityRotation, position, fov, aspect, nearZ, farZ);
 
 		return true;
 	}

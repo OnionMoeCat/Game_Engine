@@ -6,7 +6,6 @@
 #include <cassert>
 #include <d3d9.h>
 #include "../../UserOutput/UserOutput.h"
-#include "../../Math/cVector.h"
 #include "../Renderable.h"
 #include "../RenderableHelper.h"
 #include "../RenderableManager.h"

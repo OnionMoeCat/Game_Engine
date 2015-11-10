@@ -2,13 +2,12 @@
 This file contains the function declarations for MeshHelper
 */
 
-#ifndef EAE6320_ENTITYHELPER_H
-#define EAE6320_ENTITYHELPER_H
+#ifndef EAE6320_RENDERABLE_HELPER_H
+#define EAE6320_RENDERABLE_HELPER_H
 
 // Header Files
 //=============
 #include "Renderable.h"
-#include "../Math/cVector.h"
 
 // Interface
 //==========
@@ -18,10 +17,12 @@ namespace eae6320
 	namespace Graphics
 	{
 		struct RenderableHelper
-		{
-			bool static LoadEntityFromFile(Renderable& i_entity, const char* const i_effectPath, const char* i_meshPath);
-			void static OffsetPosition(Renderable& i_entity, const eae6320::Math::cVector& i_offset_position);
-			bool static CleanUp(Renderable& i_entity);
+		{			
+			bool static CleanUp(Renderable& i_renderable);
+			bool static LoadRenderableFromFile(Renderable& i_renderable, const char* const i_effectPath, const char* i_meshPath);
+			bool static CreateLocalToWorldTransform(Renderable& i_renderable, const eae6320::Math::cQuaternion& i_rotation, const eae6320::Math::cVector& i_position);
+			bool static CreateWorldToViewTransform(Renderable& i_renderable, const eae6320::Math::cQuaternion& i_cameraRotation, const eae6320::Math::cVector& i_cameraPosition);
+			bool static CreateViewToScreenTransform(Renderable& i_renderable, const float i_fov, const float i_aspect, const float i_nearZ, const float i_farZ);
 		};
 	}
 }
