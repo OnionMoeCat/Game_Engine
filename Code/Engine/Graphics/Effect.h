@@ -17,6 +17,8 @@ This file contains the function declarations for effect
 #include <gl/GLU.h>
 #endif
 
+#include "../Math/cMatrix_transformation.h"
+
 // Interface
 //==========
 
@@ -33,6 +35,9 @@ namespace eae6320
 #elif defined( EAE6320_PLATFORM_GL )
 			GLuint m_programID = 0;
 #endif
+			eae6320::Math::cMatrix_transformation m_transform_localToWorld;
+			eae6320::Math::cMatrix_transformation m_transform_worldToView;
+			eae6320::Math::cMatrix_transformation m_transform_viewToScreen;
 		};
 	}
 }

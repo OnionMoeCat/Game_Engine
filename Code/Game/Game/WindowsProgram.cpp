@@ -47,9 +47,7 @@ namespace
 	// as one of your classmate's
 	const char* s_mainWindowClass_name = "Yuchen Zhang's Main Window Class";
 
-	eae6320::Graphics::Renderable s_entity_rectangle;
-	eae6320::Graphics::Renderable s_entity_triangle1;
-	eae6320::Graphics::Renderable s_entity_triangle2;
+	eae6320::Graphics::Renderable s_entity_box;
 }
 
 // Helper Functions
@@ -137,15 +135,7 @@ int WaitForMainWindowToCloseAndReturnExitCode( const HINSTANCE i_thisInstanceOfT
 	// Wait for the main window to close
 	int exitCode;
 	bool wereThereErrors = WaitForMainWindowToClose( exitCode );
-	if (!eae6320::Graphics::RenderableHelper::CleanUp(s_entity_rectangle))
-	{
-		wereThereErrors = true;
-	}
-	if (!eae6320::Graphics::RenderableHelper::CleanUp(s_entity_triangle1))
-	{
-		wereThereErrors = true;
-	}
-	if (!eae6320::Graphics::RenderableHelper::CleanUp(s_entity_triangle2))
+	if (!eae6320::Graphics::RenderableHelper::CleanUp(s_entity_box))
 	{
 		wereThereErrors = true;
 	}
@@ -537,9 +527,7 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			// or similar, though.)
 			eae6320::Time::OnNewFrame();
 			UpdateEntities();
-			eae6320::Graphics::RenderableManager::Get().Submit(s_entity_rectangle);
-			eae6320::Graphics::RenderableManager::Get().Submit(s_entity_triangle1);
-			eae6320::Graphics::RenderableManager::Get().Submit(s_entity_triangle2);
+			eae6320::Graphics::RenderableManager::Get().Submit(s_entity_box);
 			eae6320::Graphics::Core::Render();
 		}
 		else
@@ -603,32 +591,17 @@ namespace
 		// that encapsulates a mesh, an effect, and a position offset.
 		// You don't have to do it this way for your assignment!
 		// You just need a way to update the position offset associated with the colorful rectangle.
-		eae6320::Graphics::RenderableHelper::OffsetPosition(s_entity_rectangle, offset);
+		eae6320::Graphics::RenderableHelper::OffsetPosition(s_entity_box, offset);
 	}
 
 	bool Initialize()
 	{
-		if (!eae6320::Graphics::RenderableHelper::LoadEntityFromFile(s_entity_rectangle, "data/default.effect", "data/square.mesh"))
+		if (!eae6320::Graphics::RenderableHelper::LoadEntityFromFile(s_entity_box, "data/default.effect", "data/box.mesh"))
 		{
-			return false;
-		}
-		if (!eae6320::Graphics::RenderableHelper::LoadEntityFromFile(s_entity_triangle1, "data/default.effect", "data/triangle.mesh"))
-		{
-			eae6320::Graphics::RenderableHelper::CleanUp(s_entity_rectangle);
-			return false;
-		}
-		if (!eae6320::Graphics::RenderableHelper::LoadEntityFromFile(s_entity_triangle2, "data/default.effect", "data/triangle.mesh"))
-		{
-			eae6320::Graphics::RenderableHelper::CleanUp(s_entity_rectangle);
-			eae6320::Graphics::RenderableHelper::CleanUp(s_entity_triangle1);
 			return false;
 		}
 		eae6320::Math::cVector rectangle_position_offset(0.0f, 0.0f, 0.0f);
-		eae6320::Graphics::RenderableHelper::OffsetPosition(s_entity_rectangle, rectangle_position_offset);
-		eae6320::Math::cVector triangle1_position_offset(0.0f, -0.1f, 0.0f);
-		eae6320::Graphics::RenderableHelper::OffsetPosition(s_entity_triangle1, triangle1_position_offset);
-		eae6320::Math::cVector triangle2_position_offset(0.0f, 0.1f, 0.0f);
-		eae6320::Graphics::RenderableHelper::OffsetPosition(s_entity_triangle2, triangle2_position_offset);
+		eae6320::Graphics::RenderableHelper::OffsetPosition(s_entity_box, rectangle_position_offset);
 
 		return true;
 	}

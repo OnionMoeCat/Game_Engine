@@ -18,6 +18,7 @@ namespace
 	bool LoadVertexShader(const GLuint i_programId, const char* const i_path);
 	bool LoadFragmentShader(const GLuint i_programId, const char* const i_path);
 	bool LoadAndAllocateShaderProgram(const char* i_path, void*& o_shader, size_t& o_size, std::string* o_errorMessage);
+	bool SetMatrixUniform(eae6320::Graphics::Effect& i_effect, const char* const i_variable, eae6320::Math::cMatrix_transformation& i_matrix);
 
 	// This helper struct exists to be able to dynamically allocate memory to get "log info"
 	// which will automatically be freed when the struct goes out of scope
@@ -166,16 +167,17 @@ bool eae6320::Graphics::EffectHelper::CleanUp(Effect& i_effect, const Context& i
 	}
 	return true;
 }
-bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, const eae6320::Math::cVector& i_vector, const Context& i_Context)
+bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, const Context& i_Context)
 {
-	GLint location = glGetUniformLocation(i_effect.m_programID, "g_position_offset");
-	if (location != -1)
+	if (!SetMatrixUniform(i_effect, "g_transform_localToWorld", i_effect.m_transform_localToWorld))
 	{
-		const unsigned int uniformCount = 1;
-		const float floatArray[3] = {i_vector.x, i_vector.y, i_vector.z};
-		glUniform3fv(location, uniformCount, floatArray);
+		return false;
 	}
-	else
+	if (!SetMatrixUniform(i_effect, "g_transform_worldToView", i_effect.m_transform_worldToView))
+	{
+		return false;
+	}
+	if (!SetMatrixUniform(i_effect, "g_transform_viewToScreen", i_effect.m_transform_viewToScreen))
 	{
 		return false;
 	}
@@ -692,5 +694,21 @@ namespace
 		}
 
 		return !wereThereErrors;
+	}
+
+	bool SetMatrixUniform(eae6320::Graphics::Effect& i_effect, const char* const i_variable, eae6320::Math::cMatrix_transformation& i_matrix)
+	{
+		GLint location = glGetUniformLocation(i_effect.m_programID, i_variable);
+		if (location != -1)
+		{
+			const GLboolean dontTranspose = false; // Matrices are already in the correct format
+			const GLsizei uniformCountToSet = 1;
+			glUniformMatrix4fv(location, uniformCountToSet, dontTranspose, reinterpret_cast<const GLfloat*>(&i_matrix));
+		}
+		else
+		{
+			return false;
+		}
+		return true;
 	}
 }

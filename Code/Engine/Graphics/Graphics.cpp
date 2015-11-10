@@ -43,7 +43,7 @@ void eae6320::Graphics::Core::Render()
 				Renderable& renderable = RenderableManager::Get().m_list[i];
 				result = EffectHelper::Bind(*renderable.m_effect, Context::Get());
 				assert(result);
-				result = EffectHelper::SetDrawCallUniforms(*renderable.m_effect, renderable.cVector, Context::Get());
+				result = EffectHelper::SetDrawCallUniforms(*renderable.m_effect, Context::Get());
 				assert(result);
 				result = MeshHelper::DrawMesh(*renderable.m_mesh, Context::Get());
 				assert(result);

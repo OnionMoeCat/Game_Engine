@@ -22,7 +22,6 @@ namespace eae6320
 		{
 			eae6320::Graphics::Mesh* m_mesh = NULL;
 			eae6320::Graphics::Effect* m_effect = NULL;
-			eae6320::Math::cVector cVector;
 		};
 	}
 }

@@ -4,12 +4,8 @@ return
 		builder = "MeshBuilder.exe",
 		assets = {
 			{
-				source = "square.mesh.raw",
-				target = "square.mesh",
-			},
-			{
-				source = "triangle.mesh.raw",
-				target = "triangle.mesh",
+				source = "box.mesh.raw",
+				target = "box.mesh",
 			},
 		},
 	},

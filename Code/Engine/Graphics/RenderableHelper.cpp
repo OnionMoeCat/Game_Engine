@@ -57,7 +57,7 @@ bool eae6320::Graphics::RenderableHelper::LoadEntityFromFile(Renderable& i_entit
 
 void eae6320::Graphics::RenderableHelper::OffsetPosition(Renderable& i_entity, const eae6320::Math::cVector& i_offset_position)
 {
-	i_entity.cVector += i_offset_position;
+	//TODO
 }
 
 bool eae6320::Graphics::RenderableHelper::CleanUp(Renderable& i_entity)

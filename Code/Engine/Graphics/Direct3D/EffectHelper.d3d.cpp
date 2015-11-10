@@ -15,6 +15,7 @@ namespace
 {
 	bool LoadVertexShader(eae6320::Graphics::Effect& i_effect, const char* const i_vertexPath, IDirect3DDevice9* i_device);
 	bool LoadFragmentShader(eae6320::Graphics::Effect& i_effect, const char* const i_fragmentPath, IDirect3DDevice9* i_device);
+	bool SetMatrixUniform(eae6320::Graphics::Effect& i_effect, const char* const i_variable, eae6320::Math::cMatrix_transformation& i_matrix, IDirect3DDevice9* i_device);
 }
 
 bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const Context& i_context)
@@ -65,31 +66,21 @@ bool eae6320::Graphics::EffectHelper::CleanUp(Effect& i_effect, const Context& i
 	}
 	return true;
 }
-bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, const eae6320::Math::cVector& i_vector, const Context& i_Context)
+bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, const Context& i_Context)
 {
-	if (i_effect.m_vertexShaderConstantTable != NULL)
+	if (i_Context.device == NULL)
 	{
-		D3DXHANDLE handle = i_effect.m_vertexShaderConstantTable->GetConstantByName(NULL, "g_position_offset");
-		if (handle != NULL)
-		{
-			const unsigned int floatCount = 3;
-			const float floatArray[floatCount] = { i_vector.x, i_vector.y, i_vector.z };
-			if (i_Context.device == NULL)
-			{
-				return false;
-			}
-			HRESULT result = i_effect.m_vertexShaderConstantTable->SetFloatArray(i_Context.device, handle, floatArray, floatCount);
-			if (FAILED(result))
-			{
-				return false;
-			}
-		}
-		else
-		{
-			return false;
-		}
+		return false;
 	}
-	else
+	if (!SetMatrixUniform(i_effect, "g_transform_localToWorld", i_effect.m_transform_localToWorld, i_Context.device))
+	{
+		return false;
+	}
+	if (!SetMatrixUniform(i_effect, "g_transform_worldToView", i_effect.m_transform_worldToView, i_Context.device))
+	{
+		return false;
+	}
+	if (!SetMatrixUniform(i_effect, "g_transform_viewToScreen", i_effect.m_transform_viewToScreen, i_Context.device))
 	{
 		return false;
 	}
@@ -188,5 +179,31 @@ namespace
 			free(temporaryBuffer);
 		}
 		return !wereThereErrors;
+	}
+	bool SetMatrixUniform(eae6320::Graphics::Effect& i_effect, const char* const i_variable, eae6320::Math::cMatrix_transformation& i_matrix, IDirect3DDevice9* i_device)
+	{
+		if (i_effect.m_vertexShaderConstantTable != NULL)
+		{
+			D3DXHANDLE handle = i_effect.m_vertexShaderConstantTable->GetConstantByName(NULL, i_variable);
+			if (handle != NULL)
+			{
+
+				HRESULT result = i_effect.m_vertexShaderConstantTable->SetMatrixTranspose(i_device, handle,
+					reinterpret_cast<const D3DXMATRIX*>(&i_matrix));
+				if (FAILED(result))
+				{
+					return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+		return true;
 	}
 }
