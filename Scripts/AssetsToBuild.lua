@@ -11,6 +11,10 @@ return
 				source = "square.mesh.raw",
 				target = "square.mesh",
 			},
+			{
+				source = "ball.mesh.raw",
+				target = "ball.mesh",
+			},
 		},
 	},
 	{
@@ -33,6 +37,13 @@ return
 					"fragment"
 				},
 			},
+			{
+				source = "fragment_transparent.shader",
+				target = "fragment_transparent.shader",
+				optionalArguments = {
+					"fragment"
+				},
+			},
 		},
 	},
 	{
@@ -41,6 +52,10 @@ return
 			{
 				source = "default.effect.raw",
 				target = "default.effect",
+			},
+			{
+				source = "transparent.effect.raw",
+				target = "transparent.effect",
 			},
 		},
 	},

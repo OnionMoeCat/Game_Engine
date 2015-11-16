@@ -643,7 +643,7 @@ namespace
 	bool Initialize()
 	{
 		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_box, "data/default.effect", "data/box.mesh"))
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_box, "data/default.effect", "data/ball.mesh"))
 			{
 				//TODO: find a way to show error message
 				return false;

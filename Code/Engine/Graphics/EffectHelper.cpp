@@ -34,6 +34,7 @@ bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const
 
 	const char* vertexPath = NULL;
 	const char* fragmentPath = NULL;
+	uint8_t renderStates = 0;
 
 	void* temporaryBuffer = NULL;
 	{
@@ -42,9 +43,15 @@ bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const
 			char* tempPTR = reinterpret_cast<char*>(temporaryBuffer);
 			uint8_t strLength = *reinterpret_cast<uint8_t*>(tempPTR);
 			tempPTR += sizeof(uint8_t);
-			vertexPath = reinterpret_cast<char*>(tempPTR);
+			vertexPath = reinterpret_cast<char*>(tempPTR);			
 			tempPTR += strLength;
+
+			strLength = *reinterpret_cast<uint8_t*>(tempPTR);
+			tempPTR += sizeof(uint8_t);
 			fragmentPath = reinterpret_cast<char*>(tempPTR);
+			tempPTR += strLength;
+
+			renderStates = *reinterpret_cast<uint8_t*>(tempPTR);
 		}
 		else
 		{

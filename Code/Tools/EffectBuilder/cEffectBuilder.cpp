@@ -15,6 +15,17 @@ namespace
 {
 	std::string vertexShaderPath;
 	std::string fragmentShaderPath;
+	uint8_t renderStates;
+
+	namespace RenderStates
+	{
+		const uint8_t ALPHA = 1 << 0;
+		const uint8_t DEPTHTEST = 1 << 1;
+		const uint8_t DEPTHWRITE = 1 << 2;
+		const bool DEFAULTALPHA = false;
+		const bool DEFAULTDEPTHTEST = true;
+		const bool DEFAULTDEPTHWRITE = true;
+	}
 }
 
 // Helper Function Declarations
@@ -136,6 +147,110 @@ namespace
 				fragmentShaderPath = lua_tostring(&io_luaState, -1);
 				lua_pop(&io_luaState, 1);
 			}
+		}
+
+		renderStates = 0;
+
+		// Get the value of "alpha_transparency"
+		{
+			const char* const key = "alpha_transparency";
+			lua_pushstring(&io_luaState, key);
+
+			{
+				const int currentIndexOfTable = -2;
+				lua_gettable(&io_luaState, currentIndexOfTable);
+			}
+
+			bool isBitOn = RenderStates::DEFAULTALPHA;
+
+			if (!lua_isnil(&io_luaState, -1))
+			{
+				if (!lua_isboolean(&io_luaState, -1))
+				{
+					std::stringstream errorMessage;
+					errorMessage << "The value for \"" << key << "\" must be a boolean "
+						"(instead of a " << luaL_typename(&io_luaState, -1) << ")\n";
+					eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+					lua_pop(&io_luaState, 1);
+					return false;
+				}
+
+				isBitOn = lua_toboolean(&io_luaState, -1) != 0;
+			}
+
+			if (isBitOn)
+			{
+				renderStates |= RenderStates::ALPHA;
+			}
+			lua_pop(&io_luaState, 1);
+		}
+
+		// Get the value of "depth_testing"
+		{
+			const char* const key = "depth_testing";
+			lua_pushstring(&io_luaState, key);
+
+			{
+				const int currentIndexOfTable = -2;
+				lua_gettable(&io_luaState, currentIndexOfTable);
+			}
+
+			bool isBitOn = RenderStates::DEFAULTDEPTHTEST;
+
+			if (!lua_isnil(&io_luaState, -1))
+			{
+				if (lua_type(&io_luaState, -1) != LUA_TBOOLEAN)
+				{
+					std::stringstream errorMessage;
+					errorMessage << "The value for \"" << key << "\" must be a boolean "
+						"(instead of a " << luaL_typename(&io_luaState, -1) << ")\n";
+					eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+					lua_pop(&io_luaState, 1);
+					return false;
+				}
+
+				isBitOn = lua_toboolean(&io_luaState, -1) != 0;
+			}
+
+			if (isBitOn)
+			{
+				renderStates |= RenderStates::DEPTHTEST;
+			}
+			lua_pop(&io_luaState, 1);
+		}
+
+		// Get the value of "depth_writing"
+		{
+			const char* const key = "depth_writing";
+			lua_pushstring(&io_luaState, key);
+
+			{
+				const int currentIndexOfTable = -2;
+				lua_gettable(&io_luaState, currentIndexOfTable);
+			}
+
+			bool isBitOn = RenderStates::DEFAULTDEPTHWRITE;
+
+			if (!lua_isnil(&io_luaState, -1))
+			{
+				if (lua_type(&io_luaState, -1) != LUA_TBOOLEAN)
+				{
+					std::stringstream errorMessage;
+					errorMessage << "The value for \"" << key << "\" must be a boolean "
+						"(instead of a " << luaL_typename(&io_luaState, -1) << ")\n";
+					eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+					lua_pop(&io_luaState, 1);
+					return false;
+				}
+
+				isBitOn = lua_toboolean(&io_luaState, -1) != 0;
+			}
+
+			if (isBitOn)
+			{
+				renderStates |= RenderStates::DEPTHWRITE;
+			}
+			lua_pop(&io_luaState, 1);
 		}
 
 		return true;
@@ -309,8 +424,34 @@ namespace
 			goto OnExit;
 		}
 
-		bytesToWrite = static_cast<DWORD>(fragmentShaderPath.length() + 1);
+		tempStrlen = static_cast<unsigned int>(fragmentShaderPath.length());
+		//Output error if strlength can not be hold in a uint8_t
+		if (tempStrlen + 1 > 0xFF)
+		{
+			unsigned int outputLen = 50;
+			std::stringstream errorMessage;
+			errorMessage << "File name length exceeds range of uint8_t. File name length: " << tempStrlen << " File name (first " << outputLen << "): " << fragmentShaderPath.substr(0, outputLen);
+			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+			return false;
+		}
+
+		strlength = static_cast<uint8_t>(tempStrlen + 1);
+		bytesToWrite = 1;
+		if (!WriteBufferToFile(i_path, fileHandle, &strlength, bytesToWrite))
+		{
+			wereThereErrors = true;
+			goto OnExit;
+		}
+
+		bytesToWrite = strlength;
 		if (!WriteBufferToFile(i_path, fileHandle, fragmentShaderPath.c_str(), bytesToWrite))
+		{
+			wereThereErrors = true;
+			goto OnExit;
+		}
+
+		bytesToWrite = sizeof(uint8_t);
+		if (!WriteBufferToFile(i_path, fileHandle, &renderStates, bytesToWrite))
 		{
 			wereThereErrors = true;
 			goto OnExit;
@@ -354,6 +495,7 @@ namespace
 		// Clean up global strings
 		vertexShaderPath.clear();
 		fragmentShaderPath.clear();
+		renderStates = 0;
 
 		return !wereThereErrors;
 	}

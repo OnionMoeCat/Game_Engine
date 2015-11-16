@@ -144,6 +144,13 @@ bool eae6320::Graphics::Core::Clear(eae6320::Graphics::sColor color, float depth
 	{
 		wereThereErrors = true;
 	}
+
+	glDepthMask(GL_TRUE);
+	if (glGetError() != GL_NO_ERROR)
+	{
+		wereThereErrors = true;
+	}
+
 	// In addition to the color, "depth" and "stencil" can also be cleared,
 	const GLbitfield clearColorAndDepth = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
 	glClear(clearColorAndDepth);

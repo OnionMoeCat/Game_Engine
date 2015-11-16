@@ -9,6 +9,9 @@ This file contains the function declarations for effect
 //=============
 
 #include "../Windows/Includes.h"
+
+#include <cstdint>
+
 #if defined( EAE6320_PLATFORM_D3D )
 #include <d3d9.h>
 #include <d3dx9shader.h>
@@ -35,6 +38,7 @@ namespace eae6320
 #elif defined( EAE6320_PLATFORM_GL )
 			GLuint m_programID = 0;
 #endif
+			uint8_t m_renderStates = 0;
 			eae6320::Math::cMatrix_transformation m_transform_localToWorld;
 			eae6320::Math::cMatrix_transformation m_transform_worldToView;
 			eae6320::Math::cMatrix_transformation m_transform_viewToScreen;

@@ -16,6 +16,12 @@ namespace
 	bool LoadVertexShader(eae6320::Graphics::Effect& i_effect, const char* const i_vertexPath, IDirect3DDevice9* i_device);
 	bool LoadFragmentShader(eae6320::Graphics::Effect& i_effect, const char* const i_fragmentPath, IDirect3DDevice9* i_device);
 	bool SetMatrixUniform(eae6320::Graphics::Effect& i_effect, const char* const i_variable, eae6320::Math::cMatrix_transformation& i_matrix, IDirect3DDevice9* i_device);
+	namespace RenderStates
+	{
+		const uint8_t ALPHA = 1 << 0;
+		const uint8_t DEPTHTEST = 1 << 1;
+		const uint8_t DEPTHWRITE = 1 << 2;
+	}
 }
 
 bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const Context& i_context)
@@ -40,7 +46,77 @@ bool eae6320::Graphics::EffectHelper::Bind(Effect& i_effect, const Context& i_co
 	{
 		return false;
 	}
-	HRESULT result = i_context.device->SetVertexShader(i_effect.m_vertexShader);
+
+	uint8_t renderStates = i_effect.m_renderStates;
+	
+	HRESULT result;
+	if (renderStates & RenderStates::ALPHA)
+	{
+		result = i_context.device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+		if (FAILED(result))
+		{
+			return false;
+		}
+		result = i_context.device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+		if (FAILED(result))
+		{
+			return false;
+		}
+		result = i_context.device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+		if (FAILED(result))
+		{
+			return false;
+		}
+	}
+	else
+	{
+		result = i_context.device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+		if (FAILED(result))
+		{
+			return false;
+		}
+	}
+
+	if (renderStates & RenderStates::DEPTHTEST)
+	{
+		result = i_context.device->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+		if (FAILED(result))
+		{
+			return false;
+		}
+		result = i_context.device->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+		if (FAILED(result))
+		{
+			return false;
+		}
+	}
+	else
+	{
+		result = i_context.device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+		if (FAILED(result))
+		{
+			return false;
+		}
+	}
+
+	if (renderStates & RenderStates::DEPTHWRITE)
+	{
+		result = i_context.device->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+		if (FAILED(result))
+		{
+			return false;
+		}
+	}
+	else
+	{
+		result = i_context.device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+		if (FAILED(result))
+		{
+			return false;
+		}
+	}
+
+	result = i_context.device->SetVertexShader(i_effect.m_vertexShader);
 	if (FAILED(result))
 	{
 		return false;

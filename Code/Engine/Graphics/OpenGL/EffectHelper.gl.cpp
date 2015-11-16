@@ -28,6 +28,13 @@ namespace
 		sLogInfo(const size_t i_size) { memory = reinterpret_cast<GLchar*>(malloc(i_size)); }
 		~sLogInfo() { if (memory) free(memory); }
 	};
+
+	namespace RenderStates
+	{
+		const uint8_t ALPHA = 1 << 0;
+		const uint8_t DEPTHTEST = 1 << 1;
+		const uint8_t DEPTHWRITE = 1 << 2;
+	}
 }
 
 bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const Context& i_context)
@@ -141,6 +148,68 @@ bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const
 }
 bool eae6320::Graphics::EffectHelper::Bind(Effect& i_effect, const Context& i_context)
 {
+	uint8_t renderStates = i_effect.m_renderStates;
+	if (renderStates & RenderStates::ALPHA)
+	{
+		glEnable(GL_BLEND);
+		if (glGetError() != GL_NO_ERROR)
+		{
+			return false;
+		}
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		if (glGetError() != GL_NO_ERROR)
+		{
+			return false;
+		}
+	}
+	else
+	{
+		glDisable(GL_BLEND);
+		if (glGetError() != GL_NO_ERROR)
+		{
+			return false;
+		}
+	}
+
+	if (renderStates & RenderStates::DEPTHTEST)
+	{
+		glEnable(GL_DEPTH_TEST);
+		if (glGetError() != GL_NO_ERROR)
+		{
+			return false;
+		}
+		glDepthFunc(GL_LEQUAL);
+		if (glGetError() != GL_NO_ERROR)
+		{
+			return false;
+		}
+	}
+	else
+	{
+		glDisable(GL_DEPTH_TEST);
+		if (glGetError() != GL_NO_ERROR)
+		{
+			return false;
+		}
+	}
+
+	if (renderStates & RenderStates::DEPTHTEST)
+	{
+		glDepthMask(GL_TRUE);
+		if (glGetError() != GL_NO_ERROR)
+		{
+			return false;
+		}
+	}
+	else
+	{
+		glDepthMask(GL_FALSE);
+		if (glGetError() != GL_NO_ERROR)
+		{
+			return false;
+		}
+	}
+
 	// Set the vertex and fragment shaders
 	glUseProgram(i_effect.m_programID);
 	if (glGetError() != GL_NO_ERROR)
