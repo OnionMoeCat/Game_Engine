@@ -29,11 +29,11 @@ namespace
 		~sLogInfo() { if (memory) free(memory); }
 	};
 
-	namespace RenderStates
+	enum RenderStates : uint8_t
 	{
-		const uint8_t ALPHA = 1 << 0;
-		const uint8_t DEPTHTEST = 1 << 1;
-		const uint8_t DEPTHWRITE = 1 << 2;
+		ALPHA = 1 << 0,
+		DEPTHTEST = 1 << 1,
+		DEPTHWRITE = 1 << 2
 	}
 }
 
