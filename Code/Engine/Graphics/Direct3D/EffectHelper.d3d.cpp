@@ -16,12 +16,6 @@ namespace
 	bool LoadVertexShader(eae6320::Graphics::Effect& i_effect, const char* const i_vertexPath, IDirect3DDevice9* i_device);
 	bool LoadFragmentShader(eae6320::Graphics::Effect& i_effect, const char* const i_fragmentPath, IDirect3DDevice9* i_device);
 	bool SetMatrixUniform(eae6320::Graphics::Effect& i_effect, const char* const i_variable, eae6320::Math::cMatrix_transformation& i_matrix, IDirect3DDevice9* i_device);
-	enum RenderStates : uint8_t
-	{
-		ALPHA = 1 << 0,
-		DEPTHTEST = 1 << 1,
-		DEPTHWRITE = 1 << 2
-	};
 }
 
 bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const Context& i_context)

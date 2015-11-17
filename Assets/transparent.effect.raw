@@ -1,11 +1,14 @@
 return
 {
-	vertex_shader_path = "data/vertex.shader",
-	fragment_shader_path = "data/fragment_transparent.shader",
+	paths =
+	{
+		vertex_shader_path = "data/vertex.shader",
+		fragment_shader_path = "data/fragment_transparent.shader",
+	},
 	render_states =
 	{
 		alpha_transparency = true,
 		depth_testing = true,
 		depth_writing = false,
-	}
+	},
 }

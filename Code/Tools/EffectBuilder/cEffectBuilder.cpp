@@ -17,14 +17,18 @@ namespace
 	std::string fragmentShaderPath;
 	uint8_t renderStates;
 
-	namespace RenderStates
+	enum RenderStates : uint8_t
 	{
-		const uint8_t ALPHA = 1 << 0;
-		const uint8_t DEPTHTEST = 1 << 1;
-		const uint8_t DEPTHWRITE = 1 << 2;
-		const bool DEFAULTALPHA = false;
-		const bool DEFAULTDEPTHTEST = true;
-		const bool DEFAULTDEPTHWRITE = true;
+		ALPHA = 1 << 0,
+		DEPTHTEST = 1 << 1,
+		DEPTHWRITE = 1 << 2
+	};
+
+	namespace DefaultRenderStates
+	{
+		const bool ALPHA = false;
+		const bool DEPTHTEST = true;
+		const bool DEPTHWRITE = true;
 	}
 }
 
@@ -35,6 +39,7 @@ namespace
 {
 	bool LoadTableValues(lua_State& io_luaState);
 	bool LoadTableValues_render_states(lua_State& io_luaState);
+	bool LoadTableValues_paths(lua_State& io_luaState);
 
 	void SetDefaultRenderState();
 
@@ -80,6 +85,193 @@ namespace
 {
 	bool LoadTableValues(lua_State& io_luaState)
 	{
+		
+
+		{
+			const char* const key = "paths";
+			lua_pushstring(&io_luaState, key);
+			lua_gettable(&io_luaState, -2);
+
+			if (lua_isnil(&io_luaState, -1))
+			{
+				std::stringstream errorMessage;
+				errorMessage << "No value for \"" << key << "\" was found in the asset table"
+					"\n";
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+
+
+			if (!lua_istable(&io_luaState, -1))
+			{
+				std::stringstream errorMessage;
+				errorMessage << "The value at key \"" << key << "\" must be a table (instead of a " << luaL_typename(&io_luaState, -1);
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+
+			if (!LoadTableValues_paths(io_luaState))
+			{
+				std::stringstream errorMessage;
+				errorMessage << "Fail to get value of " << key;
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+
+			lua_pop(&io_luaState, 1);
+
+		}
+
+		{
+			const char* const key = "render_states";
+			lua_pushstring(&io_luaState, key);
+			lua_gettable(&io_luaState, -2);
+
+			if (lua_isnil(&io_luaState, -1))
+			{
+				std::stringstream errorMessage;
+				errorMessage << "No value for \"" << key << "\" was found in the asset table"
+					"\n";
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+
+			if (lua_istable(&io_luaState, -1))
+			{
+				if (!LoadTableValues_render_states(io_luaState))
+				{
+					std::stringstream errorMessage;
+					errorMessage << "Fail to get value of " << key;
+					eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+					lua_pop(&io_luaState, 1);
+					return false;
+				}
+			}
+			else
+			{
+				SetDefaultRenderState();
+			}
+
+			lua_pop(&io_luaState, 1);
+
+		}
+		return true;
+	}
+
+	bool LoadTableValues_render_states(lua_State& io_luaState)
+	{
+		renderStates = 0;
+
+		// Get the value of "alpha_transparency"
+		{
+			const char* const key = "alpha_transparency";
+			lua_pushstring(&io_luaState, key);
+
+			{
+				const int currentIndexOfTable = -2;
+				lua_gettable(&io_luaState, currentIndexOfTable);
+			}
+
+			bool isBitOn = DefaultRenderStates::ALPHA;
+
+			if (!lua_isnil(&io_luaState, -1))
+			{
+				if (!lua_isboolean(&io_luaState, -1))
+				{
+					std::stringstream errorMessage;
+					errorMessage << "The value for \"" << key << "\" must be a boolean "
+						"(instead of a " << luaL_typename(&io_luaState, -1) << ")\n";
+					eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+					lua_pop(&io_luaState, 1);
+					return false;
+				}
+
+				isBitOn = lua_toboolean(&io_luaState, -1) != 0;
+			}
+
+			if (isBitOn)
+			{
+				renderStates |= RenderStates::ALPHA;
+			}
+			lua_pop(&io_luaState, 1);
+		}
+
+		// Get the value of "depth_testing"
+		{
+			const char* const key = "depth_testing";
+			lua_pushstring(&io_luaState, key);
+
+			{
+				const int currentIndexOfTable = -2;
+				lua_gettable(&io_luaState, currentIndexOfTable);
+			}
+
+			bool isBitOn = DefaultRenderStates::DEPTHTEST;
+
+			if (!lua_isnil(&io_luaState, -1))
+			{
+				if (lua_type(&io_luaState, -1) != LUA_TBOOLEAN)
+				{
+					std::stringstream errorMessage;
+					errorMessage << "The value for \"" << key << "\" must be a boolean "
+						"(instead of a " << luaL_typename(&io_luaState, -1) << ")\n";
+					eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+					lua_pop(&io_luaState, 1);
+					return false;
+				}
+
+				isBitOn = lua_toboolean(&io_luaState, -1) != 0;
+			}
+
+			if (isBitOn)
+			{
+				renderStates |= RenderStates::DEPTHTEST;
+			}
+			lua_pop(&io_luaState, 1);
+		}
+
+		// Get the value of "depth_writing"
+		{
+			const char* const key = "depth_writing";
+			lua_pushstring(&io_luaState, key);
+
+			{
+				const int currentIndexOfTable = -2;
+				lua_gettable(&io_luaState, currentIndexOfTable);
+			}
+
+			bool isBitOn = DefaultRenderStates::DEPTHWRITE;
+
+			if (!lua_isnil(&io_luaState, -1))
+			{
+				if (lua_type(&io_luaState, -1) != LUA_TBOOLEAN)
+				{
+					std::stringstream errorMessage;
+					errorMessage << "The value for \"" << key << "\" must be a boolean "
+						"(instead of a " << luaL_typename(&io_luaState, -1) << ")\n";
+					eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+					lua_pop(&io_luaState, 1);
+					return false;
+				}
+
+				isBitOn = lua_toboolean(&io_luaState, -1) != 0;
+			}
+
+			if (isBitOn)
+			{
+				renderStates |= RenderStates::DEPTHWRITE;
+			}
+			lua_pop(&io_luaState, 1);
+		}
+		return true;
+	}
+
+	bool LoadTableValues_paths(lua_State& io_luaState)
+	{
 		// Get the value of "vertex_shader_path"
 		{
 			const char* const key = "vertex_shader_path";
@@ -116,7 +308,7 @@ namespace
 			}
 		}
 
-		// Get the value of "vertex_shader_path"
+		// Get the value of "fragment_shader_path"
 		{
 			const char* const key = "fragment_shader_path";
 			lua_pushstring(&io_luaState, key);
@@ -152,148 +344,6 @@ namespace
 			}
 		}
 
-		{
-			const char* const key = "render_states";
-			lua_pushstring(&io_luaState, key);
-			lua_gettable(&io_luaState, -2);
-
-			if (lua_isnil(&io_luaState, -1))
-			{
-				std::stringstream errorMessage;
-				errorMessage << "No value for \"" << key << "\" was found in the asset table"
-					"\n";
-				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
-				lua_pop(&io_luaState, 1);
-				return false;
-			}
-
-			if (lua_istable(&io_luaState, -1))
-			{
-				if (!LoadTableValues_render_states(io_luaState))
-				{
-					std::stringstream errorMessage;
-					errorMessage << "Fail to get value of render_state";
-					eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
-					lua_pop(&io_luaState, 1);
-					return false;
-				}
-			}
-			else
-			{
-				SetDefaultRenderState();
-			}
-
-			lua_pop(&io_luaState, 1);
-
-		}
-		return true;
-	}
-
-	bool LoadTableValues_render_states(lua_State& io_luaState)
-	{
-		renderStates = 0;
-
-		// Get the value of "alpha_transparency"
-		{
-			const char* const key = "alpha_transparency";
-			lua_pushstring(&io_luaState, key);
-
-			{
-				const int currentIndexOfTable = -2;
-				lua_gettable(&io_luaState, currentIndexOfTable);
-			}
-
-			bool isBitOn = RenderStates::DEFAULTALPHA;
-
-			if (!lua_isnil(&io_luaState, -1))
-			{
-				if (!lua_isboolean(&io_luaState, -1))
-				{
-					std::stringstream errorMessage;
-					errorMessage << "The value for \"" << key << "\" must be a boolean "
-						"(instead of a " << luaL_typename(&io_luaState, -1) << ")\n";
-					eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
-					lua_pop(&io_luaState, 1);
-					return false;
-				}
-
-				isBitOn = lua_toboolean(&io_luaState, -1) != 0;
-			}
-
-			if (isBitOn)
-			{
-				renderStates |= RenderStates::ALPHA;
-			}
-			lua_pop(&io_luaState, 1);
-		}
-
-		// Get the value of "depth_testing"
-		{
-			const char* const key = "depth_testing";
-			lua_pushstring(&io_luaState, key);
-
-			{
-				const int currentIndexOfTable = -2;
-				lua_gettable(&io_luaState, currentIndexOfTable);
-			}
-
-			bool isBitOn = RenderStates::DEFAULTDEPTHTEST;
-
-			if (!lua_isnil(&io_luaState, -1))
-			{
-				if (lua_type(&io_luaState, -1) != LUA_TBOOLEAN)
-				{
-					std::stringstream errorMessage;
-					errorMessage << "The value for \"" << key << "\" must be a boolean "
-						"(instead of a " << luaL_typename(&io_luaState, -1) << ")\n";
-					eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
-					lua_pop(&io_luaState, 1);
-					return false;
-				}
-
-				isBitOn = lua_toboolean(&io_luaState, -1) != 0;
-			}
-
-			if (isBitOn)
-			{
-				renderStates |= RenderStates::DEPTHTEST;
-			}
-			lua_pop(&io_luaState, 1);
-		}
-
-		// Get the value of "depth_writing"
-		{
-			const char* const key = "depth_writing";
-			lua_pushstring(&io_luaState, key);
-
-			{
-				const int currentIndexOfTable = -2;
-				lua_gettable(&io_luaState, currentIndexOfTable);
-			}
-
-			bool isBitOn = RenderStates::DEFAULTDEPTHWRITE;
-
-			if (!lua_isnil(&io_luaState, -1))
-			{
-				if (lua_type(&io_luaState, -1) != LUA_TBOOLEAN)
-				{
-					std::stringstream errorMessage;
-					errorMessage << "The value for \"" << key << "\" must be a boolean "
-						"(instead of a " << luaL_typename(&io_luaState, -1) << ")\n";
-					eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
-					lua_pop(&io_luaState, 1);
-					return false;
-				}
-
-				isBitOn = lua_toboolean(&io_luaState, -1) != 0;
-			}
-
-			if (isBitOn)
-			{
-				renderStates |= RenderStates::DEPTHWRITE;
-			}
-			lua_pop(&io_luaState, 1);
-		}
 		return true;
 	}
 
@@ -403,21 +453,21 @@ namespace
 	{
 		renderStates = 0;
 
-		bool isBitOn = RenderStates::DEFAULTALPHA;
+		bool isBitOn = DefaultRenderStates::ALPHA;
 
 		if (isBitOn)
 		{
 			renderStates |= RenderStates::ALPHA;
 		}
 
-		isBitOn = RenderStates::DEFAULTDEPTHTEST;
+		isBitOn = DefaultRenderStates::DEPTHTEST;
 
 		if (isBitOn)
 		{
 			renderStates |= RenderStates::DEPTHTEST;
 		}
 
-		isBitOn = RenderStates::DEFAULTDEPTHWRITE;
+		isBitOn = DefaultRenderStates::DEPTHWRITE;
 
 		if (isBitOn)
 		{

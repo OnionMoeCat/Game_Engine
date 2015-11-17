@@ -20,6 +20,13 @@ namespace eae6320
 {
 	namespace Graphics
 	{
+		enum RenderStates : uint8_t
+		{
+			ALPHA = 1 << 0,
+			DEPTHTEST = 1 << 1,
+			DEPTHWRITE = 1 << 2
+		};
+
 		struct EffectHelper
 		{
 		private:
