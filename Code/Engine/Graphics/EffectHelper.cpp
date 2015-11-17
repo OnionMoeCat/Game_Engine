@@ -60,6 +60,8 @@ bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const
 		}
 	}
 
+	i_effect.m_renderStates = renderStates;
+
 	if (!LoadEffectFromFile(i_effect, vertexPath, fragmentPath, Context::Get()))
 	{
 		wereThereErrors = true;
@@ -68,6 +70,7 @@ bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const
 
 OnExit:
 
+	renderStates = 0;
 	vertexPath = NULL;
 	fragmentPath = NULL;
 

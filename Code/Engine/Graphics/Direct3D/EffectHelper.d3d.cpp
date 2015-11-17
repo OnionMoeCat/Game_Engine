@@ -21,7 +21,7 @@ namespace
 		ALPHA = 1 << 0,
 		DEPTHTEST = 1 << 1,
 		DEPTHWRITE = 1 << 2
-	}
+	};
 }
 
 bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const char* const i_vertexPath, const char* const i_fragmentPath, const Context& i_context)

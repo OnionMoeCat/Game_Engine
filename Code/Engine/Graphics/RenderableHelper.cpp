@@ -63,8 +63,10 @@ bool eae6320::Graphics::RenderableHelper::CleanUp(Renderable& i_entity)
 		{
 			std::stringstream errorMessage;
 			eae6320::UserOutput::Print("Fail to clean up effect");
+			delete i_entity.m_effect;
 			return false;
 		}
+		delete i_entity.m_effect;
 		i_entity.m_effect = NULL;
 	}
 
@@ -74,8 +76,10 @@ bool eae6320::Graphics::RenderableHelper::CleanUp(Renderable& i_entity)
 		{
 			std::stringstream errorMessage;
 			eae6320::UserOutput::Print("Fail to clean up mesh");
+			delete i_entity.m_mesh;
 			return false;
 		}
+		delete i_entity.m_mesh;
 		i_entity.m_mesh = NULL;
 	}
 	return true;

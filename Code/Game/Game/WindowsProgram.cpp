@@ -48,7 +48,11 @@ namespace
 	// as one of your classmate's
 	const char* s_mainWindowClass_name = "Yuchen Zhang's Main Window Class";
 
-	eae6320::Core::Entity s_entity_box;
+	eae6320::Core::Entity s_entity_ball_opaque1;
+	eae6320::Core::Entity s_entity_ball_opaque2;
+
+	eae6320::Core::Entity s_entity_ball_transparent;
+
 	eae6320::Core::Entity s_entity_floor;
 
 	eae6320::Core::Camera s_camera;
@@ -140,9 +144,23 @@ int WaitForMainWindowToCloseAndReturnExitCode( const HINSTANCE i_thisInstanceOfT
 	// Wait for the main window to close
 	int exitCode;
 	bool wereThereErrors = WaitForMainWindowToClose( exitCode );
-	if (!eae6320::Core::EntityHelper::CleanUp(s_entity_box))
 	{
-		wereThereErrors = true;
+		if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_opaque1))
+		{
+			wereThereErrors = true;
+		}
+		if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_opaque2))
+		{
+			wereThereErrors = true;
+		}
+		if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_transparent))
+		{
+			wereThereErrors = true;
+		}
+		if (!eae6320::Core::EntityHelper::CleanUp(s_entity_floor))
+		{
+			wereThereErrors = true;
+		}
 	}
 	// Shutdown Graphis system before closing the window
 	eae6320::Graphics::Core::ShutDown();
@@ -533,12 +551,22 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			eae6320::Time::OnNewFrame();
 			UpdateEntities();
 			UpdateCamera();
-			eae6320::Core::EntityHelper::ToCameraScreen(s_entity_floor, s_camera);
-			eae6320::Core::EntityHelper::ToCameraScreen(s_entity_box, s_camera);
+
+			{
+				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_floor, s_camera);
+				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_opaque1, s_camera);
+				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_opaque2, s_camera);
+				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_transparent, s_camera);
+			}
+
 			//TODO: find a good way to show error message here
-			eae6320::Core::EntityHelper::Submit(s_entity_floor);
-			eae6320::Core::EntityHelper::Submit(s_entity_box);
-			eae6320::Graphics::Core::Render();
+			{
+				eae6320::Core::EntityHelper::Submit(s_entity_floor);
+				eae6320::Core::EntityHelper::Submit(s_entity_ball_opaque1);
+				eae6320::Core::EntityHelper::Submit(s_entity_ball_opaque2);
+				eae6320::Core::EntityHelper::Submit(s_entity_ball_transparent);
+				eae6320::Graphics::Core::Render();
+			}
 		}
 		else
 		{
@@ -601,7 +629,7 @@ namespace
 		// that encapsulates a mesh, an effect, and a position offset.
 		// You don't have to do it this way for your assignment!
 		// You just need a way to update the position offset associated with the colorful rectangle.
-		eae6320::Core::EntityHelper::OffsetPosition(s_entity_box, offset);
+		eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_opaque2, offset);
 	}
 
 	void UpdateCamera()
@@ -643,23 +671,43 @@ namespace
 	bool Initialize()
 	{
 		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_box, "data/default.effect", "data/ball.mesh"))
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_ball_opaque1, "data/default.effect", "data/ball.mesh"))
 			{
 				//TODO: find a way to show error message
 				return false;
 			}
-			eae6320::Math::cVector box_position_offset(0.0f, 0.0f, 0.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(s_entity_box, box_position_offset);
+			eae6320::Math::cVector ball_position_offset(1.0f, -0.3f, 1.0f);
+			eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_opaque1, ball_position_offset);
 		}
 
 		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_floor, "data/default.effect", "data/square.mesh"))
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_ball_opaque2, "data/default.effect", "data/ball.mesh"))
+			{
+				//TODO: find a way to show error message
+				return false;
+			}
+			eae6320::Math::cVector ball_position_offset(-1.0f, 0.3f, -1.0f);
+			eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_opaque2, ball_position_offset);
+		}
+
+		{
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_floor, "data/default.effect", "data/floor.mesh"))
 			{
 				//TODO: find a way to show error message
 				return false;
 			}
 			eae6320::Math::cVector floor_position_offset(0.0f, 0.0f, 0.0f);
 			eae6320::Core::EntityHelper::OffsetPosition(s_entity_floor, floor_position_offset);
+		}
+
+		{
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_ball_transparent, "data/transparent.effect", "data/ball.mesh"))
+			{
+				//TODO: find a way to show error message
+				return false;
+			}
+			eae6320::Math::cVector ball_position_offset(0.0f, 0.0f, 0.0f);
+			eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_transparent, ball_position_offset);
 		}
 
 		{

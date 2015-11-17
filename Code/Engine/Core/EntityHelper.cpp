@@ -59,8 +59,10 @@ bool eae6320::Core::EntityHelper::CleanUp(Entity& i_entity)
 		{
 			std::stringstream errorMessage;
 			eae6320::UserOutput::Print("Fail to clean up effect");
+			delete i_entity.m_renderable;
 			return false;
 		}
+		delete i_entity.m_renderable;
 		i_entity.m_renderable = NULL;
 	}
 	return true;

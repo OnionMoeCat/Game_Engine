@@ -8,8 +8,8 @@ return
 				target = "box.mesh",
 			},
 			{
-				source = "square.mesh.raw",
-				target = "square.mesh",
+				source = "floor.mesh.raw",
+				target = "floor.mesh",
 			},
 			{
 				source = "ball.mesh.raw",
