@@ -34,6 +34,9 @@ namespace
 namespace
 {
 	bool LoadTableValues(lua_State& io_luaState);
+	bool LoadTableValues_render_states(lua_State& io_luaState);
+
+	void SetDefaultRenderState();
 
 	bool WriteBufferToFile(const char* const i_path, HANDLE i_fileHandle, const void* i_buffer, DWORD i_bytesToWrite);
 
@@ -149,6 +152,45 @@ namespace
 			}
 		}
 
+		{
+			const char* const key = "render_states";
+			lua_pushstring(&io_luaState, key);
+			lua_gettable(&io_luaState, -2);
+
+			if (lua_isnil(&io_luaState, -1))
+			{
+				std::stringstream errorMessage;
+				errorMessage << "No value for \"" << key << "\" was found in the asset table"
+					"\n";
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+
+			if (lua_istable(&io_luaState, -1))
+			{
+				if (!LoadTableValues_render_states(io_luaState))
+				{
+					std::stringstream errorMessage;
+					errorMessage << "Fail to get value of render_state";
+					eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+					lua_pop(&io_luaState, 1);
+					return false;
+				}
+			}
+			else
+			{
+				SetDefaultRenderState();
+			}
+
+			lua_pop(&io_luaState, 1);
+
+		}
+		return true;
+	}
+
+	bool LoadTableValues_render_states(lua_State& io_luaState)
+	{
 		renderStates = 0;
 
 		// Get the value of "alpha_transparency"
@@ -252,7 +294,6 @@ namespace
 			}
 			lua_pop(&io_luaState, 1);
 		}
-
 		return true;
 	}
 
@@ -356,6 +397,32 @@ namespace
 		}
 
 		return !wereThereErrors;
+	}
+
+	void SetDefaultRenderState()
+	{
+		renderStates = 0;
+
+		bool isBitOn = RenderStates::DEFAULTALPHA;
+
+		if (isBitOn)
+		{
+			renderStates |= RenderStates::ALPHA;
+		}
+
+		isBitOn = RenderStates::DEFAULTDEPTHTEST;
+
+		if (isBitOn)
+		{
+			renderStates |= RenderStates::DEPTHTEST;
+		}
+
+		isBitOn = RenderStates::DEFAULTDEPTHWRITE;
+
+		if (isBitOn)
+		{
+			renderStates |= RenderStates::DEPTHWRITE;
+		}
 	}
 
 	bool WriteBufferToFile(const char* const i_path, HANDLE i_fileHandle, const void* i_buffer, DWORD i_bytesToWrite)
