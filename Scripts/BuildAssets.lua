@@ -79,7 +79,11 @@ local function BuildAsset( i_relativeSourcePath, i_relativeTargetPath, i_builder
 				-- Even if the target exists it may be out-of-date.
 				-- If the source has been modified more recently than the target
 				-- then the target should be re-built.
-				lastWriteTime_dependency = math.max(lastWriteTime_dependency, GetLastWriteTime(path_dependency))
+				if not lastWriteTime_dependency then
+					lastWriteTime_dependency = GetLastWriteTime(path_dependency)
+				else
+					lastWriteTime_dependency = math.max(lastWriteTime_dependency, GetLastWriteTime(path_dependency))
+				end							
 			end
 		end
 	end
@@ -93,7 +97,7 @@ local function BuildAsset( i_relativeSourcePath, i_relativeTargetPath, i_builder
 			local lastWriteTime_source = GetLastWriteTime( path_source )
 			local lastWriteTime_target = GetLastWriteTime( path_target )
 			shouldTargetBeBuilt = lastWriteTime_source > lastWriteTime_target
-			if lastWriteTime_dependency and not shouldTargetBeBuilt then
+			if lastWriteTime_dependency and not shouldTargetBeBuilt then				
 				shouldTargetBeBuilt = lastWriteTime_dependency > lastWriteTime_target;
 			end						
 			if not shouldTargetBeBuilt then
@@ -177,11 +181,11 @@ local function BuildAssets( i_assetsToBuild )
 	for i, assetInfo_singleType in ipairs( i_assetsToBuild ) do
 		local builderFileName = assetInfo_singleType.builder
 		local assets = assetInfo_singleType.assets
+		local dependencies = assetInfo_singleType.dependencies
 		for j, assetInfo in ipairs( assets ) do
 			local sourceFileName = assetInfo.source;
 			local targetFileName = assetInfo.target;
 			local optionalArguments = assetInfo.optionalArguments;
-			local dependencies = assetInfo.dependencies;
 			if not BuildAsset(sourceFileName, targetFileName, builderFileName, dependencies, optionalArguments) then
 				-- If there's an error then the asset build should fail,
 				-- but we can still try to build any remaining assets
