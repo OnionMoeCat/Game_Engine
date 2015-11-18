@@ -29,6 +29,7 @@ namespace
 		const bool ALPHA = false;
 		const bool DEPTHTEST = true;
 		const bool DEPTHWRITE = true;
+		const uint8_t defaultRenderStates = DEPTHTEST | DEPTHWRITE;
 	}
 }
 
@@ -451,28 +452,7 @@ namespace
 
 	void SetDefaultRenderState()
 	{
-		renderStates = 0;
-
-		bool isBitOn = DefaultRenderStates::ALPHA;
-
-		if (isBitOn)
-		{
-			renderStates |= RenderStates::ALPHA;
-		}
-
-		isBitOn = DefaultRenderStates::DEPTHTEST;
-
-		if (isBitOn)
-		{
-			renderStates |= RenderStates::DEPTHTEST;
-		}
-
-		isBitOn = DefaultRenderStates::DEPTHWRITE;
-
-		if (isBitOn)
-		{
-			renderStates |= RenderStates::DEPTHWRITE;
-		}
+		renderStates = DefaultRenderStates::defaultRenderStates;
 	}
 
 	bool WriteBufferToFile(const char* const i_path, HANDLE i_fileHandle, const void* i_buffer, DWORD i_bytesToWrite)
