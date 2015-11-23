@@ -7,11 +7,12 @@
 #include "../UserOutput/UserOutput.h"
 #include "../Graphics/RenderableHelper.h"
 #include "../Graphics/RenderableManager.h"
+#include "../Graphics/EffectHelper.h"
 
 // Interface
 //==========
 
-bool eae6320::Core::EntityHelper::LoadEntityFromFile(Entity& i_entity, const char* const i_effectPath, const char* i_meshPath)
+bool eae6320::Core::EntityHelper::LoadEntityFromFile(Entity& i_entity, const char* const i_materialPath, const char* i_meshPath)
 {
 	if (i_entity.m_renderable == NULL)
 	{
@@ -19,10 +20,10 @@ bool eae6320::Core::EntityHelper::LoadEntityFromFile(Entity& i_entity, const cha
 	}
 	if (i_entity.m_renderable)
 	{
-		if (!eae6320::Graphics::RenderableHelper::LoadRenderableFromFile(*i_entity.m_renderable, i_effectPath, i_meshPath))
+		if (!eae6320::Graphics::RenderableHelper::LoadRenderableFromFile(*i_entity.m_renderable, i_materialPath, i_meshPath))
 		{
 			std::stringstream errorMessage;
-			errorMessage << "Fail to load renderable. Effect path: " << i_effectPath << " Mesh path: " << i_meshPath;
+			errorMessage << "Fail to load renderable. Material path: " << i_materialPath << " Mesh path: " << i_meshPath;
 			eae6320::UserOutput::Print(errorMessage.str());
 			return false;
 		}
@@ -42,13 +43,20 @@ bool eae6320::Core::EntityHelper::OffsetPosition(Entity& i_entity, const eae6320
 		eae6320::UserOutput::Print("entity.m_renderable not null expected");
 		return false;
 	}
-	i_entity.m_position += i_offset_position;
-	if (!eae6320::Graphics::RenderableHelper::CreateLocalToWorldTransform(*i_entity.m_renderable, i_entity.m_rotation, i_entity.m_position))
+	if (i_entity.m_renderable->m_material == NULL)
 	{
 		std::stringstream errorMessage;
-		eae6320::UserOutput::Print("Fail to create local to world transform");
+		eae6320::UserOutput::Print("entity.m_renderable->m_material not null expected");
 		return false;
 	}
+	if (i_entity.m_renderable->m_material->m_effect == NULL)
+	{
+		std::stringstream errorMessage;
+		eae6320::UserOutput::Print("entity.m_renderable->m_material->m_effect not null expected");
+		return false;
+	}
+	i_entity.m_position += i_offset_position;
+	eae6320::Graphics::EffectHelper::CreateLocalToWorldTransform(*i_entity.m_renderable->m_material->m_effect, i_entity.m_rotation, i_entity.m_position);
 	return true;
 }
 bool eae6320::Core::EntityHelper::CleanUp(Entity& i_entity)
@@ -75,18 +83,20 @@ bool eae6320::Core::EntityHelper::ToCameraScreen(Entity& i_entity, const Camera&
 		eae6320::UserOutput::Print("entity.m_renderable not null expected");
 		return false;
 	}
-	if (!eae6320::Graphics::RenderableHelper::CreateWorldToViewTransform(*i_entity.m_renderable, i_camera.m_rotation, i_camera.m_position))
+	if (i_entity.m_renderable->m_material == NULL)
 	{
 		std::stringstream errorMessage;
-		eae6320::UserOutput::Print("Fail to create world to view transform");
+		eae6320::UserOutput::Print("entity.m_renderable->m_material not null expected");
 		return false;
 	}
-	if (!eae6320::Graphics::RenderableHelper::CreateViewToScreenTransform(*i_entity.m_renderable, i_camera.m_fov, i_camera.m_aspect, i_camera.m_nearZ, i_camera.m_farZ))
+	if (i_entity.m_renderable->m_material->m_effect == NULL)
 	{
 		std::stringstream errorMessage;
-		eae6320::UserOutput::Print("Fail to create view to screen transform");
+		eae6320::UserOutput::Print("entity.m_renderable->m_material->m_effect not null expected");
 		return false;
 	}
+	eae6320::Graphics::EffectHelper::CreateWorldToViewTransform(*i_entity.m_renderable->m_material->m_effect, i_camera.m_rotation, i_camera.m_position);
+	eae6320::Graphics::EffectHelper::CreateViewToScreenTransform(*i_entity.m_renderable->m_material->m_effect, i_camera.m_fov, i_camera.m_aspect, i_camera.m_nearZ, i_camera.m_farZ);
 	return true;
 }
 bool eae6320::Core::EntityHelper::Submit(Entity& i_entity)

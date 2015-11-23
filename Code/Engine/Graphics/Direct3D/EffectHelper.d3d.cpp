@@ -157,6 +157,46 @@ bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, cons
 	return true;
 }
 
+bool eae6320::Graphics::EffectHelper::GetUniformHandler(Effect& i_effect, const char* i_name, ShaderTypes::eShaderType i_shaderType, tUniformHandle* i_uniformHandle)
+{
+	if (i_shaderType == ShaderTypes::eShaderType::Vertex)
+	{
+		D3DXHANDLE tempHandle = i_effect.m_vertexShaderConstantTable->GetConstantByName(NULL, i_name);
+		if (tempHandle == NULL)
+		{
+			return false;
+		}
+		*i_uniformHandle = tempHandle;
+		return true;
+	}
+	else if (i_shaderType == ShaderTypes::eShaderType::Fragment)
+	{
+		D3DXHANDLE tempHandle = i_effect.m_fragmentShaderConstantTable->GetConstantByName(NULL, i_name);
+		if (tempHandle == NULL)
+		{
+			return false;
+		}
+		*i_uniformHandle = tempHandle;
+		return true;
+	}
+	return false;
+}
+
+bool eae6320::Graphics::EffectHelper::SetUniform(Effect& i_effect, const float* i_values, const size_t i_valueLength, const tUniformHandle i_uniformHandle, ShaderTypes::eShaderType i_shaderType, const Context& i_context)
+{
+	if (i_shaderType == ShaderTypes::eShaderType::Vertex)
+	{
+		HRESULT result = i_effect.m_vertexShaderConstantTable->SetFloatArray(i_context.device, i_uniformHandle, i_values, static_cast<UINT>(i_valueLength));
+		return SUCCEEDED(result);
+	}
+	else if (i_shaderType == ShaderTypes::eShaderType::Fragment)
+	{
+		HRESULT result = i_effect.m_fragmentShaderConstantTable->SetFloatArray(i_context.device, i_uniformHandle, i_values, static_cast<UINT>(i_valueLength));
+		return SUCCEEDED(result);
+	}
+	return false;
+}
+
 namespace
 {
 	bool LoadVertexShader(eae6320::Graphics::Effect& i_effect, const char* const i_vertexPath, IDirect3DDevice9* i_device)
@@ -234,6 +274,19 @@ namespace
 				{
 					eae6320::UserOutput::Print("Direct3D failed to create the fragment shader");
 					wereThereErrors = true;
+				}
+
+				ID3DXConstantTable* fragmentShaderConstantTable = NULL;
+				result = D3DXGetShaderConstantTable(reinterpret_cast<const DWORD*>(temporaryBuffer), &fragmentShaderConstantTable);
+				if (FAILED(result))
+				{
+					eae6320::UserOutput::Print("Direct3D failed to load constant table of vertex shader");
+					wereThereErrors = true;
+					goto OnExit;
+				}
+				else
+				{
+					i_effect.m_fragmentShaderConstantTable = fragmentShaderConstantTable;
 				}
 			}
 			else

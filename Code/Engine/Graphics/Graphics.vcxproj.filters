@@ -31,6 +31,7 @@
     <ClCompile Include="RenderableHelper.cpp" />
     <ClCompile Include="RenderableManager.cpp" />
     <ClCompile Include="Graphics.cpp" />
+    <ClCompile Include="MaterialHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h" />
@@ -43,6 +44,9 @@
     <ClInclude Include="RenderableHelper.h" />
     <ClInclude Include="RenderableManager.h" />
     <ClInclude Include="Includes.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="Uniform.h" />
+    <ClInclude Include="MaterialHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="OpenGL">

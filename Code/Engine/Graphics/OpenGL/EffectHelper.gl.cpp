@@ -246,6 +246,40 @@ bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, cons
 	return true;
 }
 
+bool eae6320::Graphics::EffectHelper::GetUniformHandler(Effect& i_effect, const char* i_name, ShaderTypes::eShaderType i_shaderType, tUniformHandle* i_uniformHandle)
+{
+	GLuint location = glGetUniformLocation(i_effect.m_programID, i_name);
+	if (location != -1)
+	{
+		*i_uniformHandle = location;
+		return true;
+	}
+	return false;
+}
+
+bool eae6320::Graphics::EffectHelper::SetUniform(Effect& i_effect, const float* i_values, const size_t i_valueLength, const tUniformHandle i_uniformHandle, ShaderTypes::eShaderType i_shaderType, const Context& i_context)
+{
+	switch (i_valueLength)
+	{
+		case 1:
+			glUniform1fv(i_uniformHandle, 1, i_values);
+			break;
+		case 2:
+			glUniform2fv(i_uniformHandle, 1, i_values);
+			break;
+		case 3:
+			glUniform3fv(i_uniformHandle, 1, i_values);
+			break;
+		case 4:
+			glUniform4fv(i_uniformHandle, 1, i_values);
+			break;
+		default:
+			return false;
+			break;
+	}
+	return (glGetError() == GL_NO_ERROR);
+}
+
 // Helper Function Declarations
 //=============================
 

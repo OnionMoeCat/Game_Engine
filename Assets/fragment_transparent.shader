@@ -5,6 +5,8 @@
 // Platform-specific setup
 #include "shaders.inc"
 
+uniform float3 g_color_uniform;
+uniform float g_alpha_uniform;
 #if defined( EAE6320_PLATFORM_D3D )
 
 // Entry Point
@@ -56,7 +58,7 @@ void main()
 	// Set the fragment to the interpolated color that originated as per-vertex data
 	// (where color is represented by 4 floats representing "RGBA" == "Red/Green/Blue/Alpha")
 	{
-		o_color = i_color;
-		o_color.a *= 0.5;
+		o_color.rgb = i_color.rgb * g_color_uniform;
+		o_color.a = i_color.a * g_alpha_uniform;
 	}
 }

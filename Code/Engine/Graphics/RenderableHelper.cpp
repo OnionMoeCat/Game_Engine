@@ -4,7 +4,7 @@
 #include "RenderableHelper.h"
 
 #include "../UserOutput/UserOutput.h"
-#include "../Graphics/EffectHelper.h"
+#include "../Graphics/MaterialHelper.h"
 #include "../Graphics/MeshHelper.h"
 
 #include <sstream>
@@ -12,18 +12,18 @@
 // Interface
 //==========
 
-bool eae6320::Graphics::RenderableHelper::LoadRenderableFromFile(Renderable& i_renderable, const char* const i_effectPath, const char* i_meshPath)
+bool eae6320::Graphics::RenderableHelper::LoadRenderableFromFile(Renderable& i_renderable, const char* const i_materialPath, const char* i_meshPath)
 {
-	if (i_renderable.m_effect == NULL)
+	if (i_renderable.m_material == NULL)
 	{
-		i_renderable.m_effect = new eae6320::Graphics::Effect();
+		i_renderable.m_material = new eae6320::Graphics::Material();
 	}
-	if (i_renderable.m_effect)
+	if (i_renderable.m_material)
 	{
-		if (!eae6320::Graphics::EffectHelper::LoadEffectFromFile(*i_renderable.m_effect, i_effectPath))
+		if (!eae6320::Graphics::MaterialHelper::LoadMaterialFromFile(*i_renderable.m_material, i_materialPath))
 		{
 			std::stringstream errorMessage;
-			errorMessage << "Fail to load effect from effect file: " << i_effectPath;
+			errorMessage << "Fail to load effect from effect file: " << i_materialPath;
 			eae6320::UserOutput::Print(errorMessage.str());
 			return false;
 		}
@@ -57,17 +57,17 @@ bool eae6320::Graphics::RenderableHelper::LoadRenderableFromFile(Renderable& i_r
 
 bool eae6320::Graphics::RenderableHelper::CleanUp(Renderable& i_entity)
 {
-	if (i_entity.m_effect)
+	if (i_entity.m_material)
 	{
-		if (!eae6320::Graphics::EffectHelper::CleanUp(*i_entity.m_effect))
+		if (!eae6320::Graphics::MaterialHelper::CleanUp(*i_entity.m_material))
 		{
 			std::stringstream errorMessage;
 			eae6320::UserOutput::Print("Fail to clean up effect");
-			delete i_entity.m_effect;
+			delete i_entity.m_material;
 			return false;
 		}
-		delete i_entity.m_effect;
-		i_entity.m_effect = NULL;
+		delete i_entity.m_material;
+		i_entity.m_material = NULL;
 	}
 
 	if (i_entity.m_mesh)
@@ -82,41 +82,5 @@ bool eae6320::Graphics::RenderableHelper::CleanUp(Renderable& i_entity)
 		delete i_entity.m_mesh;
 		i_entity.m_mesh = NULL;
 	}
-	return true;
-}
-
-bool eae6320::Graphics::RenderableHelper::CreateLocalToWorldTransform(Renderable& i_renderable, const eae6320::Math::cQuaternion& i_rotation, const eae6320::Math::cVector& i_position)
-{
-	if (i_renderable.m_effect == NULL)
-	{
-		std::stringstream errorMessage;
-		eae6320::UserOutput::Print("renderable.m_effect not null expected");
-		return false;
-	}
-	eae6320::Graphics::EffectHelper::CreateLocalToWorldTransform(*i_renderable.m_effect, i_rotation, i_position);
-	return true;
-}
-
-bool eae6320::Graphics::RenderableHelper::CreateWorldToViewTransform(Renderable& i_renderable, const eae6320::Math::cQuaternion& i_cameraRotation, const eae6320::Math::cVector& i_cameraPosition)
-{
-	if (i_renderable.m_effect == NULL)
-	{
-		std::stringstream errorMessage;
-		eae6320::UserOutput::Print("renderable.m_effect not null expected");
-		return false;
-	}
-	eae6320::Graphics::EffectHelper::CreateWorldToViewTransform(*i_renderable.m_effect, i_cameraRotation, i_cameraPosition);
-	return true;
-}
-
-bool eae6320::Graphics::RenderableHelper::CreateViewToScreenTransform(Renderable& i_renderable, const float i_fov, const float i_aspect, const float i_nearZ, const float i_farZ)
-{
-	if (i_renderable.m_effect == NULL)
-	{
-		std::stringstream errorMessage;
-		eae6320::UserOutput::Print("renderable.m_effect not null expected");
-		return false;
-	}
-	eae6320::Graphics::EffectHelper::CreateViewToScreenTransform(*i_renderable.m_effect, i_fov, i_aspect, i_nearZ, i_farZ);
 	return true;
 }

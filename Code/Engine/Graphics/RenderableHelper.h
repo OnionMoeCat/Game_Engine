@@ -20,9 +20,6 @@ namespace eae6320
 		{			
 			bool static CleanUp(Renderable& i_renderable);
 			bool static LoadRenderableFromFile(Renderable& i_renderable, const char* const i_effectPath, const char* i_meshPath);
-			bool static CreateLocalToWorldTransform(Renderable& i_renderable, const eae6320::Math::cQuaternion& i_rotation, const eae6320::Math::cVector& i_position);
-			bool static CreateWorldToViewTransform(Renderable& i_renderable, const eae6320::Math::cQuaternion& i_cameraRotation, const eae6320::Math::cVector& i_cameraPosition);
-			bool static CreateViewToScreenTransform(Renderable& i_renderable, const float i_fov, const float i_aspect, const float i_nearZ, const float i_farZ);
 		};
 	}
 }

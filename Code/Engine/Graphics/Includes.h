@@ -36,6 +36,16 @@ namespace eae6320
 		typedef GLvoid* BufferDataPtr;
 #endif
 
+		typedef
+#if defined( EAE6320_PLATFORM_D3D )
+			// This is conceptually a D3DXHANDLE but is defined this way
+			// so that external files aren't required to specify the #include path to the DirectX SDK
+			const char*
+#elif defined( EAE6320_PLATFORM_GL )
+			GLint
+#endif
+			tUniformHandle;
+
 		// This struct determines the layout of the data that the CPU will send to the GPU
 		struct sVertex
 		{
@@ -55,9 +65,7 @@ namespace eae6320
 
 		namespace ShaderTypes
 		{
-#if defined( EAE6320_PLATFORM_D3D )
-			enum eShaderType { Unknown, Vertex, Fragment };
-#endif
+			enum eShaderType: uint8_t { Unknown, Vertex, Fragment };
 		}
 
 		struct sColor

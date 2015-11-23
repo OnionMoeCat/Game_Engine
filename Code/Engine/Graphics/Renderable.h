@@ -5,6 +5,7 @@
 //=============
 #include "../Graphics/Mesh.h"
 #include "../Graphics/Effect.h"
+#include "../Graphics/Material.h"
 #include "../Math/cVector.h"
 #include "../Math/cQuaternion.h"
 
@@ -18,7 +19,7 @@ namespace eae6320
 		struct Renderable
 		{
 			eae6320::Graphics::Mesh* m_mesh = NULL;
-			eae6320::Graphics::Effect* m_effect = NULL;
+			eae6320::Graphics::Material* m_material = NULL;
 		};
 	}
 }

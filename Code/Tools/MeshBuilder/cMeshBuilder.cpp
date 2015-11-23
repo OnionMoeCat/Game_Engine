@@ -58,8 +58,6 @@ bool eae6320::cMeshBuilder::Build( const std::vector<std::string>& )
 
 	// Copy the source to the target
 	{
-		const bool dontFailIfTargetAlreadyExists = false;
-		const bool updateTheTargetFileTime = true;
 		std::string errorMessage;
 		if ( !BuildMeshFromFile( m_path_source, m_path_target ) )
 		{
@@ -352,6 +350,11 @@ namespace
 			primitiveSize = static_cast<uint32_t>(count);
 			const unsigned int vertexPerPrimitive = 3;
 			indices = reinterpret_cast<uint32_t*>(malloc(sizeof(uint32_t) * vertexPerPrimitive * primitiveSize));
+			if (indices == NULL)
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
 			if (!LoadTableValues_triangle_indexes_array(io_luaState, count))
 			{
 				free(indices);

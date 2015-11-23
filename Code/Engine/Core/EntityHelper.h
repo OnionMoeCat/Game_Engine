@@ -13,7 +13,7 @@ namespace eae6320
 	{
 		struct EntityHelper
 		{
-			bool static LoadEntityFromFile(Entity& i_entity, const char* const i_effectPath, const char* i_meshPath);
+			bool static LoadEntityFromFile(Entity& i_entity, const char* const i_materialPath, const char* i_meshPath);
 			bool static OffsetPosition(Entity& i_entity, const eae6320::Math::cVector& i_offset_position);
 			bool static CleanUp(Entity& i_entity);
 			bool static ToCameraScreen(Entity& i_entity, const Camera& i_camera);

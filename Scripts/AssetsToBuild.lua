@@ -59,4 +59,29 @@ return
 			},
 		},
 	},
+	{
+		builder = "MaterialBuilder.exe",
+		assets = {
+			{
+				source = "default.material.raw",
+				target = "default.material",
+			},
+			{
+				source = "red.material.raw",
+				target = "red.material",
+			},
+			{
+				source = "green.material.raw",
+				target = "green.material",
+			},
+			{
+				source = "transparent_02.material.raw",
+				target = "transparent_02.material",
+			},
+			{
+				source = "transparent_08.material.raw",
+				target = "transparent_08.material",
+			},
+		},
+	},
 }

@@ -12,6 +12,7 @@
 #include "Renderable.h"
 #include "RenderableHelper.h"
 #include "RenderableManager.h"
+#include "MaterialHelper.h"
 
 // Interface
 //==========
@@ -40,9 +41,11 @@ void eae6320::Graphics::Core::Render()
 			for (unsigned int i = 0; i < RenderableManager::Get().m_list.size(); i++)
 			{
 				Renderable& renderable = RenderableManager::Get().m_list[i];
-				result = EffectHelper::Bind(*renderable.m_effect, Context::Get());
+				result = EffectHelper::Bind(*renderable.m_material->m_effect, Context::Get());
 				assert(result);
-				result = EffectHelper::SetDrawCallUniforms(*renderable.m_effect, Context::Get());
+				result = MaterialHelper::SetMaterialUniforms(*renderable.m_material, Context::Get());
+				assert(result);
+				result = EffectHelper::SetDrawCallUniforms(*renderable.m_material->m_effect, Context::Get());
 				assert(result);
 				result = MeshHelper::DrawMesh(*renderable.m_mesh, Context::Get());
 				assert(result);
