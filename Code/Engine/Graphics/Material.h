@@ -21,8 +21,10 @@ namespace eae6320
 		struct Material
 		{
 			Effect* m_effect = NULL;
-			Uniform* m_uniform = NULL;
+			Uniform* m_uniform = NULL;			
 			uint32_t m_uniformCount = 0;
+			Texture* m_texture = NULL;
+			uint32_t m_textureCount = 0;
 		};
 	}
 }

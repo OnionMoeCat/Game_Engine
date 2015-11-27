@@ -33,5 +33,6 @@
 #define float4x4 mat4
 #define O_POSITION_SCREEN gl_Position
 #define Transform(i_vector, i_matrix) ((i_vector) * (i_matrix))
+#define tex2D(sampler, texcoords) (texture2D((sampler),(texcoords)))
 
 #endif

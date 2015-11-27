@@ -84,4 +84,13 @@ return
 			},
 		},
 	},
+	{
+		builder = "TextureBuilder.exe",
+		assets = {
+			{
+				source = "default.jpg",
+				target = "default",
+			},
+		},
+	},
 }

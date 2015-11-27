@@ -33,6 +33,8 @@ namespace
 	bool LoadTableValues_vertices_array_position_xyz(lua_State& io_luaState, unsigned int i_index);
 	bool LoadTableValues_vertices_array_color(lua_State& io_luaState, unsigned int i_index);
 	bool LoadTableValues_vertices_array_color_rgba(lua_State& io_luaState, unsigned int i_index);
+	bool LoadTableValues_vertices_array_texcoord(lua_State& io_luaState, unsigned int i_index);
+	bool LoadTableValues_vertices_array_texcoord_uv(lua_State& io_luaState, unsigned int i_index);
 
 	bool LoadTableValues_triangle_indexes(lua_State& io_luaState);
 	bool LoadTableValues_triangle_indexes_array(lua_State& io_luaState, unsigned int i_count);
@@ -327,6 +329,75 @@ namespace
 		vertices[i_index - 1].g = tempRGBA[1];
 		vertices[i_index - 1].b = tempRGBA[2];
 		vertices[i_index - 1].a = tempRGBA[3];
+
+		return true;
+	}
+
+	bool LoadTableValues_vertices_array_texcoord(lua_State& io_luaState, unsigned int i_index)
+	{
+		bool wereThereErrors = false;
+
+		char* key = "texcoord";
+		lua_pushstring(&io_luaState, key);
+		lua_gettable(&io_luaState, -2);
+
+		if (!lua_istable(&io_luaState, -1))
+		{
+			std::stringstream errorMessage;
+			errorMessage << "The value at key \"" << key << "\" must be a table (instead of a " << luaL_typename(&io_luaState, -1);
+			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+			wereThereErrors = true;
+			goto OnExit;
+		}
+
+		if (!LoadTableValues_vertices_array_color_rgba(io_luaState, i_index))
+		{
+			std::stringstream errorMessage;
+			errorMessage << "Fail to get value of \"color\" for \"vertices\" at index: " << i_index;
+			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+			wereThereErrors = true;
+			goto OnExit;
+		}
+
+	OnExit:
+
+		lua_pop(&io_luaState, 1);
+		return !wereThereErrors;
+	}
+
+	bool LoadTableValues_vertices_array_texcoord_uv(lua_State& io_luaState, unsigned int i_index)
+	{
+		const int uvLength = luaL_len(&io_luaState, -1);
+		const int LENGTH = 2;
+		const char charMap[LENGTH] = { 'u','v'};
+
+		uint8_t tempUV[LENGTH];
+		if (uvLength != LENGTH)
+		{
+			std::stringstream errorMessage;
+			errorMessage << "2 elements (u, v) in key \"texcoord\" expected for \"vertices\" at index: " << i_index;
+			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+			return false;
+		}
+		for (int i = 1; i <= uvLength; i++)
+		{
+			lua_pushinteger(&io_luaState, i);
+			lua_gettable(&io_luaState, -2);
+			if (lua_type(&io_luaState, -1) != LUA_TNUMBER)
+			{
+				std::stringstream errorMessage;
+				errorMessage << "Number value expected for " << charMap[i - 1] << " in key \"texcoord\" for \"vertices\" at index: " << i_index;
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+			// round to nearest integer
+			tempUV[i - 1] = static_cast<float>(lua_tonumber(&io_luaState, -1));
+			lua_pop(&io_luaState, 1);
+		}
+
+		vertices[i_index - 1].u = tempUV[0];
+		vertices[i_index - 1].v = 1.0f - tempUV[1];
 
 		return true;
 	}

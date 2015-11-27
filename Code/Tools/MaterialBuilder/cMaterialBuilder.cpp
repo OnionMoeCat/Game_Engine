@@ -17,8 +17,11 @@ namespace
 	std::string effectPath;
 	uint32_t uniformSize = 0;
 	eae6320::Graphics::Uniform* uniforms = NULL;
-
 	char** uniformNames = NULL;
+
+	uint32_t textureSize = 0;
+	char** textureNames = NULL;
+	char** texturePaths = NULL;
 }
 
 // Helper Function Declarations
@@ -36,6 +39,10 @@ namespace
 	bool LoadTableValues_eachuniform(lua_State& io_luaState, unsigned int i_count);
 	bool LoadTableValues_eachuniform_parameters(lua_State& io_luaState, unsigned int i_index);
 	bool LoadTableValues_eachuniform_parameters_values(lua_State& io_luaState, unsigned int i_index);
+
+	bool LoadTableValues_textures(lua_State& io_luaState);
+	bool LoadTableValues_eachtexture(lua_State& io_luaState, unsigned int i_count);
+	bool LoadTableValues_eachtexture_parameters(lua_State& io_luaState, unsigned int i_index);
 
 	bool WriteBufferToFile(const char* const i_path, HANDLE i_fileHandle, const void* i_buffer, DWORD i_bytesToWrite);
 
@@ -79,6 +86,10 @@ namespace
 			return false;
 		}
 		if (!LoadTableValues_uniforms(io_luaState))
+		{
+			return false;
+		}
+		if (!LoadTableValues_textures(io_luaState))
 		{
 			return false;
 		}
@@ -421,6 +432,220 @@ namespace
 		return true;
 	}
 
+	bool LoadTableValues_textures(lua_State& io_luaState)
+	{
+		bool wereThereErrors = false;
+
+		const char* const key = "textures";
+		lua_pushstring(&io_luaState, key);
+		lua_gettable(&io_luaState, -2);
+		if (lua_istable(&io_luaState, -1))
+		{
+			unsigned int count;
+			if (!LoadTableValues_array_count(io_luaState, count))
+			{
+				eae6320::OutputErrorMessage("Fail to get array length of \"textures\"", __FILE__);
+				wereThereErrors = true;
+				goto OnExit;
+			}
+
+			textureSize = static_cast<uint32_t>(count);
+			textureNames = reinterpret_cast<char**>(malloc(sizeof(char*) * textureSize));
+			texturePaths = reinterpret_cast<char**>(malloc(sizeof(char*) * textureSize));
+			if (uniforms == NULL)
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (uniformNames == NULL)
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!LoadTableValues_eachtexture(io_luaState, count))
+			{
+				textureSize = 0;
+				free(textureNames);
+				textureNames = NULL;
+				free(texturePaths);
+				texturePaths = NULL;
+
+				eae6320::OutputErrorMessage("Fail to get value of \"uniforms\"", __FILE__);
+				wereThereErrors = true;
+				goto OnExit;
+			}
+		}
+		else
+		{
+			std::stringstream errorMessage;
+			errorMessage << "The value at key \"" << key << "\" must be a table (instead of a " << luaL_typename(&io_luaState, -1);
+			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+			wereThereErrors = true;
+			goto OnExit;
+		}
+
+	OnExit:
+
+		// Pop the textures table
+		lua_pop(&io_luaState, 1);
+
+		return !wereThereErrors;
+	}
+
+	bool LoadTableValues_eachtexture(lua_State& io_luaState, unsigned int i_count)
+	{
+		for (unsigned int i = 1; i <= i_count; ++i)
+		{
+			lua_pushinteger(&io_luaState, i);
+			lua_gettable(&io_luaState, -2);
+
+			if (lua_isnil(&io_luaState, -1))
+			{
+				std::stringstream errorMessage;
+				errorMessage << "No value was found in the asset table"
+					"\n";
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+
+			if (!lua_istable(&io_luaState, -1))
+			{
+				lua_pop(&io_luaState, 1);
+				std::stringstream errorMessage;
+				errorMessage << "The value at index " << i << " of \"textures\" must be a table (instead of a " << luaL_typename(&io_luaState, -1);
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				return false;
+			}
+			if (!LoadTableValues_eachtexture_parameters(io_luaState, i))
+			{
+				lua_pop(&io_luaState, 1);
+				std::stringstream errorMessage;
+				errorMessage << "Fail to get value for \"textures\" expected at index: " << i;
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				return false;
+			}
+			lua_pop(&io_luaState, 1);
+		}
+
+		return true;
+	}
+
+	bool LoadTableValues_eachtexture_parameters(lua_State& io_luaState, unsigned int i_index)
+	{
+		{
+			const char* const key = "name";
+			lua_pushstring(&io_luaState, key);
+			lua_gettable(&io_luaState, -2);
+
+			if (lua_isnil(&io_luaState, -1))
+			{
+				std::stringstream errorMessage;
+				errorMessage << "No value for \"" << key << "\" was found in the asset table"
+					"\n";
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+
+			if (!lua_isstring(&io_luaState, -1))
+			{
+				std::stringstream errorMessage;
+				errorMessage << "The value at key \"" << key << "\" must be a string (instead of a " << luaL_typename(&io_luaState, -1);
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+
+			{
+				const char* tempStr = lua_tostring(&io_luaState, -1);
+				textureNames[i_index - 1] = _strdup(tempStr);
+			}
+
+			lua_pop(&io_luaState, 1);
+
+		}
+
+		{
+			const char* const key = "path";
+			lua_pushstring(&io_luaState, key);
+			lua_gettable(&io_luaState, -2);
+
+			if (lua_isnil(&io_luaState, -1))
+			{
+				std::stringstream errorMessage;
+				errorMessage << "No value for \"" << key << "\" was found in the asset table"
+					"\n";
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+
+			if (!lua_isstring(&io_luaState, -1))
+			{
+				std::stringstream errorMessage;
+				errorMessage << "The value at key \"" << key << "\" must be a string (instead of a " << luaL_typename(&io_luaState, -1);
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+
+			{
+				const char* tempStr = lua_tostring(&io_luaState, -1);
+				texturePaths[i_index - 1] = _strdup(tempStr);
+			}
+
+			lua_pop(&io_luaState, 1);
+
+		}
+
+		{
+			const char* const key = "shader_type";
+			lua_pushstring(&io_luaState, key);
+			lua_gettable(&io_luaState, -2);
+
+			if (lua_isnil(&io_luaState, -1))
+			{
+				std::stringstream errorMessage;
+				errorMessage << "No value for \"" << key << "\" was found in the asset table"
+					"\n";
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+
+			if (!lua_isstring(&io_luaState, -1))
+			{
+				std::stringstream errorMessage;
+				errorMessage << "The value at key \"" << key << "\" must be a string (instead of a " << luaL_typename(&io_luaState, -1);
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+
+			{
+				std::string temp = lua_tostring(&io_luaState, -1);
+				if (temp == "vertex")
+				{
+					uniforms[i_index - 1].shaderType = eae6320::Graphics::ShaderTypes::eShaderType::Vertex;
+				}
+				else if (temp == "fragment")
+				{
+					uniforms[i_index - 1].shaderType = eae6320::Graphics::ShaderTypes::eShaderType::Fragment;
+				}
+				else
+				{
+					uniforms[i_index - 1].shaderType = eae6320::Graphics::ShaderTypes::eShaderType::Unknown;
+				}
+			}
+
+			lua_pop(&io_luaState, 1);
+
+		}
+
+		return true;
+	}
+
 	bool LoadMaterial(const char* const i_path)
 	{
 		bool wereThereErrors = false;
@@ -635,6 +860,68 @@ namespace
 			}
 		}
 
+		bytesToWrite = (DWORD)sizeof(uint32_t);
+		if (!WriteBufferToFile(i_path, fileHandle, &textureSize, bytesToWrite))
+		{
+			wereThereErrors = true;
+			goto OnExit;
+		}
+
+		for (size_t i = 0; i < textureSize; i++)
+		{
+			tempStrlen = static_cast<unsigned int>(strlen(textureNames[i]));
+			//Output error if strlength can not be hold in a uint8_t
+			if (tempStrlen + 1 > 0xFF)
+			{
+				unsigned int outputLen = 50;
+				std::stringstream errorMessage;
+				errorMessage << "Texture name length exceeds range of uint8_t. Variable name length: " << tempStrlen << " File name (first " << outputLen << "): " << effectPath.substr(0, outputLen);
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				return false;
+			}
+
+			strlength = static_cast<uint8_t>(tempStrlen + 1);
+			DWORD bytesToWrite = 1;
+			if (!WriteBufferToFile(i_path, fileHandle, &strlength, bytesToWrite))
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+
+			bytesToWrite = strlength;
+			if (!WriteBufferToFile(i_path, fileHandle, textureNames[i], bytesToWrite))
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+
+			tempStrlen = static_cast<unsigned int>(strlen(texturePaths[i]));
+			//Output error if strlength can not be hold in a uint8_t
+			if (tempStrlen + 1 > 0xFF)
+			{
+				unsigned int outputLen = 50;
+				std::stringstream errorMessage;
+				errorMessage << "Texture path length exceeds range of uint8_t. File name length: " << tempStrlen << " File name (first " << outputLen << "): " << effectPath.substr(0, outputLen);
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				return false;
+			}
+
+			strlength = static_cast<uint8_t>(tempStrlen + 1);
+			DWORD bytesToWrite = 1;
+			if (!WriteBufferToFile(i_path, fileHandle, &strlength, bytesToWrite))
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+
+			bytesToWrite = strlength;
+			if (!WriteBufferToFile(i_path, fileHandle, texturePaths[i], bytesToWrite))
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+		}
+
 	OnExit:
 
 		if (fileHandle != INVALID_HANDLE_VALUE)
@@ -691,6 +978,36 @@ namespace
 
 		uniforms = NULL;
 		uniformSize = 0;
+
+		if (textureNames != NULL)
+		{
+			for (size_t i = 0; i < textureSize; i++)
+			{
+				if (textureNames[i] != NULL)
+				{
+					free(textureNames[i]);
+				}
+			}
+			free(textureNames);
+		}
+
+		textureNames = NULL;
+
+		if (texturePaths != NULL)
+		{
+			for (size_t i = 0; i < textureSize; i++)
+			{
+				if (texturePaths[i] != NULL)
+				{
+					free(texturePaths[i]);
+				}
+			}
+			free(texturePaths);
+		}
+
+		texturePaths = NULL;
+
+		textureSize = 0;
 		return !wereThereErrors;
 	}
 }

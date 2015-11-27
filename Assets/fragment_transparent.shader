@@ -7,6 +7,7 @@
 
 uniform float3 g_color_uniform;
 uniform float g_alpha_uniform;
+uniform sampler2D g_sampler;
 #if defined( EAE6320_PLATFORM_D3D )
 
 // Entry Point
@@ -40,6 +41,7 @@ void main(
 // will be interpolated across the triangle and given as input to the fragment shader
 
 layout( location = 0 ) in vec4 i_color;
+layout( location = 1 ) in vec2 i_texcoords;
 
 // Output
 //=======
@@ -60,5 +62,6 @@ void main()
 	{
 		o_color.rgb = i_color.rgb * g_color_uniform;
 		o_color.a = i_color.a * g_alpha_uniform;
+		o_color = o_color * tex2D( g_sampler, i_texcoords );
 	}
 }

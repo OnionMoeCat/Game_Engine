@@ -6,6 +6,7 @@
 #include <sstream>
 
 #include "EffectHelper.h"
+#include "TextureHelper.h"
 #include "../UserOutput/UserOutput.h"
 #include "../Utils/Utils.h"
 
@@ -66,6 +67,42 @@ bool eae6320::Graphics::MaterialHelper::LoadMaterialFromFile(Material& i_materia
 				}			
 				tempPTR += strLength;
 			}
+
+			i_material.m_textureCount = *reinterpret_cast<uint32_t*>(tempPTR);
+			i_material.m_texture = new Texture[i_material.m_textureCount];
+			if (i_material.m_texture == NULL)
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+
+			tempPTR += sizeof(uint32_t);
+
+			for (uint32_t i = 0; i < i_material.m_textureCount; i++)
+			{
+				uint8_t strLength = *reinterpret_cast<uint8_t*>(tempPTR);
+				tempPTR += sizeof(uint8_t);
+				const char* textureName = reinterpret_cast<char*>(tempPTR);
+				tempPTR += strLength;
+				strLength = *reinterpret_cast<uint8_t*>(tempPTR);
+				tempPTR += sizeof(uint8_t);
+				const char* texturePath = reinterpret_cast<char*>(tempPTR);
+				tempPTR += strLength;
+
+				if (!TextureHelper::LoadTextureFromFile(i_material.m_texture[i], texturePath))
+				{
+					wereThereErrors = true;
+					goto OnExit;
+				}
+
+				if (!GetSampleID(i_material))
+				{
+					wereThereErrors = true;
+					goto OnExit;
+				}
+				
+			}
+
 		}
 		else
 		{

@@ -38,6 +38,22 @@ namespace eae6320
 
 		typedef
 #if defined( EAE6320_PLATFORM_D3D )
+			DWORD
+#elif defined( EAE6320_PLATFORM_GL )
+			GLint
+#endif
+			SamplerID;
+
+		typedef
+#if defined( EAE6320_PLATFORM_D3D )
+			IDirect3DTexture9*
+#elif defined( EAE6320_PLATFORM_GL )
+			GLint
+#endif
+			TextureData;
+
+		typedef
+#if defined( EAE6320_PLATFORM_D3D )
 			// This is conceptually a D3DXHANDLE but is defined this way
 			// so that external files aren't required to specify the #include path to the DirectX SDK
 			const char*
@@ -55,12 +71,16 @@ namespace eae6320
 			float x, y, z;
 			// COLOR0
 			// 4 uint8_ts == 4 bytes
-			// Offset = 8
+			// Offset = 12
 #if defined( EAE6320_PLATFORM_D3D )
 			uint8_t b, g, r, a;	// Direct3D expects the byte layout of a color to be different from what you might expect
 #elif defined( EAE6320_PLATFORM_GL )
 			uint8_t r, g, b, a;	// Direct3D expects the byte layout of a color to be different from what you might expect
 #endif
+			// TEXTURE COORDINATE
+			// 2 floats == 8 bytes
+			// Offset = 16
+			float u, v;
 		};
 
 		namespace ShaderTypes
