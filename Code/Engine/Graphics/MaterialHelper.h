@@ -23,6 +23,7 @@ namespace eae6320
 		public:
 			bool static LoadMaterialFromFile(Material& i_material, const char* const i_path);
 			bool static SetMaterialUniforms(Material& i_material, const Context& i_context);
+			bool static SetMaterialTextures(Material& i_material, const Context& i_context);
 			bool static CleanUp(Material& i_material);		
 		};
 	}

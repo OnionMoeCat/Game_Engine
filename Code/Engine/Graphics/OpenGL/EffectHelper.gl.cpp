@@ -213,6 +213,7 @@ bool eae6320::Graphics::EffectHelper::Bind(Effect& i_effect, const Context& i_co
 }
 bool eae6320::Graphics::EffectHelper::CleanUp(Effect& i_effect, const Context& i_context)
 {
+	bool wereThereErrors = false;
 	if (i_effect.m_programID != 0)
 	{
 		glDeleteProgram(i_effect.m_programID);
@@ -223,11 +224,11 @@ bool eae6320::Graphics::EffectHelper::CleanUp(Effect& i_effect, const Context& i
 			errorMessage << "OpenGL failed to delete the program: " <<
 				reinterpret_cast<const char*>(gluErrorString(errorCode));
 			UserOutput::Print(errorMessage.str());
-			return false;
+			wereThereErrors = true;
 		}
 		i_effect.m_programID = 0;
 	}
-	return true;
+	return !wereThereErrors;
 }
 bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, const Context& i_Context)
 {
@@ -246,7 +247,7 @@ bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, cons
 	return true;
 }
 
-bool eae6320::Graphics::EffectHelper::GetUniformHandler(Effect& i_effect, const char* i_name, ShaderTypes::eShaderType i_shaderType, tUniformHandle* i_uniformHandle)
+bool eae6320::Graphics::EffectHelper::GetUniformHandler(const Effect& i_effect, const char* i_name, ShaderTypes::eShaderType i_shaderType, tUniformHandle* i_uniformHandle)
 {
 	GLuint location = glGetUniformLocation(i_effect.m_programID, i_name);
 	if (location != -1)

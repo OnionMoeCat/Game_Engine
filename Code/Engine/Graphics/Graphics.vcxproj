@@ -36,6 +36,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Direct3D\TextureHelper.d3d.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="EffectHelper.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="MaterialHelper.cpp" />
@@ -56,8 +60,13 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="OpenGL\TextureHelper.gl.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="RenderableHelper.cpp" />
     <ClCompile Include="RenderableManager.cpp" />
+    <ClCompile Include="TextureHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Context.h" />
@@ -72,6 +81,8 @@
     <ClInclude Include="Renderable.h" />
     <ClInclude Include="RenderableHelper.h" />
     <ClInclude Include="RenderableManager.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureHelper.h" />
     <ClInclude Include="Uniform.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

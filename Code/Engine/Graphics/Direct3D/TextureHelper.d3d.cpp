@@ -5,6 +5,7 @@
 
 #include "../../Windows/Includes.h"
 #include "../../UserOutput/UserOutput.h"
+#include "../EffectHelper.h"
 
 #include <sstream>
 #include <d3d9.h>
@@ -37,5 +38,42 @@ bool eae6320::Graphics::TextureHelper::LoadTextureFromFile(Texture& i_texture, c
 			return false;
 		}
 	}
+	return true;
+}
+
+bool eae6320::Graphics::TextureHelper::GetSampleID(Texture& i_texture, const Effect& i_effect, const char* const i_textureName, const ShaderTypes::eShaderType i_shaderType)
+{
+	tUniformHandle tempHandle;
+	{
+		if (!EffectHelper::GetUniformHandler(i_effect, i_textureName, i_shaderType, &tempHandle))
+		{
+			return false;
+		}
+		
+		if (i_shaderType == ShaderTypes::eShaderType::Vertex)
+		{
+			i_texture.samplerID = static_cast<DWORD>(i_effect.m_vertexShaderConstantTable->GetSamplerIndex(tempHandle));
+		}
+		else if (i_shaderType == ShaderTypes::eShaderType::Fragment)
+		{
+			i_texture.samplerID = static_cast<DWORD>(i_effect.m_fragmentShaderConstantTable->GetSamplerIndex(tempHandle));;
+		}
+		else
+		{
+			return false;
+		}		
+	}
+	return true;
+}
+
+bool eae6320::Graphics::TextureHelper::SetTexture(Texture& i_texture, const Context& i_context)
+{
+	const HRESULT result = i_context.device->SetTexture(i_texture.samplerID, i_texture.textureData);
+	return SUCCEEDED(result);
+}
+
+bool eae6320::Graphics::TextureHelper::CleanUp(Texture& i_texture)
+{
+	i_texture.textureData->Release();
 	return true;
 }

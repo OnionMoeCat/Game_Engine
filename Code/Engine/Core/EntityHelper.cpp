@@ -61,6 +61,7 @@ bool eae6320::Core::EntityHelper::OffsetPosition(Entity& i_entity, const eae6320
 }
 bool eae6320::Core::EntityHelper::CleanUp(Entity& i_entity)
 {
+	bool wereThereErrors = false;
 	if (i_entity.m_renderable)
 	{
 		if (!eae6320::Graphics::RenderableHelper::CleanUp(*i_entity.m_renderable))
@@ -68,12 +69,12 @@ bool eae6320::Core::EntityHelper::CleanUp(Entity& i_entity)
 			std::stringstream errorMessage;
 			eae6320::UserOutput::Print("Fail to clean up effect");
 			delete i_entity.m_renderable;
-			return false;
+			wereThereErrors = true;
 		}
 		delete i_entity.m_renderable;
 		i_entity.m_renderable = NULL;
 	}
-	return true;
+	return !wereThereErrors;
 }
 bool eae6320::Core::EntityHelper::ToCameraScreen(Entity& i_entity, const Camera& i_camera)
 {

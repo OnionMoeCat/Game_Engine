@@ -22,6 +22,7 @@ namespace
 	uint32_t textureSize = 0;
 	char** textureNames = NULL;
 	char** texturePaths = NULL;
+	eae6320::Graphics::ShaderTypes::eShaderType* textureShaderType = NULL;
 }
 
 // Helper Function Declarations
@@ -187,6 +188,13 @@ namespace
 		const char* const key = "uniforms";
 		lua_pushstring(&io_luaState, key);
 		lua_gettable(&io_luaState, -2);
+
+		if (lua_isnil(&io_luaState, -1))
+		{
+			uniformSize = 0;
+			return true;
+		}
+
 		if (lua_istable(&io_luaState, -1))
 		{
 			unsigned int count;
@@ -394,6 +402,10 @@ namespace
 			lua_pop(&io_luaState, 1);
 
 		}
+		
+		{
+			uniforms[i_index - 1].uniformHandle = 0;
+		}
 
 		return true;
 	}
@@ -408,7 +420,7 @@ namespace
 		if (valueLength > MAXLENGTH)
 		{
 			std::stringstream errorMessage;
-			errorMessage << "less equal than 4 elements (r, g, b, a) in key \"color\" expected for \"vertices\" at index: " << i_index;
+			errorMessage << "less equal than 4 elements expected for \"uniforms\" at index: " << i_index;
 			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
 			return false;
 		}
@@ -419,7 +431,7 @@ namespace
 			if (lua_type(&io_luaState, -1) != LUA_TNUMBER)
 			{
 				std::stringstream errorMessage;
-				errorMessage << "Number value expected for index " << i << " in key \"color\" for \"vertices\" at index: " << i_index;
+				errorMessage << "Number value expected for index " << i << " for \"uniforms\" at index: " << i_index;
 				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
 				lua_pop(&io_luaState, 1);
 				return false;
@@ -427,6 +439,10 @@ namespace
 			// round to nearest integer
 			uniforms[i_index - 1].values[i - 1] = static_cast<float>(lua_tonumber(&io_luaState, -1));
 			lua_pop(&io_luaState, 1);
+		}
+		for (int i = valueLength; i < MAXLENGTH; i++)
+		{
+			uniforms[i_index - 1].values[i] = 0;
 		}
 
 		return true;
@@ -439,6 +455,13 @@ namespace
 		const char* const key = "textures";
 		lua_pushstring(&io_luaState, key);
 		lua_gettable(&io_luaState, -2);
+
+		if (lua_isnil(&io_luaState, -1))
+		{
+			textureSize = 0;
+			return true;
+		}
+
 		if (lua_istable(&io_luaState, -1))
 		{
 			unsigned int count;
@@ -452,12 +475,18 @@ namespace
 			textureSize = static_cast<uint32_t>(count);
 			textureNames = reinterpret_cast<char**>(malloc(sizeof(char*) * textureSize));
 			texturePaths = reinterpret_cast<char**>(malloc(sizeof(char*) * textureSize));
-			if (uniforms == NULL)
+			textureShaderType = reinterpret_cast<eae6320::Graphics::ShaderTypes::eShaderType*>(malloc(sizeof(eae6320::Graphics::ShaderTypes::eShaderType) * textureSize));
+			if (textureNames == NULL)
 			{
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (uniformNames == NULL)
+			if (texturePaths == NULL)
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (textureShaderType == NULL)
 			{
 				wereThereErrors = true;
 				goto OnExit;
@@ -469,6 +498,8 @@ namespace
 				textureNames = NULL;
 				free(texturePaths);
 				texturePaths = NULL;
+				free(textureShaderType);
+				textureShaderType = NULL;
 
 				eae6320::OutputErrorMessage("Fail to get value of \"uniforms\"", __FILE__);
 				wereThereErrors = true;
@@ -627,15 +658,15 @@ namespace
 				std::string temp = lua_tostring(&io_luaState, -1);
 				if (temp == "vertex")
 				{
-					uniforms[i_index - 1].shaderType = eae6320::Graphics::ShaderTypes::eShaderType::Vertex;
+					textureShaderType[i_index - 1] = eae6320::Graphics::ShaderTypes::eShaderType::Vertex;
 				}
 				else if (temp == "fragment")
 				{
-					uniforms[i_index - 1].shaderType = eae6320::Graphics::ShaderTypes::eShaderType::Fragment;
+					textureShaderType[i_index - 1] = eae6320::Graphics::ShaderTypes::eShaderType::Fragment;
 				}
 				else
 				{
-					uniforms[i_index - 1].shaderType = eae6320::Graphics::ShaderTypes::eShaderType::Unknown;
+					textureShaderType[i_index - 1] = eae6320::Graphics::ShaderTypes::eShaderType::Unknown;
 				}
 			}
 
@@ -907,7 +938,7 @@ namespace
 			}
 
 			strlength = static_cast<uint8_t>(tempStrlen + 1);
-			DWORD bytesToWrite = 1;
+			bytesToWrite = 1;
 			if (!WriteBufferToFile(i_path, fileHandle, &strlength, bytesToWrite))
 			{
 				wereThereErrors = true;
@@ -916,6 +947,13 @@ namespace
 
 			bytesToWrite = strlength;
 			if (!WriteBufferToFile(i_path, fileHandle, texturePaths[i], bytesToWrite))
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+
+			bytesToWrite = sizeof(eae6320::Graphics::ShaderTypes::eShaderType);
+			if (!WriteBufferToFile(i_path, fileHandle, &textureShaderType[i], bytesToWrite))
 			{
 				wereThereErrors = true;
 				goto OnExit;
@@ -1006,6 +1044,13 @@ namespace
 		}
 
 		texturePaths = NULL;
+
+		if (textureShaderType != NULL)
+		{
+			free(textureShaderType);
+		}
+
+		textureShaderType = NULL;
 
 		textureSize = 0;
 		return !wereThereErrors;

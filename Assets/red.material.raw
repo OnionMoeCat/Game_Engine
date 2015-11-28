@@ -12,4 +12,12 @@ return
 			shader_type = "fragment",
 		},
 	},
+	textures =
+	{
+		{
+			name = "g_sampler",
+			path = "data/brick.dds",
+			shader_type = "fragment",
+		},
+	},
 }

@@ -40,7 +40,7 @@ namespace eae6320
 			void static CreateLocalToWorldTransform(Effect& i_effect, const eae6320::Math::cQuaternion& i_rotation, const eae6320::Math::cVector& i_position);
 			void static CreateWorldToViewTransform(Effect& i_effect, const eae6320::Math::cQuaternion& i_cameraQuaternion, const eae6320::Math::cVector& i_cameraPosition);
 			void static CreateViewToScreenTransform(Effect& i_effect, const float i_fov, const float i_aspect, const float i_nearZ, const float i_farZ);
-			bool static GetUniformHandler(Effect& i_effect, const char* i_name, ShaderTypes::eShaderType i_shaderType, tUniformHandle* i_uniformHandle);
+			bool static GetUniformHandler(const Effect& i_effect, const char* i_name, ShaderTypes::eShaderType i_shaderType, tUniformHandle* i_uniformHandle);
 			bool static SetUniform(Effect& i_effect, const float* i_values, const size_t i_valueLength, const tUniformHandle i_uniformHandle, ShaderTypes::eShaderType i_shaderType, const Context& i_context);
 		};
 	}

@@ -4,8 +4,8 @@ return
 		builder = "MeshBuilder.exe",
 		assets = {
 			{
-				source = "box.mesh.raw",
-				target = "box.mesh",
+				source = "plane.mesh.raw",
+				target = "plane.mesh",
 			},
 			{
 				source = "floor.mesh.raw",
@@ -75,12 +75,20 @@ return
 				target = "green.material",
 			},
 			{
-				source = "transparent_02.material.raw",
-				target = "transparent_02.material",
+				source = "transparent_03.material.raw",
+				target = "transparent_03.material",
 			},
 			{
 				source = "transparent_08.material.raw",
 				target = "transparent_08.material",
+			},
+			{
+				source = "eae6320.material.raw",
+				target = "eae6320.material",
+			},
+			{
+				source = "alpha.material.raw",
+				target = "alpha.material",
 			},
 		},
 	},
@@ -89,7 +97,19 @@ return
 		assets = {
 			{
 				source = "default.jpg",
-				target = "default",
+				target = "default.dds",
+			},
+			{
+				source = "brick.jpg",
+				target = "brick.dds",
+			},
+			{
+				source = "eae6320.png",
+				target = "eae6320.dds",
+			},
+			{
+				source = "alpha.png",
+				target = "alpha.dds",
 			},
 		},
 	},

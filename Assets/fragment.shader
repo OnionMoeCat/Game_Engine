@@ -62,6 +62,6 @@ void main()
 	{
 		o_color.rgb = i_color.rgb * g_color_uniform;
 		o_color.a = i_color.a;
-		o_color = o_color * tex2D(g_sampler, texcoords);
+		o_color = o_color * tex2D(g_sampler, i_texcoords);
 	}
 }

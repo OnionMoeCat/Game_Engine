@@ -22,6 +22,7 @@ void main(
 	// will be interpolated across the triangle and given as input to the fragment shader
 
 	in float4 i_color : COLOR0,
+	in float2 i_texcoords : TEXCOORD0,
 
 	// Output
 	//=======

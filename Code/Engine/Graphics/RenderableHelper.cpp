@@ -57,6 +57,7 @@ bool eae6320::Graphics::RenderableHelper::LoadRenderableFromFile(Renderable& i_r
 
 bool eae6320::Graphics::RenderableHelper::CleanUp(Renderable& i_entity)
 {
+	bool wereThereErrors = false;
 	if (i_entity.m_material)
 	{
 		if (!eae6320::Graphics::MaterialHelper::CleanUp(*i_entity.m_material))
@@ -64,7 +65,7 @@ bool eae6320::Graphics::RenderableHelper::CleanUp(Renderable& i_entity)
 			std::stringstream errorMessage;
 			eae6320::UserOutput::Print("Fail to clean up effect");
 			delete i_entity.m_material;
-			return false;
+			wereThereErrors = true;
 		}
 		delete i_entity.m_material;
 		i_entity.m_material = NULL;
@@ -77,10 +78,11 @@ bool eae6320::Graphics::RenderableHelper::CleanUp(Renderable& i_entity)
 			std::stringstream errorMessage;
 			eae6320::UserOutput::Print("Fail to clean up mesh");
 			delete i_entity.m_mesh;
-			return false;
+			wereThereErrors = true;
 		}
 		delete i_entity.m_mesh;
 		i_entity.m_mesh = NULL;
 	}
-	return true;
+
+	return !wereThereErrors;
 }

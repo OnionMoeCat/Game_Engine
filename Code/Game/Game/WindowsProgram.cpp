@@ -53,10 +53,14 @@ namespace
 	eae6320::Core::Entity s_entity_ball_red;
 	eae6320::Core::Entity s_entity_ball_green;
 
-	eae6320::Core::Entity s_entity_ball_transparent_02;
+	eae6320::Core::Entity s_entity_ball_transparent_03;
 	eae6320::Core::Entity s_entity_ball_transparent_08;
 
 	eae6320::Core::Entity s_entity_floor;
+
+	eae6320::Core::Entity s_entity_plane_opaque;
+
+	eae6320::Core::Entity s_entity_plane_transparent;
 
 	eae6320::Core::Camera s_camera;
 }
@@ -549,18 +553,22 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_moving, s_camera);
 				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_red, s_camera);
 				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_green, s_camera);
-				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_transparent_02, s_camera);
+				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_transparent_03, s_camera);
 				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_transparent_08, s_camera);
+				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_plane_opaque, s_camera);
+				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_plane_transparent, s_camera);
 			}
 
 			//TODO: find a good way to show error message here
 			{
 				eae6320::Core::EntityHelper::Submit(s_entity_floor);
-				eae6320::Core::EntityHelper::Submit(s_entity_ball_moving);
 				eae6320::Core::EntityHelper::Submit(s_entity_ball_red);
 				eae6320::Core::EntityHelper::Submit(s_entity_ball_green);
-				eae6320::Core::EntityHelper::Submit(s_entity_ball_transparent_02);
+				eae6320::Core::EntityHelper::Submit(s_entity_ball_moving);
+				eae6320::Core::EntityHelper::Submit(s_entity_plane_opaque);
+				eae6320::Core::EntityHelper::Submit(s_entity_ball_transparent_03);
 				eae6320::Core::EntityHelper::Submit(s_entity_ball_transparent_08);
+				eae6320::Core::EntityHelper::Submit(s_entity_plane_transparent);
 				eae6320::Graphics::Core::Render();
 			}
 		}
@@ -712,14 +720,14 @@ namespace
 		}
 
 		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_ball_transparent_02, "data/transparent_02.material", "data/ball.mesh"))
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_ball_transparent_03, "data/transparent_03.material", "data/ball.mesh"))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
 			eae6320::Math::cVector ball_position_offset(1.0f, -0.2f, 3.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_transparent_02, ball_position_offset);
+			eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_transparent_03, ball_position_offset);
 		}
 
 		{
@@ -731,6 +739,28 @@ namespace
 			}
 			eae6320::Math::cVector ball_position_offset(3.0f, -0.2f, 3.0f);
 			eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_transparent_08, ball_position_offset);
+		}
+
+		{
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_plane_opaque, "data/eae6320.material", "data/plane.mesh"))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			eae6320::Math::cVector plane_position_offset(0.0f, 2.0f, -2.0f);
+			eae6320::Core::EntityHelper::OffsetPosition(s_entity_plane_opaque, plane_position_offset);
+		}
+
+		{
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_plane_transparent, "data/alpha.material", "data/plane.mesh"))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			eae6320::Math::cVector plane_position_offset(0.0f, 0.0f, 5.0f);
+			eae6320::Core::EntityHelper::OffsetPosition(s_entity_plane_transparent, plane_position_offset);
 		}
 
 		{
@@ -766,11 +796,27 @@ namespace
 			{
 				wereThereErrors = true;
 			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_transparent_02))
+			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_green))
+			{
+				wereThereErrors = true;
+			}
+			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_transparent_03))
+			{
+				wereThereErrors = true;
+			}
+			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_transparent_08))
 			{
 				wereThereErrors = true;
 			}
 			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_floor))
+			{
+				wereThereErrors = true;
+			}
+			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_plane_opaque))
+			{
+				wereThereErrors = true;
+			}
+			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_plane_transparent))
 			{
 				wereThereErrors = true;
 			}

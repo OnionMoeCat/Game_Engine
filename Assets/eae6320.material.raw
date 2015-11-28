@@ -2,7 +2,7 @@ return
 {
 	paths =
 	{
-		effect_path = "data/transparent.effect",
+		effect_path = "data/default.effect",
 	},
 	uniforms =
 	{
@@ -11,9 +11,12 @@ return
 			values = {1.0, 1.0, 1.0},
 			shader_type = "fragment",
 		},
+	},
+	textures =
+	{
 		{
-			name = "g_alpha_uniform",
-			values = {0.2},
+			name = "g_sampler",
+			path = "data/eae6320.dds",
 			shader_type = "fragment",
 		},
 	},

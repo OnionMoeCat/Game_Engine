@@ -88,6 +88,8 @@ bool eae6320::Graphics::MaterialHelper::LoadMaterialFromFile(Material& i_materia
 				tempPTR += sizeof(uint8_t);
 				const char* texturePath = reinterpret_cast<char*>(tempPTR);
 				tempPTR += strLength;
+				ShaderTypes::eShaderType shaderType = *reinterpret_cast<ShaderTypes::eShaderType*>(tempPTR);
+				tempPTR += sizeof(ShaderTypes::eShaderType);
 
 				if (!TextureHelper::LoadTextureFromFile(i_material.m_texture[i], texturePath))
 				{
@@ -95,7 +97,7 @@ bool eae6320::Graphics::MaterialHelper::LoadMaterialFromFile(Material& i_materia
 					goto OnExit;
 				}
 
-				if (!GetSampleID(i_material))
+				if (!TextureHelper::GetSampleID(i_material.m_texture[i], *(i_material.m_effect), textureName, shaderType))
 				{
 					wereThereErrors = true;
 					goto OnExit;
@@ -125,6 +127,7 @@ OnExit:
 
 bool eae6320::Graphics::MaterialHelper::CleanUp(Material& i_material)
 {
+	bool wereThereErrors = false;
 	if (i_material.m_effect != NULL)
 	{
 		if (!eae6320::Graphics::EffectHelper::CleanUp(*i_material.m_effect))
@@ -132,7 +135,7 @@ bool eae6320::Graphics::MaterialHelper::CleanUp(Material& i_material)
 			std::stringstream errorMessage;
 			eae6320::UserOutput::Print("Fail to clean up effect");
 			delete i_material.m_effect;
-			return false;
+			wereThereErrors = true;
 		}
 		delete i_material.m_effect;
 		i_material.m_effect = NULL;
@@ -146,7 +149,25 @@ bool eae6320::Graphics::MaterialHelper::CleanUp(Material& i_material)
 
 	i_material.m_uniformCount = 0;
 
-	return true;
+	if (i_material.m_texture != NULL)
+	{
+		for (size_t i = 0; i < i_material.m_textureCount; i++)
+		{
+			if (!eae6320::Graphics::TextureHelper::CleanUp(i_material.m_texture[i]))
+			{
+				std::stringstream errorMessage;
+				eae6320::UserOutput::Print("Fail to clean up texture");
+				delete i_material.m_effect;
+				wereThereErrors = true;
+			}
+		}
+		delete[] i_material.m_texture;
+		i_material.m_texture = NULL;
+	}
+
+	i_material.m_textureCount = 0;
+
+	return !wereThereErrors;
 }
 
 bool eae6320::Graphics::MaterialHelper::SetMaterialUniforms(Material& i_material, const Context& i_context)
@@ -164,5 +185,21 @@ bool eae6320::Graphics::MaterialHelper::SetMaterialUniforms(Material& i_material
 		}
 	}
 
+	return true;
+}
+
+bool eae6320::Graphics::MaterialHelper::SetMaterialTextures(Material& i_material, const Context& i_context)
+{
+	for (size_t i = 0; i < i_material.m_textureCount; i++)
+	{
+		if (!TextureHelper::SetTexture(i_material.m_texture[i], 
+#ifdef EAE6320_GRAPHICS_ISTEXTUREINDEXREQUIREDTOSETTEXTURE
+			i,
+#endif			
+			i_context))
+		{
+			return false;
+		}
+	}
 	return true;
 }

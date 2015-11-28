@@ -32,6 +32,13 @@
     <ClCompile Include="RenderableManager.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="MaterialHelper.cpp" />
+    <ClCompile Include="TextureHelper.cpp" />
+    <ClCompile Include="Direct3D\TextureHelper.d3d.cpp">
+      <Filter>Direct3D</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGL\TextureHelper.gl.cpp">
+      <Filter>OpenGL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Graphics.h" />
@@ -47,6 +54,8 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="Uniform.h" />
     <ClInclude Include="MaterialHelper.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="OpenGL">

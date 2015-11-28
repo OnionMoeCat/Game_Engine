@@ -13,7 +13,7 @@ return
 		},
 		{
 			name = "g_alpha_uniform",
-			values = {0.8},
+			values = {0.5},
 			shader_type = "fragment",
 		},
 	},
@@ -21,7 +21,7 @@ return
 	{
 		{
 			name = "g_sampler",
-			path = "data/brick.dds",
+			path = "data/alpha.dds",
 			shader_type = "fragment",
 		},
 	},

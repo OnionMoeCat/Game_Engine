@@ -13,7 +13,7 @@ return
 		},
 		{
 			name = "g_alpha_uniform",
-			values = {0.8},
+			values = {0.3},
 			shader_type = "fragment",
 		},
 	},

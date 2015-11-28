@@ -6,6 +6,7 @@
 #include "../../Windows/Includes.h"
 #include "../../Windows/Functions.h"
 #include "../../UserOutput/UserOutput.h"
+#include "../EffectHelper.h"
 
 #include <algorithm>	// For std::max
 #include <sstream>
@@ -82,7 +83,7 @@ bool eae6320::Graphics::TextureHelper::LoadTextureFromFile(Texture& i_texture, c
 	{
 		wereThereErrors = true;
 		std::stringstream errorMessage;
-		errorMessage << "Failed to allocate " << fileSize << " bytes to read in the texture " << i_path;
+		errorMessage << "Failed to allocate " << fileSize << " bytes to read in the texture " << i_texturePath;
 		eae6320::UserOutput::Print(errorMessage.str());
 		goto OnExit;
 	}
@@ -263,4 +264,64 @@ OnExit:
 	}
 
 	return !wereThereErrors;
+}
+
+bool eae6320::Graphics::TextureHelper::GetSampleID(Texture& i_texture, const Effect& i_effect, const char* const i_textureName, const ShaderTypes::eShaderType i_shaderType)
+{
+	if (!EffectHelper::GetUniformHandler(i_effect, i_textureName, i_shaderType, &i_texture.samplerID))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool eae6320::Graphics::TextureHelper::SetTexture(Texture& i_texture, const int i_textureUnit, const Context& i_context)
+{
+	glActiveTexture(GL_TEXTURE0 + i_textureUnit);
+	GLenum errorCode = glGetError();
+	if (errorCode != GL_NO_ERROR)
+	{
+		std::stringstream errorMessage;
+		errorMessage << "OpenGL failed to activate texture: " <<
+			reinterpret_cast<const char*>(gluErrorString(errorCode));
+		eae6320::UserOutput::Print(errorMessage.str());
+		return false;
+	}
+	glBindTexture(GL_TEXTURE_2D, i_texture.textureData);
+	errorCode = glGetError();
+	if (errorCode != GL_NO_ERROR)
+	{
+		std::stringstream errorMessage;
+		errorMessage << "OpenGL failed to bind texture: " <<
+			reinterpret_cast<const char*>(gluErrorString(errorCode));
+		eae6320::UserOutput::Print(errorMessage.str());
+		return false;
+	}
+	glUniform1i(i_texture.samplerID, i_textureUnit);
+	errorCode = glGetError();
+	if (errorCode != GL_NO_ERROR)
+	{
+		std::stringstream errorMessage;
+		errorMessage << "OpenGL failed to set samplerID: " <<
+			reinterpret_cast<const char*>(gluErrorString(errorCode));
+		eae6320::UserOutput::Print(errorMessage.str());
+		return false;
+	}
+	return true;
+}
+
+bool eae6320::Graphics::TextureHelper::CleanUp(Texture& i_texture)
+{
+	glDeleteTextures(1, &i_texture.textureData);
+	GLenum errorCode = glGetError();
+	if (errorCode != GL_NO_ERROR)
+	{
+		std::stringstream errorMessage;
+		errorMessage << "OpenGL failed to cleanup texture: " <<
+			reinterpret_cast<const char*>(gluErrorString(errorCode));
+		eae6320::UserOutput::Print(errorMessage.str());
+		return false;
+	}
+	return true;
 }

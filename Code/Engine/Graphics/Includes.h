@@ -48,7 +48,7 @@ namespace eae6320
 #if defined( EAE6320_PLATFORM_D3D )
 			IDirect3DTexture9*
 #elif defined( EAE6320_PLATFORM_GL )
-			GLint
+			GLuint
 #endif
 			TextureData;
 
@@ -61,6 +61,10 @@ namespace eae6320
 			GLint
 #endif
 			tUniformHandle;
+
+#if defined( EAE6320_PLATFORM_GL )
+#define EAE6320_GRAPHICS_ISTEXTUREINDEXREQUIREDTOSETTEXTURE
+#endif
 
 		// This struct determines the layout of the data that the CPU will send to the GPU
 		struct sVertex

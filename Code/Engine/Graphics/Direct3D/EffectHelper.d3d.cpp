@@ -157,7 +157,7 @@ bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, cons
 	return true;
 }
 
-bool eae6320::Graphics::EffectHelper::GetUniformHandler(Effect& i_effect, const char* i_name, ShaderTypes::eShaderType i_shaderType, tUniformHandle* i_uniformHandle)
+bool eae6320::Graphics::EffectHelper::GetUniformHandler(const Effect& i_effect, const char* i_name, ShaderTypes::eShaderType i_shaderType, tUniformHandle* i_uniformHandle)
 {
 	if (i_shaderType == ShaderTypes::eShaderType::Vertex)
 	{

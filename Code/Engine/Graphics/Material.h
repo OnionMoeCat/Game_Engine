@@ -10,6 +10,7 @@ This file contains the function declarations for effect
 
 #include "Effect.h"
 #include "Uniform.h"
+#include "Texture.h"
 
 // Interface
 //==========

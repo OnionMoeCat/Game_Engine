@@ -180,6 +180,14 @@ namespace
 				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
 				return false;
 			}
+			if (!LoadTableValues_vertices_array_texcoord(io_luaState, i))
+			{
+				lua_pop(&io_luaState, 1);
+				std::stringstream errorMessage;
+				errorMessage << "Fail to get value of \"texcoord\" for \"vertices\" expected at index: " << i;
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				return false;
+			}
 			lua_pop(&io_luaState, 1);
 		}
 
@@ -350,7 +358,7 @@ namespace
 			goto OnExit;
 		}
 
-		if (!LoadTableValues_vertices_array_color_rgba(io_luaState, i_index))
+		if (!LoadTableValues_vertices_array_texcoord_uv(io_luaState, i_index))
 		{
 			std::stringstream errorMessage;
 			errorMessage << "Fail to get value of \"color\" for \"vertices\" at index: " << i_index;
@@ -371,7 +379,7 @@ namespace
 		const int LENGTH = 2;
 		const char charMap[LENGTH] = { 'u','v'};
 
-		uint8_t tempUV[LENGTH];
+		float tempUV[LENGTH];
 		if (uvLength != LENGTH)
 		{
 			std::stringstream errorMessage;

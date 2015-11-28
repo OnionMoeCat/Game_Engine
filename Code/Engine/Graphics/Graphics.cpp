@@ -45,6 +45,8 @@ void eae6320::Graphics::Core::Render()
 				assert(result);
 				result = MaterialHelper::SetMaterialUniforms(*renderable.m_material, Context::Get());
 				assert(result);
+				result = MaterialHelper::SetMaterialTextures(*renderable.m_material, Context::Get());
+				assert(result);
 				result = EffectHelper::SetDrawCallUniforms(*renderable.m_material->m_effect, Context::Get());
 				assert(result);
 				result = MeshHelper::DrawMesh(*renderable.m_mesh, Context::Get());
