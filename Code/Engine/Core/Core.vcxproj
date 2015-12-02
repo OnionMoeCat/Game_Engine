@@ -23,10 +23,12 @@
     <ClInclude Include="CameraHelper.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityHelper.h" />
+    <ClInclude Include="EntityManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraHelper.cpp" />
     <ClCompile Include="EntityHelper.cpp" />
+    <ClCompile Include="EntityManager.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{62FF0FD9-07F8-4C55-81A2-56EEE70FCA7A}</ProjectGuid>
