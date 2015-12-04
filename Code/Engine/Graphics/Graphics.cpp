@@ -38,18 +38,18 @@ void eae6320::Graphics::Core::Render()
 	{
 		// Set the vertex and fragment shaders
 		{
-			for (unsigned int i = 0; i < RenderableManager::Get().m_list.size(); i++)
+			for (unsigned int i = 0; i < RenderableManager::Get().GetSize(); i++)
 			{
-				Renderable& renderable = RenderableManager::Get().m_list[i];
-				result = EffectHelper::Bind(*renderable.m_material->m_effect, Context::Get());
+				Renderable* renderable = RenderableManager::Get().GetRenderableAtIndex(i);
+				result = EffectHelper::Bind(*renderable->m_material->m_effect, Context::Get());
 				assert(result);
-				result = MaterialHelper::SetMaterialUniforms(*renderable.m_material, Context::Get());
+				result = MaterialHelper::SetMaterialUniforms(*renderable->m_material, Context::Get());
 				assert(result);
-				result = MaterialHelper::SetMaterialTextures(*renderable.m_material, Context::Get());
+				result = MaterialHelper::SetMaterialTextures(*renderable->m_material, Context::Get());
 				assert(result);
-				result = EffectHelper::SetDrawCallUniforms(*renderable.m_material->m_effect, Context::Get());
+				result = EffectHelper::SetDrawCallUniforms(*renderable->m_material->m_effect, Context::Get());
 				assert(result);
-				result = MeshHelper::DrawMesh(*renderable.m_mesh, Context::Get());
+				result = MeshHelper::DrawMesh(*renderable->m_mesh, Context::Get());
 				assert(result);
 			}
 			RenderableManager::Get().CleanUp();

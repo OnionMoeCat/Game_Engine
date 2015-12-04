@@ -6,10 +6,12 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityHelper.h" />
     <ClInclude Include="EntityManager.h" />
+    <ClInclude Include="EntityHandle.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraHelper.cpp" />
     <ClCompile Include="EntityHelper.cpp" />
     <ClCompile Include="EntityManager.cpp" />
+    <ClCompile Include="EntityHandle.cpp" />
   </ItemGroup>
 </Project>

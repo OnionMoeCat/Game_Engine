@@ -25,6 +25,7 @@
 #include "../../Engine/Core/CameraHelper.h"
 #include "../../Engine/Core/Entity.h"
 #include "../../Engine/Core/EntityHelper.h"
+#include "../../Engine/Core/EntityManager.h"
 
 // Static Data Initialization
 //===========================
@@ -48,21 +49,22 @@ namespace
 	// as one of your classmate's
 	const char* s_mainWindowClass_name = "Yuchen Zhang's Main Window Class";
 
-	eae6320::Core::Entity s_entity_ball_moving;
+	eae6320::Core::EntityHandle s_entity_ball_moving_iterator;
+	eae6320::Core::EntityHandle s_entity_ball_red_iterator;
+	eae6320::Core::EntityHandle s_entity_ball_green_iterator;
 
-	eae6320::Core::Entity s_entity_ball_red;
-	eae6320::Core::Entity s_entity_ball_green;
+	eae6320::Core::EntityHandle s_entity_ball_transparent_03;
+	eae6320::Core::EntityHandle s_entity_ball_transparent_08;
 
-	eae6320::Core::Entity s_entity_ball_transparent_03;
-	eae6320::Core::Entity s_entity_ball_transparent_08;
+	eae6320::Core::EntityHandle s_entity_floor;
 
-	eae6320::Core::Entity s_entity_floor;
+	eae6320::Core::EntityHandle s_entity_plane_opaque;
 
-	eae6320::Core::Entity s_entity_plane_opaque;
-
-	eae6320::Core::Entity s_entity_plane_transparent;
+	eae6320::Core::EntityHandle s_entity_plane_transparent;
 
 	eae6320::Core::Camera s_camera;
+
+	
 }
 
 // Helper Functions
@@ -549,26 +551,18 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			UpdateCamera();
 
 			{
-				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_floor, s_camera);
-				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_moving, s_camera);
-				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_red, s_camera);
-				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_green, s_camera);
-				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_transparent_03, s_camera);
-				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_transparent_08, s_camera);
-				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_plane_opaque, s_camera);
-				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_plane_transparent, s_camera);
+				for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)
+				{
+					eae6320::Core::EntityHelper::ToCameraScreen(*eae6320::Core::EntityManager::Get().GetHandleAtIndex(i).ToEntity(), s_camera);
+				}
 			}
 
 			//TODO: find a good way to show error message here
 			{
-				eae6320::Core::EntityHelper::Submit(s_entity_floor);
-				eae6320::Core::EntityHelper::Submit(s_entity_ball_red);
-				eae6320::Core::EntityHelper::Submit(s_entity_ball_green);
-				eae6320::Core::EntityHelper::Submit(s_entity_ball_moving);
-				eae6320::Core::EntityHelper::Submit(s_entity_plane_opaque);
-				eae6320::Core::EntityHelper::Submit(s_entity_ball_transparent_03);
-				eae6320::Core::EntityHelper::Submit(s_entity_ball_transparent_08);
-				eae6320::Core::EntityHelper::Submit(s_entity_plane_transparent);
+				for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)
+				{
+					eae6320::Core::EntityHelper::Submit(*eae6320::Core::EntityManager::Get().GetHandleAtIndex(i).ToEntity());
+				}
 				eae6320::Graphics::Core::Render();
 			}
 		}
@@ -633,7 +627,7 @@ namespace
 		// that encapsulates a mesh, an effect, and a position offset.
 		// You don't have to do it this way for your assignment!
 		// You just need a way to update the position offset associated with the colorful rectangle.
-		eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_moving, offset);
+		eae6320::Core::EntityHelper::OffsetPosition(*s_entity_ball_moving_iterator.ToEntity(), offset);
 	}
 
 	void UpdateCamera()
@@ -675,92 +669,92 @@ namespace
 	bool Initialize()
 	{
 		bool wereThereErrors = false;
-		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_ball_moving, "data/default.material", "data/ball.mesh"))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			eae6320::Math::cVector ball_position_offset(0.0f, 0.2f, -1.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_moving, ball_position_offset);
-		}
 
 		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_ball_red, "data/red.material", "data/ball.mesh"))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			eae6320::Math::cVector ball_position_offset(-3.0f, -0.2f, 3.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_red, ball_position_offset);
-		}
-
-		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_ball_green, "data/green.material", "data/ball.mesh"))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			eae6320::Math::cVector ball_position_offset(-1.0f, -0.2f, 3.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_green, ball_position_offset);
-		}
-
-		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_floor, "data/default.material", "data/floor.mesh"))
+			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/floor.mesh", s_entity_floor))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
 			eae6320::Math::cVector floor_position_offset(0.0f, 0.0f, 0.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(s_entity_floor, floor_position_offset);
+			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_floor.ToEntity(), floor_position_offset);
 		}
 
 		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_ball_transparent_03, "data/transparent_03.material", "data/ball.mesh"))
+			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/ball.mesh", s_entity_ball_moving_iterator))
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			eae6320::Math::cVector ball_position_offset(0.0f, 0.2f, -1.0f);
+			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_ball_moving_iterator.ToEntity(), ball_position_offset);
+		}
+
+		{
+			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/red.material", "data/ball.mesh", s_entity_ball_red_iterator))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector ball_position_offset(1.0f, -0.2f, 3.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_transparent_03, ball_position_offset);
+			eae6320::Math::cVector ball_position_offset(-3.0f, -0.2f, 3.0f);
+			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_ball_red_iterator.ToEntity(), ball_position_offset);
 		}
 
 		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_ball_transparent_08, "data/transparent_08.material", "data/ball.mesh"))
+			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/green.material", "data/ball.mesh", s_entity_ball_green_iterator))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector ball_position_offset(3.0f, -0.2f, 3.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_transparent_08, ball_position_offset);
+			eae6320::Math::cVector ball_position_offset(-1.0f, -0.2f, 3.0f);
+			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_ball_green_iterator.ToEntity(), ball_position_offset);
 		}
 
 		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_plane_opaque, "data/eae6320.material", "data/plane.mesh"))
+			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/eae6320.material", "data/plane.mesh", s_entity_plane_opaque))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
 			eae6320::Math::cVector plane_position_offset(0.0f, 2.0f, -2.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(s_entity_plane_opaque, plane_position_offset);
+			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_plane_opaque.ToEntity(), plane_position_offset);
 		}
 
 		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_plane_transparent, "data/alpha.material", "data/plane.mesh"))
+			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/transparent_03.material", "data/ball.mesh", s_entity_ball_transparent_03))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			eae6320::Math::cVector ball_position_offset(1.0f, -0.2f, 3.0f);
+			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_ball_transparent_03.ToEntity(), ball_position_offset);
+		}
+
+		{
+			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/transparent_08.material", "data/ball.mesh", s_entity_ball_transparent_08))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			eae6320::Math::cVector ball_position_offset(3.0f, -0.2f, 3.0f);
+			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_ball_transparent_08.ToEntity(), ball_position_offset);
+		}
+
+		{
+			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/alpha.material", "data/plane.mesh", s_entity_plane_transparent))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
 			eae6320::Math::cVector plane_position_offset(0.0f, 0.0f, 5.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(s_entity_plane_transparent, plane_position_offset);
+			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_plane_transparent.ToEntity(), plane_position_offset);
 		}
 
 		{
@@ -788,37 +782,12 @@ namespace
 	{
 		bool wereThereErrors = false;
 		{
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_moving))
+			for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)
 			{
-				wereThereErrors = true;
-			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_red))
-			{
-				wereThereErrors = true;
-			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_green))
-			{
-				wereThereErrors = true;
-			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_transparent_03))
-			{
-				wereThereErrors = true;
-			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_transparent_08))
-			{
-				wereThereErrors = true;
-			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_floor))
-			{
-				wereThereErrors = true;
-			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_plane_opaque))
-			{
-				wereThereErrors = true;
-			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_plane_transparent))
-			{
-				wereThereErrors = true;
+				if (!eae6320::Core::EntityHelper::CleanUp(*eae6320::Core::EntityManager::Get().GetHandleAtIndex(i).ToEntity()))
+				{
+					wereThereErrors = true;
+				}			
 			}
 		}
 		return !wereThereErrors;

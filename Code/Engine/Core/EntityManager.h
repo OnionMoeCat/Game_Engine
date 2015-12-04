@@ -8,6 +8,7 @@ This file contains the function declarations for mesh
 // Header Files
 //=============
 #include "Entity.h"
+#include "EntityHandle.h"
 
 #include <vector>
 
@@ -20,19 +21,21 @@ namespace eae6320
 	{
 		struct EntityManager
 		{
-		private:
-			typedef std::vector<Entity> EntityList;
-			EntityList m_list;
-			static EntityManager m_Instance;
-			EntityManager();
 		public:
 			static EntityManager& Get();
 			void CleanUp();
-			bool CreateEntityFromFile(const char* const i_materialPath, const char* const i_meshPath);
-			typedef EntityList::iterator iterator;
-			typedef EntityList::const_iterator const_iterator;
-			iterator begin() { return m_list.begin(); }
-			iterator end() { return m_list.end(); }
+			void Release(const EntityHandle& i_handle);
+			bool CreateEntityFromFile(const char* const i_materialPath, const char* const i_meshPath, EntityHandle& o_handle);
+			EntityHandle GetHandleAtIndex(size_t i_index);
+			size_t GetEntitySize();
+			friend struct EntityHandle;
+		private:
+			static uint32_t g_UniqueID;
+			typedef std::vector<Entity*> EntityList;
+			EntityList m_list;
+			static EntityManager m_Instance;
+			EntityManager();
+			EntityHandle InsertAndGetIndex(Entity* i_entity);
 		};
 	}
 }

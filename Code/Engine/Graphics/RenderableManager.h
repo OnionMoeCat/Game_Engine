@@ -20,12 +20,15 @@ namespace eae6320
 	{
 		struct RenderableManager
 		{
-			std::vector<Renderable> m_list;
 			static RenderableManager& Get();
 			void CleanUp();
 			void Submit(const Renderable& i_renderable);
+			size_t GetSize();
+			Renderable* GetRenderableAtIndex(size_t i_index);
 		private:
 			static RenderableManager m_Instance;
+			std::vector<Renderable> m_transparent_list;
+			std::vector<Renderable> m_opaque_list;
 		};
 	}
 }

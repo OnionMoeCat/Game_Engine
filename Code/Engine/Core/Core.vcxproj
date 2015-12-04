@@ -22,11 +22,13 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraHelper.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityHandle.h" />
     <ClInclude Include="EntityHelper.h" />
     <ClInclude Include="EntityManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraHelper.cpp" />
+    <ClCompile Include="EntityHandle.cpp" />
     <ClCompile Include="EntityHelper.cpp" />
     <ClCompile Include="EntityManager.cpp" />
   </ItemGroup>
