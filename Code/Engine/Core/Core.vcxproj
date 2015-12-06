@@ -21,16 +21,20 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraHelper.h" />
+    <ClInclude Include="IController.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityHandle.h" />
     <ClInclude Include="EntityHelper.h" />
     <ClInclude Include="EntityManager.h" />
+    <ClInclude Include="Transform.h" />
+    <ClInclude Include="TransformHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraHelper.cpp" />
     <ClCompile Include="EntityHandle.cpp" />
     <ClCompile Include="EntityHelper.cpp" />
     <ClCompile Include="EntityManager.cpp" />
+    <ClCompile Include="TransformHelper.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{62FF0FD9-07F8-4C55-81A2-56EEE70FCA7A}</ProjectGuid>

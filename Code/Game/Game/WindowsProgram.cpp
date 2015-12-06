@@ -26,6 +26,10 @@
 #include "../../Engine/Core/Entity.h"
 #include "../../Engine/Core/EntityHelper.h"
 #include "../../Engine/Core/EntityManager.h"
+#include "../../Engine/Core/TransformHelper.h"
+
+#include "Controllers/InputController.h"
+#include "Controllers/ConstantController.h"
 
 // Static Data Initialization
 //===========================
@@ -72,8 +76,7 @@ namespace
 
 namespace
 {
-	void UpdateEntities();
-	void UpdateCamera();
+	void UpdateCamera(float dt);
 	bool Initialize();
 	bool CleanUp();
 }
@@ -547,8 +550,18 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			//	someGameClass.OnNewFrame();
 			// or similar, though.)
 			eae6320::Time::OnNewFrame();
-			UpdateEntities();
-			UpdateCamera();
+
+			{
+				float dt = eae6320::Time::GetSecondsElapsedThisFrame();
+				for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)
+				{
+					eae6320::Core::Entity* entity = eae6320::Core::EntityManager::Get().GetHandleAtIndex(i).ToEntity();
+					entity->m_iController->UpdateEntity(*entity, dt);
+					eae6320::Core::TransformHelper::UpdateTransform(*entity->m_transform, *entity->m_renderable->m_material->m_effect, dt);
+				}
+
+				UpdateCamera(dt);
+			}
 
 			{
 				for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)
@@ -594,43 +607,8 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 
 namespace
 {
-	void UpdateEntities()
-	{
-		eae6320::Math::cVector offset(0.0f, 0.0f);
-		{
-			// Get the direction
-			{
-				if (eae6320::UserInput::IsKeyPressed(VK_LEFT))
-				{
-					offset.x -= 1.0f;
-				}
-				if (eae6320::UserInput::IsKeyPressed(VK_RIGHT))
-				{
-					offset.x += 1.0f;
-				}
-				if (eae6320::UserInput::IsKeyPressed(VK_UP))
-				{
-					offset.y += 1.0f;
-				}
-				if (eae6320::UserInput::IsKeyPressed(VK_DOWN))
-				{
-					offset.y -= 1.0f;
-				}
-			}
-			// Get the speed
-			const float unitsPerSecond = 1.0f;	// This is arbitrary
-			const float unitsToMove = unitsPerSecond * eae6320::Time::GetSecondsElapsedThisFrame();	// This makes the speed frame-rate-independent
-																									// Normalize the offset
-			offset *= unitsToMove;
-		}
-		// The following line assumes there is some "entity" for the rectangle that the game code controls
-		// that encapsulates a mesh, an effect, and a position offset.
-		// You don't have to do it this way for your assignment!
-		// You just need a way to update the position offset associated with the colorful rectangle.
-		eae6320::Core::EntityHelper::OffsetPosition(*s_entity_ball_moving_iterator.ToEntity(), offset);
-	}
 
-	void UpdateCamera()
+	void UpdateCamera(float dt)
 	{
 		eae6320::Math::cVector offset(0.0f, 0.0f);
 		{
@@ -655,7 +633,7 @@ namespace
 			}
 			// Get the speed
 			const float unitsPerSecond = 1.0f;	// This is arbitrary
-			const float unitsToMove = unitsPerSecond * eae6320::Time::GetSecondsElapsedThisFrame();	// This makes the speed frame-rate-independent
+			const float unitsToMove = unitsPerSecond * dt;	// This makes the speed frame-rate-independent
 																									// Normalize the offset
 			offset *= unitsToMove;
 		}
@@ -677,8 +655,20 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector floor_position_offset(0.0f, 0.0f, 0.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_floor.ToEntity(), floor_position_offset);
+			eae6320::Math::cVector floor_position(0.0f, 0.0f, 0.0f);
+			eae6320::Math::cQuaternion floor_rotation;
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_floor.ToEntity(), floor_position, floor_rotation))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_floor.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 		}
 
 		{
@@ -687,8 +677,20 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector ball_position_offset(0.0f, 0.2f, -1.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_ball_moving_iterator.ToEntity(), ball_position_offset);
+			eae6320::Math::cVector ball_position(0.0f, 0.2f, -1.0f);
+			eae6320::Math::cQuaternion ball_rotation;
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_moving_iterator.ToEntity(), ball_position, ball_rotation))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_moving_iterator.ToEntity(), new eae6320::Game::InputController(1.0f)))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 		}
 
 		{
@@ -698,8 +700,20 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector ball_position_offset(-3.0f, -0.2f, 3.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_ball_red_iterator.ToEntity(), ball_position_offset);
+			eae6320::Math::cVector ball_position(-3.0f, -0.2f, 3.0f);
+			eae6320::Math::cQuaternion ball_rotation;
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_red_iterator.ToEntity(), ball_position, ball_rotation))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_red_iterator.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 		}
 
 		{
@@ -709,8 +723,20 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector ball_position_offset(-1.0f, -0.2f, 3.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_ball_green_iterator.ToEntity(), ball_position_offset);
+			eae6320::Math::cVector ball_position(-1.0f, -0.2f, 3.0f);
+			eae6320::Math::cQuaternion ball_rotation;
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_green_iterator.ToEntity(), ball_position, ball_rotation))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_green_iterator.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 		}
 
 		{
@@ -720,8 +746,20 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector plane_position_offset(0.0f, 2.0f, -2.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_plane_opaque.ToEntity(), plane_position_offset);
+			eae6320::Math::cVector plane_position(0.0f, 2.0f, -2.0f);
+			eae6320::Math::cQuaternion plane_rotation;
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_plane_opaque.ToEntity(), plane_position, plane_rotation))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_plane_opaque.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 		}
 
 		{
@@ -731,8 +769,20 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector ball_position_offset(1.0f, -0.2f, 3.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_ball_transparent_03.ToEntity(), ball_position_offset);
+			eae6320::Math::cVector ball_position(1.0f, -0.2f, 3.0f);
+			eae6320::Math::cQuaternion ball_rotation;
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_transparent_03.ToEntity(), ball_position, ball_rotation))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_transparent_03.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}			
 		}
 
 		{
@@ -742,8 +792,20 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector ball_position_offset(3.0f, -0.2f, 3.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_ball_transparent_08.ToEntity(), ball_position_offset);
+			eae6320::Math::cVector ball_position(3.0f, -0.2f, 3.0f);
+			eae6320::Math::cQuaternion ball_rotation;
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_transparent_08.ToEntity(), ball_position, ball_rotation))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_transparent_08.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 		}
 
 		{
@@ -753,8 +815,20 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector plane_position_offset(0.0f, 0.0f, 5.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(*s_entity_plane_transparent.ToEntity(), plane_position_offset);
+			eae6320::Math::cVector plane_position(0.0f, 0.0f, 5.0f);
+			eae6320::Math::cQuaternion plane_rotation;
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_plane_transparent.ToEntity(), plane_position, plane_rotation))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_plane_transparent.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 		}
 
 		{

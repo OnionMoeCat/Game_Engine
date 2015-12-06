@@ -3,6 +3,12 @@
   <ItemGroup>
     <ClCompile Include="EntryPoint.cpp" />
     <ClCompile Include="WindowsProgram.cpp" />
+    <ClCompile Include="Controllers\ConstantController.cpp">
+      <Filter>Controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="Controllers\InputController.cpp">
+      <Filter>Controllers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowsProgram.h" />
@@ -11,6 +17,12 @@
     </ClInclude>
     <ClInclude Include="Resources\targetver.h">
       <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Controllers\ConstantController.h">
+      <Filter>Controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="Controllers\InputController.h">
+      <Filter>Controllers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -24,6 +36,9 @@
   <ItemGroup>
     <Filter Include="Resources">
       <UniqueIdentifier>{80f7a4e0-8789-4403-a714-82be548ce0a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controllers">
+      <UniqueIdentifier>{39124602-defc-4a6a-a070-ad3faa01ff2a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

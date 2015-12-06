@@ -4,6 +4,8 @@
 // Header Files
 //=============
 
+#include "Transform.h"
+#include "IController.h"
 #include "../Graphics/Renderable.h"
 
 namespace eae6320
@@ -12,9 +14,9 @@ namespace eae6320
 	{
 		struct Entity
 		{
+			Transform* m_transform = NULL;
+			IController* m_iController = NULL;
 			eae6320::Graphics::Renderable* m_renderable = NULL;
-			eae6320::Math::cVector m_position;
-			eae6320::Math::cQuaternion m_rotation;
 			uint32_t m_handleIndex;
 			uint32_t m_uniqueId;
 		};

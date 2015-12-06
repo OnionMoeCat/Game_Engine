@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include "EntityHelper.h"
+#include "TransformHelper.h"
 #include "../UserOutput/UserOutput.h"
 #include "../Graphics/RenderableHelper.h"
 #include "../Graphics/RenderableManager.h"
@@ -35,30 +36,6 @@ bool eae6320::Core::EntityHelper::LoadEntityFromFile(Entity& i_entity, const cha
 	}
 	return true;
 }
-bool eae6320::Core::EntityHelper::OffsetPosition(Entity& i_entity, const eae6320::Math::cVector& i_offset_position)
-{
-	if (i_entity.m_renderable == NULL)
-	{
-		std::stringstream errorMessage;
-		eae6320::UserOutput::Print("entity.m_renderable not null expected");
-		return false;
-	}
-	if (i_entity.m_renderable->m_material == NULL)
-	{
-		std::stringstream errorMessage;
-		eae6320::UserOutput::Print("entity.m_renderable->m_material not null expected");
-		return false;
-	}
-	if (i_entity.m_renderable->m_material->m_effect == NULL)
-	{
-		std::stringstream errorMessage;
-		eae6320::UserOutput::Print("entity.m_renderable->m_material->m_effect not null expected");
-		return false;
-	}
-	i_entity.m_position += i_offset_position;
-	eae6320::Graphics::EffectHelper::CreateLocalToWorldTransform(*i_entity.m_renderable->m_material->m_effect, i_entity.m_rotation, i_entity.m_position);
-	return true;
-}
 bool eae6320::Core::EntityHelper::CleanUp(Entity& i_entity)
 {
 	bool wereThereErrors = false;
@@ -73,6 +50,16 @@ bool eae6320::Core::EntityHelper::CleanUp(Entity& i_entity)
 		}
 		delete i_entity.m_renderable;
 		i_entity.m_renderable = NULL;
+	}
+	if (i_entity.m_renderable)
+	{
+		delete i_entity.m_renderable;
+		i_entity.m_renderable = NULL;
+	}
+	if (i_entity.m_iController)
+	{
+		delete i_entity.m_iController;
+		i_entity.m_iController = NULL;
 	}
 	return !wereThereErrors;
 }
@@ -109,5 +96,29 @@ bool eae6320::Core::EntityHelper::Submit(Entity& i_entity)
 		return false;
 	}
 	eae6320::Graphics::RenderableManager::Get().Submit(*i_entity.m_renderable);
+	return true;
+}
+bool eae6320::Core::EntityHelper::SetTransform(Entity& i_entity, const eae6320::Math::cVector i_position, const eae6320::Math::cQuaternion i_quaternion)
+{
+	if (i_entity.m_transform == NULL)
+	{
+		i_entity.m_transform = new eae6320::Core::Transform();
+	}
+	if (i_entity.m_transform)
+	{
+		TransformHelper::SetPosition(*i_entity.m_transform, *i_entity.m_renderable->m_material->m_effect, i_position);
+		TransformHelper::SetRotation(*i_entity.m_transform, *i_entity.m_renderable->m_material->m_effect, i_quaternion);
+	}
+	else
+	{
+		eae6320::UserOutput::Print("Fail to initialize transform");
+		return false;
+	}
+	return true;
+}
+
+bool eae6320::Core::EntityHelper::SetController(Entity& i_entity, IController* i_controller)
+{
+	i_entity.m_iController = i_controller;
 	return true;
 }

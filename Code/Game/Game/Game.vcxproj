@@ -213,11 +213,15 @@
     <Image Include="Resources\small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Controllers\ConstantController.h" />
+    <ClInclude Include="Controllers\InputController.h" />
     <ClInclude Include="Resources\Resource.h" />
     <ClInclude Include="Resources\targetver.h" />
     <ClInclude Include="WindowsProgram.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Controllers\ConstantController.cpp" />
+    <ClCompile Include="Controllers\InputController.cpp" />
     <ClCompile Include="EntryPoint.cpp" />
     <ClCompile Include="WindowsProgram.cpp" />
   </ItemGroup>

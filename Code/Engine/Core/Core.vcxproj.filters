@@ -7,11 +7,15 @@
     <ClInclude Include="EntityHelper.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="EntityHandle.h" />
+    <ClInclude Include="Transform.h" />
+    <ClInclude Include="TransformHelper.h" />
+    <ClInclude Include="IController.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraHelper.cpp" />
     <ClCompile Include="EntityHelper.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="EntityHandle.cpp" />
+    <ClCompile Include="TransformHelper.cpp" />
   </ItemGroup>
 </Project>
