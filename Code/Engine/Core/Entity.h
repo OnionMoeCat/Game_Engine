@@ -6,6 +6,7 @@
 
 #include "Transform.h"
 #include "IController.h"
+#include "Collidable.h"
 #include "../Graphics/Renderable.h"
 
 namespace eae6320
@@ -14,6 +15,7 @@ namespace eae6320
 	{
 		struct Entity
 		{
+			Collidable* m_collidable = NULL;
 			Transform* m_transform = NULL;
 			IController* m_iController = NULL;
 			eae6320::Graphics::Renderable* m_renderable = NULL;

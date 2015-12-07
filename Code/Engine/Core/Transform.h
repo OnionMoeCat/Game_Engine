@@ -15,6 +15,7 @@ namespace eae6320
 			eae6320::Math::cVector m_velocity;
 			eae6320::Math::cVector m_prev_velocity;
 			eae6320::Math::cVector m_position;
+			eae6320::Math::cVector m_AABB;
 			eae6320::Math::cQuaternion m_rotation;
 		};
 	}

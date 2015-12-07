@@ -10,6 +10,8 @@
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TransformHelper.h" />
     <ClInclude Include="IController.h" />
+    <ClInclude Include="Collidable.h" />
+    <ClInclude Include="Intersection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraHelper.cpp" />
@@ -17,5 +19,7 @@
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="EntityHandle.cpp" />
     <ClCompile Include="TransformHelper.cpp" />
+    <ClCompile Include="Collidable.cpp" />
+    <ClCompile Include="Intersection.cpp" />
   </ItemGroup>
 </Project>
