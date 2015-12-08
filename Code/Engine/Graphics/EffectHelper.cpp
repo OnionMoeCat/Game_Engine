@@ -7,7 +7,7 @@
 #include <sstream>
 
 #include "../UserOutput/UserOutput.h"
-#include "../Utils/Utils.h"
+#include "../Utils/FileUtils.h"
 #include "../Math/Functions.h"
 
 // Interface
@@ -38,7 +38,7 @@ bool eae6320::Graphics::EffectHelper::LoadEffectFromFile(Effect& i_effect, const
 
 	void* temporaryBuffer = NULL;
 	{
-		if (eae6320::Utils::ReadDataFromFile(i_effectPath, &temporaryBuffer))
+		if (eae6320::Utils::FileUtils::ReadDataFromFile(i_effectPath, &temporaryBuffer))
 		{
 			char* tempPTR = reinterpret_cast<char*>(temporaryBuffer);
 			uint8_t strLength = *reinterpret_cast<uint8_t*>(tempPTR);

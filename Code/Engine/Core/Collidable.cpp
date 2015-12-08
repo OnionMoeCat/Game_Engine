@@ -1,6 +1,6 @@
 #include "Collidable.h"
 
-void eae6320::Core::Collidable::SetColliding(EntityHandle i_colliding)
+void eae6320::Core::Collidable::SetColliding(const EntityHandle& i_colliding)
 {
 	m_colliding = i_colliding;
 }

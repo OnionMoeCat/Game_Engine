@@ -12,7 +12,7 @@ namespace eae6320
 		private:
 			EntityHandle m_colliding;			
 		public:
-			void SetColliding(EntityHandle i_pCollidable);
+			void SetColliding(const EntityHandle& i_pCollidable);
 			EntityHandle GetColliding();
 		};
 	}

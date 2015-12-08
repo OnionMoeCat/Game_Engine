@@ -4,8 +4,10 @@
 #include "cMatrix_transformation.h"
 
 #include <cmath>
+#include <cassert>
 #include "cQuaternion.h"
 #include "cVector.h"
+#include "FloatPointUtils.h"
 
 // Interface
 //==========
@@ -111,4 +113,40 @@ eae6320::Math::cMatrix_transformation::cMatrix_transformation(
 	m_03( i_03 ), m_13( i_13 ), m_23( i_23 ), m_33( i_33 )
 {
 
+}
+
+eae6320::Math::cVector eae6320::Math::operator*(const cMatrix_transformation& lhs, const cVector& rhs)
+{
+	float normalW = 1.0f;
+	float t0 = lhs.m_00 * rhs.x + lhs.m_01 * rhs.y + lhs.m_02 * rhs.z + lhs.m_03 * normalW;
+	float t1 = lhs.m_10 * rhs.x + lhs.m_11 * rhs.y + lhs.m_12 * rhs.z + lhs.m_13 * normalW;
+	float t2 = lhs.m_20 * rhs.x + lhs.m_21 * rhs.y + lhs.m_22 * rhs.z + lhs.m_23 * normalW;
+	float t3 = lhs.m_30 * rhs.x + lhs.m_31 * rhs.y + lhs.m_32 * rhs.z + lhs.m_33 * normalW;
+	assert(!FloatPointUtils::AlmostEqualRelativeAndAbs(t3, 0.0f));
+	return cVector(t0 / t3, t1 / t3, t2 / t3);
+}
+
+eae6320::Math::cMatrix_transformation eae6320::Math::operator*(const eae6320::Math::cMatrix_transformation& lhs, const eae6320::Math::cMatrix_transformation& rhs)
+{
+	float m_00 = lhs.m_00 * rhs.m_00 + lhs.m_01 * rhs.m_10 + lhs.m_02 * rhs.m_20 + lhs.m_03 * rhs.m_30;
+	float m_01 = lhs.m_00 * rhs.m_01 + lhs.m_01 * rhs.m_11 + lhs.m_02 * rhs.m_21 + lhs.m_03 * rhs.m_31;
+	float m_02 = lhs.m_00 * rhs.m_02 + lhs.m_01 * rhs.m_12 + lhs.m_02 * rhs.m_22 + lhs.m_03 * rhs.m_32;
+	float m_03 = lhs.m_00 * rhs.m_03 + lhs.m_01 * rhs.m_13 + lhs.m_02 * rhs.m_23 + lhs.m_03 * rhs.m_33;
+	float m_10 = lhs.m_10 * rhs.m_00 + lhs.m_11 * rhs.m_10 + lhs.m_12 * rhs.m_20 + lhs.m_13 * rhs.m_30;
+	float m_11 = lhs.m_10 * rhs.m_01 + lhs.m_11 * rhs.m_11 + lhs.m_12 * rhs.m_21 + lhs.m_13 * rhs.m_31;
+	float m_12 = lhs.m_10 * rhs.m_02 + lhs.m_11 * rhs.m_12 + lhs.m_12 * rhs.m_22 + lhs.m_13 * rhs.m_32;
+	float m_13 = lhs.m_10 * rhs.m_03 + lhs.m_11 * rhs.m_13 + lhs.m_12 * rhs.m_23 + lhs.m_13 * rhs.m_33;
+	float m_20 = lhs.m_20 * rhs.m_00 + lhs.m_21 * rhs.m_10 + lhs.m_22 * rhs.m_20 + lhs.m_23 * rhs.m_30;
+	float m_21 = lhs.m_20 * rhs.m_01 + lhs.m_21 * rhs.m_11 + lhs.m_22 * rhs.m_21 + lhs.m_23 * rhs.m_31;
+	float m_22 = lhs.m_20 * rhs.m_02 + lhs.m_21 * rhs.m_12 + lhs.m_22 * rhs.m_22 + lhs.m_23 * rhs.m_32;
+	float m_23 = lhs.m_20 * rhs.m_03 + lhs.m_21 * rhs.m_13 + lhs.m_22 * rhs.m_23 + lhs.m_23 * rhs.m_33;
+	float m_30 = lhs.m_30 * rhs.m_00 + lhs.m_31 * rhs.m_10 + lhs.m_32 * rhs.m_20 + lhs.m_33 * rhs.m_30;
+	float m_31 = lhs.m_30 * rhs.m_01 + lhs.m_31 * rhs.m_11 + lhs.m_32 * rhs.m_21 + lhs.m_33 * rhs.m_31;
+	float m_32 = lhs.m_30 * rhs.m_02 + lhs.m_31 * rhs.m_12 + lhs.m_32 * rhs.m_22 + lhs.m_33 * rhs.m_32;
+	float m_33 = lhs.m_30 * rhs.m_03 + lhs.m_31 * rhs.m_13 + lhs.m_32 * rhs.m_23 + lhs.m_33 * rhs.m_33;
+	return cMatrix_transformation(
+		m_00, m_10, m_20, m_30,
+		m_01, m_11, m_21, m_31,
+		m_02, m_12, m_22, m_32,
+		m_03, m_13, m_23, m_33);
 }

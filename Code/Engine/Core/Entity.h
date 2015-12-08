@@ -6,13 +6,15 @@
 
 #include "Transform.h"
 #include "IController.h"
-#include "Collidable.h"
 #include "../Graphics/Renderable.h"
 
 namespace eae6320
 {
 	namespace Core
 	{
+		// forward declaration
+		struct Collidable;
+
 		struct Entity
 		{
 			Collidable* m_collidable = NULL;

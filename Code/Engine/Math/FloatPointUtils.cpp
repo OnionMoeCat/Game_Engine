@@ -1,6 +1,6 @@
 #include "FloatPointUtils.h"
 
-bool eae6320::Utils::FloatPointUtils::AlmostEqualRelativeAndAbs(float A, float B,
+bool eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(float A, float B,
 	float maxDiff, float maxRelDiff)
 {
 	// Check if the numbers are really close -- needed
@@ -18,7 +18,7 @@ bool eae6320::Utils::FloatPointUtils::AlmostEqualRelativeAndAbs(float A, float B
 		return true;
 	return false;
 }
-bool eae6320::Utils::FloatPointUtils::AlmostEqualUlpsAndAbs(float A, float B,
+bool eae6320::Math::FloatPointUtils::AlmostEqualUlpsAndAbs(float A, float B,
 	float maxDiff, int maxUlpsDiff)
 {
 	// Check if the numbers are really close -- needed
@@ -41,19 +41,19 @@ bool eae6320::Utils::FloatPointUtils::AlmostEqualUlpsAndAbs(float A, float B,
 
 	return false;
 }
-bool eae6320::Utils::FloatPointUtils::isNaN(const float i_val)
+bool eae6320::Math::FloatPointUtils::isNaN(const float i_val)
 {
 	volatile float  v = i_val;
 	return v != v;
 }
-bool eae6320::Utils::FloatPointUtils::isInfinity(const float i_val)
+bool eae6320::Math::FloatPointUtils::isInfinity(const float i_val)
 {
 	volatile float v = i_val;
 
 	return ((v * 0) != 0) && (v == v);
 }
 
-bool eae6320::Utils::FloatPointUtils::isNaNOrInfinity(const float i_val)
+bool eae6320::Math::FloatPointUtils::isNaNOrInfinity(const float i_val)
 {
 	volatile float v = i_val;
 

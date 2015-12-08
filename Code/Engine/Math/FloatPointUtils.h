@@ -7,7 +7,7 @@
 
 namespace eae6320
 {
-	namespace Utils
+	namespace Math
 	{
 		//ulp representation of float
 		union Float_t

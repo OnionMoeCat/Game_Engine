@@ -4,7 +4,7 @@
 #include "MeshHelper.h"
 
 #include "../UserOutput/UserOutput.h"
-#include "../Utils/Utils.h"
+#include "../Utils/FileUtils.h"
 
 // Interface
 //==========
@@ -20,7 +20,7 @@ bool eae6320::Graphics::MeshHelper::LoadMeshFromFile(Mesh& i_mesh, const char* c
 
 	void* temporaryBuffer = NULL;
 	{
-		if (eae6320::Utils::ReadDataFromFile(i_path, &temporaryBuffer))
+		if (eae6320::Utils::FileUtils::ReadDataFromFile(i_path, &temporaryBuffer))
 		{
 			char* tempPTR = reinterpret_cast<char*>(temporaryBuffer);
 			vertexSize = *reinterpret_cast<uint32_t*>(tempPTR);

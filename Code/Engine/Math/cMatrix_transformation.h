@@ -61,6 +61,12 @@ namespace eae6320
 			// Data
 			//=====
 
+			bool Invert();
+			void Transpose();
+			inline const float* operator[](const unsigned int i) const;
+			cMatrix_transformation friend operator*(const cMatrix_transformation& lhs, const cMatrix_transformation& rhs);
+			cVector friend operator*(const cMatrix_transformation& lhs, const cVector& rhs);
+
 		private:
 
 			// Storage is column-major; see notes at the top of the file

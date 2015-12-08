@@ -3,7 +3,7 @@
 
 namespace eae6320
 {
-	namespace Utils
+	namespace Math
 	{
 		namespace MathFloat
 		{
