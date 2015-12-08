@@ -1,7 +1,7 @@
 // Header Files
 //=============
 
-#include "Utils.h"
+#include "FileUtils.h"
 
 #include "../Windows/Includes.h"
 
@@ -10,7 +10,7 @@
 #include "../UserOutput/UserOutput.h"
 #include "../Windows/Functions.h"
 
-bool eae6320::Utils::ReadDataFromFile(const char* const i_path, void** i_temporaryBuffer)
+bool eae6320::Utils::FileUtils::ReadDataFromFile(const char* const i_path, void** i_temporaryBuffer)
 {
 	bool wereThereErrors = false;
 
@@ -106,15 +106,4 @@ OnExit:
 	temporaryBuffer = NULL;
 
 	return !wereThereErrors;
-}
-
-float eae6320::Utils::GetLambda(float i_a, float i_b, float i_y)
-{
-	assert(i_a != i_b);
-	return (i_y - i_a) / (i_b - i_a);
-}
-
-float eae6320::Utils::sgn(float i_a)
-{
-	return static_cast<float>((0.0f < i_a) - (i_a < 0.0f));
 }

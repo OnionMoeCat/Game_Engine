@@ -1,14 +1,15 @@
-#ifndef EAE6320_UTILS_H
-#define EAE6320_UTILS_H
+#ifndef EAE6320_FLOATPOINTUTILS_H
+#define EAE6320_FLOATPOINTUTILS_H
+
+#include <stdint.h>
+#include <cmath>
+#include <cfloat>
 
 namespace eae6320
 {
 	namespace Utils
 	{
-		bool ReadDataFromFile(const char* const i_path, void** i_temporaryBuffer);
-		float GetLambda(float i_a, float i_b, float i_y);
-		float sgn(float i_a);
-
+		//ulp representation of float
 		union Float_t
 		{
 			Float_t(float num = 0.0f) : f(num) {}
@@ -29,24 +30,22 @@ namespace eae6320
 #endif
 		};
 
-		struct FloatPointUtils
+		namespace FloatPointUtils
 		{
-		public:
 			//float comparision using max difference and max relative difference.
-			static bool AlmostEqualRelativeAndAbs(float A, float B,
-				float maxDiff, float maxRelDiff);
+			bool AlmostEqualRelativeAndAbs(float A, float B,
+				float maxDiff = 4 * FLT_EPSILON, float maxRelDiff = 4 * FLT_EPSILON);
 			//float comparision using max difference and max ulp difference
-			static bool AlmostEqualUlpsAndAbs(float A, float B,
+			bool AlmostEqualUlpsAndAbs(float A, float B,
 				float maxDiff, int maxUlpsDiff);
 
-			static bool isNaN(const float i_val);
+			bool isNaN(const float i_val);
 
-			static bool isInfinity(const float i_val);
+			bool isInfinity(const float i_val);
 
-			static bool isNaNOrInfinity(const float i_val);
+			bool isNaNOrInfinity(const float i_val);
 
-		};
+		}
 	}
 }
-
-#endif	// EAE6320_UTILS_H
+#endif

@@ -19,10 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Utils.h" />
+    <ClInclude Include="FloatPointUtils.h" />
+    <ClInclude Include="MathFloat.h" />
+    <ClInclude Include="FileUtils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="FloatPointUtils.cpp" />
+    <ClCompile Include="MathFloat.cpp" />
+    <ClCompile Include="FileUtils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8842C3AA-8E38-49D5-9366-F3E000507C1B}</ProjectGuid>
