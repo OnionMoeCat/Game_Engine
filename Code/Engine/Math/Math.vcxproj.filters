@@ -15,5 +15,6 @@
     <ClInclude Include="Functions.h" />
     <ClInclude Include="FloatPointUtils.h" />
     <ClInclude Include="MathFloat.h" />
+    <ClInclude Include="MatrixHelper.h" />
   </ItemGroup>
 </Project>

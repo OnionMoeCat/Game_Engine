@@ -13,6 +13,7 @@
     <ClInclude Include="Collidable.h" />
     <ClInclude Include="Intersection.h" />
     <ClInclude Include="Collision.h" />
+    <ClInclude Include="Physics.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraHelper.cpp" />
@@ -23,5 +24,6 @@
     <ClCompile Include="Collidable.cpp" />
     <ClCompile Include="Intersection.cpp" />
     <ClCompile Include="Collision.cpp" />
+    <ClCompile Include="Physics.cpp" />
   </ItemGroup>
 </Project>

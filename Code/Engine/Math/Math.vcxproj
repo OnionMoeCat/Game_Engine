@@ -33,6 +33,7 @@
     <ClInclude Include="FloatPointUtils.h" />
     <ClInclude Include="Functions.h" />
     <ClInclude Include="MathFloat.h" />
+    <ClInclude Include="MatrixHelper.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{06F00F02-D352-44A1-B42B-B5C2CEB2567A}</ProjectGuid>

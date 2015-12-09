@@ -23,3 +23,13 @@ eae6320::Core::Entity* eae6320::Core::EntityHandle::ToEntity() const
 	}
 	return NULL;
 }
+
+bool eae6320::Core::EntityHandle::operator==(const EntityHandle& rhs)
+{
+	return (this->m_uniqueId == rhs.m_uniqueId && this->m_handleIndex == rhs.m_handleIndex);
+}
+
+bool eae6320::Core::EntityHandle::operator!=(const EntityHandle& rhs)
+{ 
+	return !(*this == rhs); 
+}
