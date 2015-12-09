@@ -51,10 +51,10 @@ void eae6320::Core::Physics::Update(float dt)
 					else
 					{
 						//if they are not colliding and used to collide, set their colliding null.
-						if (A.ToEntity()->m_collidable->m_colliding == B && B.ToEntity()->m_collidable->m_colliding == A)
+						if (A.ToEntity()->m_collidable->m_isColliding && B.ToEntity()->m_collidable->m_isColliding && A.ToEntity()->m_collidable->m_colliding == B && B.ToEntity()->m_collidable->m_colliding == A)
 						{
-							A.ToEntity()->m_collidable->m_colliding = ;
-							A.ToEntity()->m_collidable->m_colliding = ;
+							A.ToEntity()->m_collidable->m_isColliding = false;
+							B.ToEntity()->m_collidable->m_isColliding = false;
 						}
 					}
 				}
@@ -77,16 +77,18 @@ void eae6320::Core::Physics::Update(float dt)
 			EntityHandle A = EntityManager::Get().GetHandleAtIndex(index1);
 			EntityHandle B = EntityManager::Get().GetHandleAtIndex(index2);
 			//detach and attach
-			if (!(A->GetColliding() == nullptr))
+			if (A.ToEntity()->m_collidable->m_isColliding)
 			{
-				A->GetColliding()->SetColliding(SmartPtr<Collidable>(nullptr));
+				A.ToEntity()->m_collidable->m_colliding.ToEntity()->m_collidable->m_isColliding = false;
 			}
-			if (!(B->GetColliding() == nullptr))
+			if (B.ToEntity()->m_collidable->m_isColliding)
 			{
-				B->GetColliding()->SetColliding(SmartPtr<Collidable>(nullptr));
+				B.ToEntity()->m_collidable->m_colliding.ToEntity()->m_collidable->m_isColliding = false;
 			}
-			A->SetColliding(B);
-			B->SetColliding(A);
+			A.ToEntity()->m_collidable->m_isColliding = true;
+			A.ToEntity()->m_collidable->m_colliding = B;
+			B.ToEntity()->m_collidable->m_isColliding = true;
+			B.ToEntity()->m_collidable->m_colliding = A;
 
 			//resolve collision
 			Collision::ResolveCollsion(*(A.ToEntity()->m_transform), *(B.ToEntity()->m_transform), *(A.ToEntity()->m_collidable), *(B.ToEntity()->m_collidable), normal);
