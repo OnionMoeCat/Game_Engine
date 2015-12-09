@@ -4,15 +4,15 @@ return
 		builder = "MeshBuilder.exe",
 		assets = {
 			{
-				source = "plane.mesh.raw",
+				source = "plane.meshraw",
 				target = "plane.mesh",
 			},
 			{
-				source = "floor.mesh.raw",
+				source = "floor.meshraw",
 				target = "floor.mesh",
 			},
 			{
-				source = "ball.mesh.raw",
+				source = "ball.meshraw",
 				target = "ball.mesh",
 			},
 		},

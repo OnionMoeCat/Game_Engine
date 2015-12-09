@@ -12,6 +12,7 @@
     <ClInclude Include="IController.h" />
     <ClInclude Include="Collidable.h" />
     <ClInclude Include="Intersection.h" />
+    <ClInclude Include="Collision.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraHelper.cpp" />
@@ -21,5 +22,6 @@
     <ClCompile Include="TransformHelper.cpp" />
     <ClCompile Include="Collidable.cpp" />
     <ClCompile Include="Intersection.cpp" />
+    <ClCompile Include="Collision.cpp" />
   </ItemGroup>
 </Project>

@@ -9,11 +9,8 @@ namespace eae6320
 	{
 		struct Collidable
 		{
-		private:
-			EntityHandle m_colliding;			
-		public:
-			void SetColliding(const EntityHandle& i_pCollidable);
-			EntityHandle GetColliding();
+			EntityHandle m_colliding;	
+			float m_mass;
 		};
 	}
 }

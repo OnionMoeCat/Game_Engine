@@ -9,3 +9,13 @@ eae6320::Core::EntityHandle eae6320::Core::Collidable::GetColliding()
 {
 	return m_colliding;
 }
+
+void eae6320::Core::Collidable::SetMass(const float i_mass)
+{
+	m_mass = i_mass;
+}
+
+float eae6320::Core::Collidable::GetMass()
+{
+	return m_mass;
+}

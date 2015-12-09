@@ -22,13 +22,17 @@
     <ClCompile Include="cMatrix_transformation.cpp" />
     <ClCompile Include="cQuaternion.cpp" />
     <ClCompile Include="cVector.cpp" />
+    <ClCompile Include="FloatPointUtils.cpp" />
     <ClCompile Include="Functions.cpp" />
+    <ClCompile Include="MathFloat.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cMatrix_transformation.h" />
     <ClInclude Include="cQuaternion.h" />
     <ClInclude Include="cVector.h" />
+    <ClInclude Include="FloatPointUtils.h" />
     <ClInclude Include="Functions.h" />
+    <ClInclude Include="MathFloat.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{06F00F02-D352-44A1-B42B-B5C2CEB2567A}</ProjectGuid>

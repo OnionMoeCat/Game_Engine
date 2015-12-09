@@ -19,13 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FloatPointUtils.h" />
-    <ClInclude Include="MathFloat.h" />
     <ClInclude Include="FileUtils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FloatPointUtils.cpp" />
-    <ClCompile Include="MathFloat.cpp" />
     <ClCompile Include="FileUtils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

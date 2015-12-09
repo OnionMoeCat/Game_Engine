@@ -1,6 +1,6 @@
 #include "Intersection.h"
-#include "../Utils/MathFloat.h"
-#include "../Utils/FloatPointUtils.h"
+#include "../Math/MathFloat.h"
+#include "../Math/FloatPointUtils.h"
 
 #include <cfloat>
 #include <cmath>
@@ -28,8 +28,8 @@ namespace
 		//on the differ edge -> overlap and separate in middle: calculate time to reach two min and max, overlap = min(t1, t2), separation = max(t1, t2)
 		else if ((i_Begin < i_Min && i_End > i_Max) || (i_Begin > i_Max && i_End < i_Min))
 		{
-			float XMinTime = eae6320::Utils::MathFloat::GetLambda(i_Begin, i_End, i_Min);
-			float XMaxTime = eae6320::Utils::MathFloat::GetLambda(i_Begin, i_End, i_Max);
+			float XMinTime = eae6320::Math::MathFloat::GetLambda(i_Begin, i_End, i_Min);
+			float XMaxTime = eae6320::Math::MathFloat::GetLambda(i_Begin, i_End, i_Max);
 			o_TimeOverlap = fmin(XMinTime, XMaxTime);
 			o_TimeSeparate = fmax(XMinTime, XMaxTime);
 			if (i_Begin < i_End)
@@ -47,10 +47,10 @@ namespace
 		}
 		//else see if two points are all inside [Min Max] -> all overlap overlap = 0.0 separation = N/A
 		else if (
-			(i_Begin > i_Min || eae6320::Utils::FloatPointUtils::AlmostEqualRelativeAndAbs(i_Begin, i_Min, EPSILON, EPSILON))
-			&& (i_Begin < i_Max || eae6320::Utils::FloatPointUtils::AlmostEqualRelativeAndAbs(i_Begin, i_Max, EPSILON, EPSILON))
-			&& (i_End > i_Min || eae6320::Utils::FloatPointUtils::AlmostEqualRelativeAndAbs(i_End, i_Min, EPSILON, EPSILON))
-			&& (i_End < i_Max || eae6320::Utils::FloatPointUtils::AlmostEqualRelativeAndAbs(i_End, i_Max, EPSILON, EPSILON))
+			(i_Begin > i_Min || eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(i_Begin, i_Min, EPSILON, EPSILON))
+			&& (i_Begin < i_Max || eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(i_Begin, i_Max, EPSILON, EPSILON))
+			&& (i_End > i_Min || eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(i_End, i_Min, EPSILON, EPSILON))
+			&& (i_End < i_Max || eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(i_End, i_Max, EPSILON, EPSILON))
 			)
 		{
 			o_TimeOverlap = N_A_N; o_TimeSeparate = N_A_P;
@@ -72,8 +72,8 @@ namespace
 		{
 			//if begin is inside-> overlap = -FLT_MAX, calculate time to reach two min and max, separate = the time in [0, 1]
 			if (
-				(i_Begin > i_Min || eae6320::Utils::FloatPointUtils::AlmostEqualRelativeAndAbs(i_Begin, i_Min, EPSILON, EPSILON))
-				&& (i_Begin < i_Max || eae6320::Utils::FloatPointUtils::AlmostEqualRelativeAndAbs(i_Begin, i_Max, EPSILON, EPSILON))
+				(i_Begin > i_Min || eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(i_Begin, i_Min, EPSILON, EPSILON))
+				&& (i_Begin < i_Max || eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(i_Begin, i_Max, EPSILON, EPSILON))
 				)
 			{
 				o_TimeOverlap = N_A_N;
@@ -89,11 +89,11 @@ namespace
 				{
 					o_Direction = 0;
 				}
-				float XMinTime = eae6320::Utils::MathFloat::GetLambda(i_Begin, i_End, i_Min);
-				float XMaxTime = eae6320::Utils::MathFloat::GetLambda(i_Begin, i_End, i_Max);
+				float XMinTime = eae6320::Math::MathFloat::GetLambda(i_Begin, i_End, i_Min);
+				float XMaxTime = eae6320::Math::MathFloat::GetLambda(i_Begin, i_End, i_Max);
 				if (
-					(XMinTime > 0.0f || eae6320::Utils::FloatPointUtils::AlmostEqualRelativeAndAbs(XMinTime, 0.0f, EPSILON, EPSILON))
-					&& (XMinTime < 1.0f || eae6320::Utils::FloatPointUtils::AlmostEqualRelativeAndAbs(XMinTime, 1.0f, EPSILON, EPSILON))
+					(XMinTime > 0.0f || eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(XMinTime, 0.0f, EPSILON, EPSILON))
+					&& (XMinTime < 1.0f || eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(XMinTime, 1.0f, EPSILON, EPSILON))
 					)
 				{
 					o_TimeSeparate = XMinTime;
@@ -119,11 +119,11 @@ namespace
 				{
 					o_Direction = 0;
 				}
-				float XMinTime = eae6320::Utils::MathFloat::GetLambda(i_Begin, i_End, i_Min);
-				float XMaxTime = eae6320::Utils::MathFloat::GetLambda(i_Begin, i_End, i_Max);
+				float XMinTime = eae6320::Math::MathFloat::GetLambda(i_Begin, i_End, i_Min);
+				float XMaxTime = eae6320::Math::MathFloat::GetLambda(i_Begin, i_End, i_Max);
 				if (
-					(XMinTime > 0.0f || eae6320::Utils::FloatPointUtils::AlmostEqualRelativeAndAbs(XMinTime, 0.0f, EPSILON, EPSILON))
-					&& (XMinTime < 1.0f || eae6320::Utils::FloatPointUtils::AlmostEqualRelativeAndAbs(XMinTime, 1.0f, EPSILON, EPSILON))
+					(XMinTime > 0.0f || eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(XMinTime, 0.0f, EPSILON, EPSILON))
+					&& (XMinTime < 1.0f || eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(XMinTime, 1.0f, EPSILON, EPSILON))
 					)
 				{
 					o_TimeOverlap = XMinTime;
@@ -176,9 +176,9 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 		// 1. Treat each of Object A's extents (width, high, depth) as vector along each of Object A's axes
 		// (i.e. the extent of Object A's bounding box along it's X axis (width) would be the vector [Extent.X, 0.0f, 0.0f]
 		// in Object A's coordinate system
-		float xExt = i_BoxA.X();
-		float yExt = i_BoxA.Y();
-		float zExt = i_BoxA.Z();
+		float xExt = i_BoxA.x;
+		float yExt = i_BoxA.y;
+		float zExt = i_BoxA.z;
 
 		// 2. Transform these extent vectors from Object A's coordinate system to Object B's coordinate system (using our ObjAtoObjB matrix)
 		eae6320::Math::cVector xVector(xExt, 0.0f, 0.0f);
@@ -191,39 +191,37 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 		eae6320::Math::cVector AzExtInB = ObjAToObjB * zVector;
 
 		// 3. For each of Object B's axes accumulate the influence of (project) each of the 3 transformed Object A's extent vectors on that axis
-		float totalXExt = abs(AxExtInB.X()) + abs(AyExtInB.X()) + abs(AzExtInB.X());
-		float totalYExt = abs(AxExtInB.Y()) + abs(AyExtInB.Y()) + abs(AzExtInB.Y());
-		float totalZExt = abs(AxExtInB.Z()) + abs(AyExtInB.Z()) + abs(AzExtInB.Z());
+		float totalXExt = abs(AxExtInB.x) + abs(AyExtInB.x) + abs(AzExtInB.x);
+		float totalYExt = abs(AxExtInB.y) + abs(AyExtInB.y) + abs(AzExtInB.y);
+		float totalZExt = abs(AxExtInB.z) + abs(AyExtInB.z) + abs(AzExtInB.z);
 
 		// Expand Object B's bounding box by Object A's projected extents
-		float XMin = -totalXExt - i_BoxB.X();
+		float XMin = -totalXExt - i_BoxB.x;
 		float XMax = -XMin;
-		float YMin = -totalYExt - i_BoxB.Y();
+		float YMin = -totalYExt - i_BoxB.y;
 		float YMax = -YMin;
-		float ZMin = -totalZExt - i_BoxB.Z();
+		float ZMin = -totalZExt - i_BoxB.z;
 		float ZMax = -ZMin;
 
 		// Now that we've expanded Object B's bounding box by Object A's projected extents we can treat Object A as a point
 		// (determined by transforming it's Center (or Offset) from it's coordinate system to Object B's
 		// Find Object A's frame movement vector relative to Object B's (essentially treating Object B as stationary)
 		// 1. Transform both Objects frame movement vectors from World coordinate system to Object B's coordinate system
-		eae6320::Math::cVector VelocityA(i_VelocityA, 0);
-		eae6320::Math::cVector VelocityB(i_VelocityB, 0);
 
-		eae6320::Math::cVector velocityA = WorldToObjB * VelocityA;
-		eae6320::Math::cVector velocityB = WorldToObjB * VelocityB;
+		eae6320::Math::cVector velocityA = WorldToObjB * i_VelocityA;
+		eae6320::Math::cVector velocityB = WorldToObjB * i_VelocityB;
 
 		// 2. Subtract Object A's frame movement vector (calculated in Object B's coordinate system) from Object B's (also in it's coordinate system)
 		eae6320::Math::cVector vAtoB = velocityA - velocityB;
 		AToBVelocity = vAtoB;
 
 		// Calculate the begin and end point for each axis.
-		float XBegin = ACenterInB.X();
-		float YBegin = ACenterInB.Y();
-		float ZBegin = ACenterInB.Z();
-		float vX = vAtoB.X();
-		float vY = vAtoB.Y();
-		float vZ = vAtoB.Z();
+		float XBegin = ACenterInB.x;
+		float YBegin = ACenterInB.y;
+		float ZBegin = ACenterInB.z;
+		float vX = vAtoB.x;
+		float vY = vAtoB.y;
+		float vZ = vAtoB.z;
 		float XEnd = XBegin + vX;
 		float YEnd = YBegin + vY;
 		float ZEnd = ZBegin + vZ;
@@ -250,53 +248,50 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 	// Now check Object B against Object A in Object A's coordinate system continuing to find the latest overlap and first separation
 	{
 
-		Matrix44 WorldToObjA = i_ObjAtoWorld;
+		eae6320::Math::cMatrix_transformation WorldToObjA = i_ObjAtoWorld;
 		//MessagedAssert(WorldToObjA.Invert(), "ObjBToWorld should be invertable");
 		WorldToObjA.Invert();
 
-		Matrix44 ObjBToObjA = WorldToObjA* i_ObjBtoWorld;
+		eae6320::Math::cMatrix_transformation ObjBToObjA = WorldToObjA* i_ObjBtoWorld;
 
-		Vector4 Center(0.0f, 0.0f, 0.0f, 1.0f);
-		Vector4 BCenterInA = ObjBToObjA * Center;
+		eae6320::Math::cVector Center(0.0f, 0.0f, 0.0f);
+		eae6320::Math::cVector BCenterInA = ObjBToObjA * Center;
 
-		float xExt = i_BoxB.X();
-		float yExt = i_BoxB.Y();
-		float zExt = i_BoxB.Z();
+		float xExt = i_BoxB.x;
+		float yExt = i_BoxB.y;
+		float zExt = i_BoxB.z;
 
-		Vector4 xVector(xExt, 0.0f, 0.0f, 0.0f);
-		Vector4 BxExtInA = ObjBToObjA * xVector;
+		eae6320::Math::cVector xVector(xExt, 0.0f, 0.0f);
+		eae6320::Math::cVector BxExtInA = ObjBToObjA * xVector;
 
-		Vector4 yVector(0.0f, yExt, 0.0f, 0.0f);
-		Vector4 ByExtInA = ObjBToObjA * yVector;
+		eae6320::Math::cVector yVector(0.0f, yExt, 0.0f);
+		eae6320::Math::cVector ByExtInA = ObjBToObjA * yVector;
 
-		Vector4 zVector(0.0f, 0.0f, zExt, 0.0f);
-		Vector4 BzExtInA = ObjBToObjA * zVector;
+		eae6320::Math::cVector zVector(0.0f, 0.0f, zExt);
+		eae6320::Math::cVector BzExtInA = ObjBToObjA * zVector;
 
-		float totalXExt = abs(BxExtInA.X()) + abs(ByExtInA.X()) + abs(BzExtInA.X());
-		float totalYExt = abs(BxExtInA.Y()) + abs(ByExtInA.Y()) + abs(BzExtInA.Y());
-		float totalZExt = abs(BxExtInA.Z()) + abs(ByExtInA.Z()) + abs(BzExtInA.Z());
+		float totalXExt = abs(BxExtInA.x) + abs(ByExtInA.x) + abs(BzExtInA.x);
+		float totalYExt = abs(BxExtInA.y) + abs(ByExtInA.y) + abs(BzExtInA.y);
+		float totalZExt = abs(BxExtInA.z) + abs(ByExtInA.z) + abs(BzExtInA.z);
 
-		float XMin = -totalXExt - i_BoxA.X();
+		float XMin = -totalXExt - i_BoxA.x;
 		float XMax = -XMin;
-		float YMin = -totalYExt - i_BoxA.Y();
+		float YMin = -totalYExt - i_BoxA.y;
 		float YMax = -YMin;
-		float ZMin = -totalZExt - i_BoxA.Z();
+		float ZMin = -totalZExt - i_BoxA.z;
 		float ZMax = -ZMin;
 
-		Vector4 VelocityB(i_VelocityB, 0);
-		Vector4 VelocityA(i_VelocityA, 0);
-
-		Vector4 velocityB = WorldToObjA * VelocityB;
-		Vector4 velocityA = WorldToObjA * VelocityA;
-		Vector4 vBtoA = velocityB - velocityA;
+		eae6320::Math::cVector velocityB = WorldToObjA * i_VelocityB;
+		eae6320::Math::cVector velocityA = WorldToObjA * i_VelocityA;
+		eae6320::Math::cVector vBtoA = velocityB - velocityA;
 		BToAVelocity = vBtoA;
 
-		float XBegin = BCenterInA.X();
-		float YBegin = BCenterInA.Y();
-		float ZBegin = BCenterInA.Z();
-		float vX = vBtoA.X();
-		float vY = vBtoA.Y();
-		float vZ = vBtoA.Z();
+		float XBegin = BCenterInA.x;
+		float YBegin = BCenterInA.y;
+		float ZBegin = BCenterInA.z;
+		float vX = vBtoA.x;
+		float vY = vBtoA.y;
+		float vZ = vBtoA.z;
 		float XEnd = XBegin + vX;
 		float YEnd = YBegin + vY;
 		float ZEnd = ZBegin + vZ;
@@ -323,7 +318,7 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 	// If we get to here we didn't find a separation that lasted the whole frame so we need to compare the time of last overlap
 	// against the time of first separation
 	if (OverlapTime < SeparationTime
-		|| FloatPointUtils::AlmostEqualRelativeAndAbs(OverlapTime, SeparationTime, EPSILON, EPSILON))
+		|| eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(OverlapTime, SeparationTime, EPSILON, EPSILON))
 	{
 		o_Time = OverlapTime;
 		//If two cubes collide, find the colliding normal. 
@@ -340,61 +335,58 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 		//We can consider axis seperately.
 		//This vector is related to cube, we need to transform it from cube's coordinate to world.
 		if ((OverlapTime > 0.0f
-			|| FloatPointUtils::AlmostEqualRelativeAndAbs(OverlapTime, 0.0f, EPSILON, EPSILON))
+			|| eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(OverlapTime, 0.0f, EPSILON, EPSILON))
 			&& (OverlapTime < 1.0f
-				|| FloatPointUtils::AlmostEqualRelativeAndAbs(OverlapTime, 1.0f, EPSILON, EPSILON)))
+				|| eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(OverlapTime, 1.0f, EPSILON, EPSILON)))
 		{
 			//if collide happens on axises in AToB
-			if (FloatPointUtils::AlmostEqualRelativeAndAbs(AToBOverlapTime, OverlapTime, EPSILON, EPSILON))
+			if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(AToBOverlapTime, OverlapTime, EPSILON, EPSILON))
 			{
 				//normal vector
-				Vector3 temp(0.0f, 0.0f, 0.0f);
+				eae6320::Math::cVector temp(0.0f, 0.0f, 0.0f);
 				//if collides happens on X, set temp.X
-				if (FloatPointUtils::AlmostEqualRelativeAndAbs(AToBXOverlapTime, OverlapTime, EPSILON, EPSILON))
+				if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(AToBXOverlapTime, OverlapTime, EPSILON, EPSILON))
 				{
 					//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(AToBVelocity.X(), 0.0f, EPSILON, EPSILON), "vx should not be 0");
-					temp.X(AToBXDirection);
+					temp.x = AToBXDirection;
 				}
 				//if collides happens on Y, set temp.Y
-				if (FloatPointUtils::AlmostEqualRelativeAndAbs(AToBYOverlapTime, OverlapTime, EPSILON, EPSILON))
+				if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(AToBYOverlapTime, OverlapTime, EPSILON, EPSILON))
 				{
 					//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(AToBVelocity.Y(), 0.0f, EPSILON, EPSILON), "vy should not be 0");
-					temp.Y(AToBYDirection);
+					temp.y = AToBYDirection;
 				}
 				//if collides happens on Z, set temp.Z
-				if (FloatPointUtils::AlmostEqualRelativeAndAbs(AToBZOverlapTime, OverlapTime, EPSILON, EPSILON))
+				if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(AToBZOverlapTime, OverlapTime, EPSILON, EPSILON))
 				{
 					//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(AToBVelocity.Z(), 0.0f, EPSILON, EPSILON), "vz should not be 0");
-					temp.Z(AToBZDirection);
+					temp.z = AToBZDirection;
 				}
 				//the vector is in B. Use i_ObjBtoWorld to transform the vector from B to World.
-				Vector4 tempNormal = i_ObjBtoWorld * Vector4(temp, 0);
-				o_Normal = Vector3(tempNormal.X(), tempNormal.Y(), tempNormal.Z());
+				o_Normal = i_ObjBtoWorld * temp;
 			}
 			//if collide happens on axises in BToA
-			else if (FloatPointUtils::AlmostEqualRelativeAndAbs(BToAOverlapTime, OverlapTime, EPSILON, EPSILON))
+			else if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(BToAOverlapTime, OverlapTime, EPSILON, EPSILON))
 			{
-				Vector3 temp(0.0f, 0.0f, 0.0f);
-				if (FloatPointUtils::AlmostEqualRelativeAndAbs(BToAXOverlapTime, OverlapTime, EPSILON, EPSILON))
+				eae6320::Math::cVector temp(0.0f, 0.0f, 0.0f);
+				if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(BToAXOverlapTime, OverlapTime, EPSILON, EPSILON))
 				{
 					//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(BToAVelocity.X(), 0.0f, EPSILON, EPSILON), "vx should not be 0");
-					temp.X(BToAXDirection);
+					temp.x = BToAXDirection;
 				}
-				if (FloatPointUtils::AlmostEqualRelativeAndAbs(BToAYOverlapTime, OverlapTime, EPSILON, EPSILON))
+				if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(BToAYOverlapTime, OverlapTime, EPSILON, EPSILON))
 				{
 					//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(BToAVelocity.Y(), 0.0f, EPSILON, EPSILON), "vy should not be 0");
-					temp.Y(BToAYDirection);
+					temp.y = BToAYDirection;
 				}
-				if (FloatPointUtils::AlmostEqualRelativeAndAbs(BToAZOverlapTime, OverlapTime, EPSILON, EPSILON))
+				if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(BToAZOverlapTime, OverlapTime, EPSILON, EPSILON))
 				{
 					//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(BToAVelocity.Z(), 0.0f, EPSILON, EPSILON), "vz should not be 0");
-					temp.Z(BToAZDirection);
+					temp.z = BToAZDirection;
 				}
 				//the vector is in A. Use i_ObjBtoWorld to transform the vector from A to World.
-				Vector4 tempNormal = i_ObjAtoWorld * Vector4(temp, 0);
-				o_Normal = Vector3(tempNormal.X(), tempNormal.Y(), tempNormal.Z());
+				o_Normal = i_ObjAtoWorld * temp;
 			}
-			MessagedAssert(!(o_Normal.X() == 0 && o_Normal.Y() == 0 && o_Normal.Z() == 0), "normal should not be 0");
 		}
 		return true;
 	}
