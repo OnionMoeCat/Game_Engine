@@ -27,6 +27,8 @@
 #include "../../Engine/Core/EntityHelper.h"
 #include "../../Engine/Core/EntityManager.h"
 #include "../../Engine/Core/TransformHelper.h"
+#include "../../Engine/Core/AI.h"
+#include "../../Engine/Core/Physics.h"
 
 #include "Controllers/InputController.h"
 #include "Controllers/ConstantController.h"
@@ -553,12 +555,10 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 
 			{
 				float dt = eae6320::Time::GetSecondsElapsedThisFrame();
-				for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)
-				{
-					eae6320::Core::Entity* entity = eae6320::Core::EntityManager::Get().GetHandleAtIndex(i).ToEntity();
-					entity->m_iController->UpdateEntity(*entity, dt);
-					eae6320::Core::TransformHelper::UpdateTransform(*entity->m_transform, *entity->m_renderable->m_material->m_effect, dt);
-				}
+
+				eae6320::Core::AI::Update(dt);
+
+				eae6320::Core::Physics::Update(dt);
 
 				UpdateCamera(dt);
 			}
@@ -664,6 +664,12 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
+			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_ball_moving_iterator.ToEntity(), FLT_MAX))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 			if (!eae6320::Core::EntityHelper::SetController(*s_entity_floor.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
 			{
 				//TODO: find a way to show error message
@@ -682,6 +688,12 @@ namespace
 			eae6320::Math::cQuaternion ball_rotation;
 			eae6320::Math::cVector ball_AABB(1.0f, 1.0f, 1.0f);
 			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_moving_iterator.ToEntity(), ball_position, ball_rotation))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_ball_moving_iterator.ToEntity(), 10000.0f))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -711,6 +723,12 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
+			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_ball_red_iterator.ToEntity(), 1.0f))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_red_iterator.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
 			{
 				//TODO: find a way to show error message
@@ -730,6 +748,12 @@ namespace
 			eae6320::Math::cQuaternion ball_rotation;
 			eae6320::Math::cVector ball_AABB(1.0f, 1.0f, 1.0f);
 			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_green_iterator.ToEntity(), ball_position, ball_rotation))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_ball_green_iterator.ToEntity(), 1.0f))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -759,6 +783,12 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
+			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_plane_opaque.ToEntity(), FLT_MAX))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 			if (!eae6320::Core::EntityHelper::SetController(*s_entity_plane_opaque.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
 			{
 				//TODO: find a way to show error message
@@ -778,6 +808,12 @@ namespace
 			eae6320::Math::cQuaternion ball_rotation;
 			eae6320::Math::cVector ball_AABB(1.0f, 1.0f, 1.0f);
 			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_transparent_03.ToEntity(), ball_position, ball_rotation))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_ball_transparent_03.ToEntity(), 1.0f))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -807,6 +843,12 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
+			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_ball_transparent_08.ToEntity(), 1.0f))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_transparent_08.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
 			{
 				//TODO: find a way to show error message
@@ -826,6 +868,12 @@ namespace
 			eae6320::Math::cQuaternion plane_rotation;
 			eae6320::Math::cVector plane_AABB(1.0f, 1.0f, 0.0001f);
 			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_plane_transparent.ToEntity(), plane_position, plane_rotation))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_plane_transparent.ToEntity(), FLT_MAX))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;

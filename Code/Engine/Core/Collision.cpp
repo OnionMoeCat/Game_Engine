@@ -25,7 +25,12 @@ void eae6320::Core::Collision::ResolveCollsion(Transform& i_A, Transform& i_B, c
 	eae6320::Math::cVector vAB = vA - vB;
 	float mA = i_collidableA.m_mass;
 	float mB = i_collidableB.m_mass;
-	float j = -(eae6320::Math::Dot(vAB, i_normal) / eae6320::Math::Dot(i_normal, i_normal) / (1 / mA + 1 / mB));
-	TransformHelper::SetVelocity(i_A, vA + i_normal * (j / mA));
-	TransformHelper::SetVelocity(i_B, vB - i_normal * (j / mB));
+	float j = - 2 * (eae6320::Math::Dot(vAB, i_normal) / eae6320::Math::Dot(i_normal, i_normal) / (1 / mA + 1 / mB));
+	
+	//to avoid repeating setting velocity, only change when j > 0. (when the two is coming together)
+	if (j > 0)
+	{
+		TransformHelper::SetVelocity(i_A, vA + i_normal * (j / mA));
+		TransformHelper::SetVelocity(i_B, vB - i_normal * (j / mB));
+	}
 }

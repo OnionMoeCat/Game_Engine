@@ -5,6 +5,7 @@
 
 #include "EntityHelper.h"
 #include "TransformHelper.h"
+#include "CollidableHelper.h"
 #include "../UserOutput/UserOutput.h"
 #include "../Graphics/RenderableHelper.h"
 #include "../Graphics/RenderableManager.h"
@@ -120,5 +121,23 @@ bool eae6320::Core::EntityHelper::SetTransform(Entity& i_entity, const eae6320::
 bool eae6320::Core::EntityHelper::SetController(Entity& i_entity, IController* i_controller)
 {
 	i_entity.m_iController = i_controller;
+	return true;
+}
+
+bool eae6320::Core::EntityHelper::SetCollidable(Entity& i_entity, const float i_mass)
+{
+	if (i_entity.m_collidable == NULL)
+	{
+		i_entity.m_collidable = new eae6320::Core::Collidable();
+	}
+	if (i_entity.m_collidable)
+	{
+		CollidableHelper::SetMass(*i_entity.m_collidable, i_mass);
+	}
+	else
+	{
+		eae6320::UserOutput::Print("Fail to initialize transform");
+		return false;
+	}
 	return true;
 }

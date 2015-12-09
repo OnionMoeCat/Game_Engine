@@ -9,9 +9,7 @@ namespace eae6320
 	{
 		struct Collidable
 		{
-			EntityHandle m_colliding;
 			float m_mass;
-			bool m_isColliding = false;
 		};
 	}
 }

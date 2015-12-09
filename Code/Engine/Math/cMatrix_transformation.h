@@ -51,6 +51,7 @@ namespace eae6320
 			static cMatrix_transformation CreateViewToScreenTransform(
 				const float i_fieldOfView_y, const float i_aspectRatio,
 				const float i_z_nearPlane, const float i_z_farPlane );
+		    static cMatrix_transformation Invert(const cMatrix_transformation& i_matrix);
 
 			// Initialization / Shut Down
 			//---------------------------
@@ -60,10 +61,6 @@ namespace eae6320
 
 			// Data
 			//=====
-
-			bool Invert();
-			void Transpose();
-			inline const float* operator[](const unsigned int i) const;
 			cMatrix_transformation friend operator*(const cMatrix_transformation& lhs, const cMatrix_transformation& rhs);
 			cVector friend operator*(const cMatrix_transformation& lhs, const cVector& rhs);
 

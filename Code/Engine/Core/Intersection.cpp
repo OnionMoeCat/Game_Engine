@@ -159,11 +159,7 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 	float BToAXDirection, BToAYDirection, BToAZDirection;
 	eae6320::Math::cVector AToBVelocity, BToAVelocity;
 	{
-		//Matrix4x4 WorldToObjB = ObjBToWorld.GetInverse();
-		eae6320::Math::cMatrix_transformation WorldToObjB = i_ObjBtoWorld;
-		//MessagedAssert(WorldToObjB.Invert(), "ObjBToWorld should be invertable");
-
-		WorldToObjB.Invert();
+		eae6320::Math::cMatrix_transformation WorldToObjB = eae6320::Math::cMatrix_transformation::Invert(i_ObjBtoWorld);
 		// Muliply by ObjAToWorld to get from ObjA's coordinate system to ObjB's
 		eae6320::Math::cMatrix_transformation ObjAToObjB = WorldToObjB * i_ObjAtoWorld;
 
@@ -247,10 +243,7 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 
 	// Now check Object B against Object A in Object A's coordinate system continuing to find the latest overlap and first separation
 	{
-
-		eae6320::Math::cMatrix_transformation WorldToObjA = i_ObjAtoWorld;
-		//MessagedAssert(WorldToObjA.Invert(), "ObjBToWorld should be invertable");
-		WorldToObjA.Invert();
+		eae6320::Math::cMatrix_transformation WorldToObjA = eae6320::Math::cMatrix_transformation::Invert(i_ObjAtoWorld);
 
 		eae6320::Math::cMatrix_transformation ObjBToObjA = WorldToObjA* i_ObjBtoWorld;
 

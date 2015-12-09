@@ -150,3 +150,67 @@ eae6320::Math::cMatrix_transformation eae6320::Math::operator*(const eae6320::Ma
 		m_02, m_12, m_22, m_32,
 		m_03, m_13, m_23, m_33);
 }
+
+eae6320::Math::cMatrix_transformation eae6320::Math::cMatrix_transformation::Invert(const cMatrix_transformation& i_matrix)
+{
+	cMatrix_transformation temp = i_matrix;
+	cMatrix_transformation result;
+	result.m_00 = result.m_11 = result.m_22 = result.m_33 = 1.0f;
+
+	const size_t SIZE = 4;
+
+	const float* fromValues = &(i_matrix.m_00);
+
+	float* tempValues = &(temp.m_00);
+
+	float* resultValues = &(result.m_00);
+
+	int indexs[SIZE];
+	for (size_t i = 0; i < SIZE; i++)
+	{
+		indexs[i] = -1;
+	}
+	for (size_t i = 0; i < SIZE; i++)
+	{
+		float t_absMax = 0;
+		int t_index = -1;
+		//override i with pivot
+		for (size_t j = 0; j < SIZE; j++)
+		{
+			float t_abs = abs(tempValues[j * SIZE + i]);
+			if (t_abs > t_absMax && indexs[j] == -1)
+			{
+				t_absMax = t_abs;
+				t_index = j;
+			}
+		}
+		//because we are using transform matrix which always has inverted matrix
+		assert(t_index != -1);
+		indexs[t_index] = i;
+		float factor = tempValues[t_index * SIZE + i];
+		for (size_t j = 0; j < SIZE; j++)
+		{
+			tempValues[t_index * SIZE + j] /= factor;
+			resultValues[t_index * SIZE + j] /= factor;
+		}
+		for (size_t j = 0; j < SIZE; j++)
+		{
+			if (t_index == j) continue;
+			float coefficient = tempValues[j * SIZE + i];
+			for (size_t k = 0; k < SIZE; k++)
+			{
+				resultValues[j * SIZE + k] -= coefficient * resultValues[t_index * SIZE + k];
+				tempValues[j * SIZE + k] -= coefficient * tempValues[t_index * SIZE + k];
+			}
+		}
+	}
+	for (size_t i = 0; i < SIZE; i++)
+	{
+		for (size_t j = 0; j < SIZE; j++)
+		{
+			resultValues[indexs[i] * SIZE + j] = tempValues[i * SIZE + j];
+		}
+	}
+
+	return result;
+}

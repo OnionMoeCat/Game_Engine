@@ -37,24 +37,12 @@ void eae6320::Core::Physics::Update(float dt)
 						*(B.ToEntity()->m_transform), totalTime, tempNormal, tempTime);
 					if (collide)
 					{
-						// if they are colliding, check if collision happens first and if they've ready collided.
-						// if they've collided, ignore until they detached or one of them collides with another cube.
-						// we only care about the first to collide because everything may change after collision resolve.
-						if (tempTime < minTime && !(A.ToEntity()->m_collidable->m_colliding == B && B.ToEntity()->m_collidable->m_colliding == A))
+						if (tempTime < minTime)
 						{
 							index1 = i;
 							index2 = j;
 							minTime = fmax(tempTime, 0.0f);
 							normal = tempNormal;
-						}
-					}
-					else
-					{
-						//if they are not colliding and used to collide, set their colliding null.
-						if (A.ToEntity()->m_collidable->m_isColliding && B.ToEntity()->m_collidable->m_isColliding && A.ToEntity()->m_collidable->m_colliding == B && B.ToEntity()->m_collidable->m_colliding == A)
-						{
-							A.ToEntity()->m_collidable->m_isColliding = false;
-							B.ToEntity()->m_collidable->m_isColliding = false;
 						}
 					}
 				}
@@ -76,20 +64,6 @@ void eae6320::Core::Physics::Update(float dt)
 			//set collidable->colliding (which object the collidable is collding with)
 			EntityHandle A = EntityManager::Get().GetHandleAtIndex(index1);
 			EntityHandle B = EntityManager::Get().GetHandleAtIndex(index2);
-			//detach and attach
-			if (A.ToEntity()->m_collidable->m_isColliding)
-			{
-				A.ToEntity()->m_collidable->m_colliding.ToEntity()->m_collidable->m_isColliding = false;
-			}
-			if (B.ToEntity()->m_collidable->m_isColliding)
-			{
-				B.ToEntity()->m_collidable->m_colliding.ToEntity()->m_collidable->m_isColliding = false;
-			}
-			A.ToEntity()->m_collidable->m_isColliding = true;
-			A.ToEntity()->m_collidable->m_colliding = B;
-			B.ToEntity()->m_collidable->m_isColliding = true;
-			B.ToEntity()->m_collidable->m_colliding = A;
-
 			//resolve collision
 			Collision::ResolveCollsion(*(A.ToEntity()->m_transform), *(B.ToEntity()->m_transform), *(A.ToEntity()->m_collidable), *(B.ToEntity()->m_collidable), normal);
 			//MessageSystem<SmartPtr<GameObject>, SmartPtr<GameObject>>::Get().SendingMessage("Collision", A->GetGameObject(), B->GetGameObject());

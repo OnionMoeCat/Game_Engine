@@ -14,6 +14,8 @@
     <ClInclude Include="Intersection.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Physics.h" />
+    <ClInclude Include="CollidableHelper.h" />
+    <ClInclude Include="AI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraHelper.cpp" />
@@ -21,9 +23,10 @@
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="EntityHandle.cpp" />
     <ClCompile Include="TransformHelper.cpp" />
-    <ClCompile Include="Collidable.cpp" />
     <ClCompile Include="Intersection.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Physics.cpp" />
+    <ClCompile Include="CollidableHelper.cpp" />
+    <ClCompile Include="AI.cpp" />
   </ItemGroup>
 </Project>
