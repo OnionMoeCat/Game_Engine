@@ -6,7 +6,7 @@
 #include "../../Windows/Includes.h"
 
 #include "../../UserOutput/UserOutput.h"
-#include "../../Utils/Utils.h"
+#include "../../Utils/FileUtils.h"
 
 // Helper Function Declarations
 //=============================
@@ -205,7 +205,7 @@ namespace
 		// Load binary vertex shader file
 		void* temporaryBuffer = NULL;
 		{
-			if (!eae6320::Utils::ReadDataFromFile(i_vertexPath, &temporaryBuffer))
+			if (!eae6320::Utils::FileUtils::ReadDataFromFile(i_vertexPath, &temporaryBuffer))
 			{
 				wereThereErrors = true;
 				goto OnExit;
@@ -258,7 +258,7 @@ namespace
 		// Load binary fragment shader file
 		void* temporaryBuffer = NULL;
 		{
-			if (!eae6320::Utils::ReadDataFromFile(i_fragmentPath, &temporaryBuffer))
+			if (!eae6320::Utils::FileUtils::ReadDataFromFile(i_fragmentPath, &temporaryBuffer))
 			{
 				wereThereErrors = true;
 				goto OnExit;

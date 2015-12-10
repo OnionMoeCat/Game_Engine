@@ -658,7 +658,7 @@ namespace
 			eae6320::Math::cVector floor_position(0.0f, 0.0f, 0.0f);
 			eae6320::Math::cQuaternion floor_rotation;
 			eae6320::Math::cVector floor_AABB(1.0f, 1.0f, 0.00001f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_floor.ToEntity(), floor_position, floor_rotation))
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_floor.ToEntity(), floor_position, floor_rotation, floor_AABB))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -687,7 +687,7 @@ namespace
 			eae6320::Math::cVector ball_position(0.0f, 0.2f, -1.0f);
 			eae6320::Math::cQuaternion ball_rotation;
 			eae6320::Math::cVector ball_AABB(1.0f, 1.0f, 1.0f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_moving_iterator.ToEntity(), ball_position, ball_rotation))
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_moving_iterator.ToEntity(), ball_position, ball_rotation, ball_AABB))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -717,7 +717,7 @@ namespace
 			eae6320::Math::cVector ball_position(-3.0f, -0.2f, 3.0f);
 			eae6320::Math::cQuaternion ball_rotation;
 			eae6320::Math::cVector ball_AABB(1.0f, 1.0f, 1.0f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_red_iterator.ToEntity(), ball_position, ball_rotation))
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_red_iterator.ToEntity(), ball_position, ball_rotation, ball_AABB))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -747,7 +747,7 @@ namespace
 			eae6320::Math::cVector ball_position(-1.0f, -0.2f, 3.0f);
 			eae6320::Math::cQuaternion ball_rotation;
 			eae6320::Math::cVector ball_AABB(1.0f, 1.0f, 1.0f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_green_iterator.ToEntity(), ball_position, ball_rotation))
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_green_iterator.ToEntity(), ball_position, ball_rotation, ball_AABB))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -777,7 +777,7 @@ namespace
 			eae6320::Math::cVector plane_position(0.0f, 2.0f, -2.0f);
 			eae6320::Math::cQuaternion plane_rotation;
 			eae6320::Math::cVector plane_AABB(1.0f, 1.0f, 0.0001f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_plane_opaque.ToEntity(), plane_position, plane_rotation))
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_plane_opaque.ToEntity(), plane_position, plane_rotation, plane_AABB))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -807,7 +807,7 @@ namespace
 			eae6320::Math::cVector ball_position(1.0f, -0.2f, 3.0f);
 			eae6320::Math::cQuaternion ball_rotation;
 			eae6320::Math::cVector ball_AABB(1.0f, 1.0f, 1.0f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_transparent_03.ToEntity(), ball_position, ball_rotation))
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_transparent_03.ToEntity(), ball_position, ball_rotation, ball_AABB))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -837,7 +837,7 @@ namespace
 			eae6320::Math::cVector ball_position(3.0f, -0.2f, 3.0f);
 			eae6320::Math::cQuaternion ball_rotation;
 			eae6320::Math::cVector ball_AABB(1.0f, 1.0f, 1.0f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_transparent_08.ToEntity(), ball_position, ball_rotation))
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_transparent_08.ToEntity(), ball_position, ball_rotation, ball_AABB))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -867,7 +867,7 @@ namespace
 			eae6320::Math::cVector plane_position(0.0f, 0.0f, 5.0f);
 			eae6320::Math::cQuaternion plane_rotation;
 			eae6320::Math::cVector plane_AABB(1.0f, 1.0f, 0.0001f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_plane_transparent.ToEntity(), plane_position, plane_rotation))
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_plane_transparent.ToEntity(), plane_position, plane_rotation, plane_AABB))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;

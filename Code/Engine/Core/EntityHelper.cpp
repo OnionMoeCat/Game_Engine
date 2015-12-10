@@ -99,7 +99,7 @@ bool eae6320::Core::EntityHelper::Submit(Entity& i_entity)
 	eae6320::Graphics::RenderableManager::Get().Submit(*i_entity.m_renderable);
 	return true;
 }
-bool eae6320::Core::EntityHelper::SetTransform(Entity& i_entity, const eae6320::Math::cVector i_position, const eae6320::Math::cQuaternion i_quaternion)
+bool eae6320::Core::EntityHelper::SetTransform(Entity& i_entity, const eae6320::Math::cVector& i_position, const eae6320::Math::cQuaternion& i_quaternion, const eae6320::Math::cVector& i_AABB)
 {
 	if (i_entity.m_transform == NULL)
 	{
@@ -109,6 +109,7 @@ bool eae6320::Core::EntityHelper::SetTransform(Entity& i_entity, const eae6320::
 	{
 		TransformHelper::SetPosition(*i_entity.m_transform, *i_entity.m_renderable->m_material->m_effect, i_position);
 		TransformHelper::SetRotation(*i_entity.m_transform, *i_entity.m_renderable->m_material->m_effect, i_quaternion);
+		TransformHelper::SetAABB(*i_entity.m_transform, i_AABB);
 	}
 	else
 	{

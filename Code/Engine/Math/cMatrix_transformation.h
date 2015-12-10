@@ -62,7 +62,7 @@ namespace eae6320
 			// Data
 			//=====
 			cMatrix_transformation friend operator*(const cMatrix_transformation& lhs, const cMatrix_transformation& rhs);
-			cVector friend operator*(const cMatrix_transformation& lhs, const cVector& rhs);
+			cVector friend operator*(const cVector& lhs, const cMatrix_transformation& rhs);
 
 		private:
 

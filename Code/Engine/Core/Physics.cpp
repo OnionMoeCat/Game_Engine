@@ -13,7 +13,7 @@ void eae6320::Core::Physics::Update(float dt)
 	// Epsilon for float comparision
 	float epsilon = FLT_EPSILON * 4;
 
-	size_t size = EntityManager::Get().GetEntitySize();
+	int size = static_cast<int>(EntityManager::Get().GetEntitySize());
 	float totalTime = dt;
 	while (totalTime > 0)
 	{
@@ -21,9 +21,9 @@ void eae6320::Core::Physics::Update(float dt)
 		int index1 = -1;
 		int index2 = -1;
 		eae6320::Math::cVector normal;
-		for (size_t i = 0; i < size; i++)
+		for (int i = 0; i < size; i++)
 		{
-			for (size_t j = i; j < size; j++)
+			for (int j = i; j < size; j++)
 			{
 				if (i != j)
 				{
