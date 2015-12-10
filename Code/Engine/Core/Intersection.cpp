@@ -157,7 +157,7 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 	float BToAXOverlapTime, BToAYOverlapTime, BToAZOverlapTime;
 	float AToBXDirection, AToBYDirection, AToBZDirection;
 	float BToAXDirection, BToAYDirection, BToAZDirection;
-	eae6320::Math::cVector AToBVelocity, BToAVelocity;
+	eae6320::Math::cVector4 AToBVelocity, BToAVelocity;
 	{
 		eae6320::Math::cMatrix_transformation WorldToObjB = eae6320::Math::cMatrix_transformation::Invert(i_ObjBtoWorld);
 		// Muliply by ObjAToWorld to get from ObjA's coordinate system to ObjB's
@@ -166,7 +166,7 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 		// Transform Object A's Center (or Offset) into Object B's coordinate system (using our Object A to Obj B transform matrix)
 		eae6320::Math::cVector Center(0.0f, 0.0f, 0.0f);
 
-		eae6320::Math::cVector ACenterInB = Center * ObjAToObjB;
+		eae6320::Math::cVector4 ACenterInB = eae6320::Math::cVector4(Center, 1.0f) * ObjAToObjB;
 
 		// Project Object A's bounding box extents onto each of Object B's axes
 		// 1. Treat each of Object A's extents (width, high, depth) as vector along each of Object A's axes
@@ -178,13 +178,13 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 
 		// 2. Transform these extent vectors from Object A's coordinate system to Object B's coordinate system (using our ObjAtoObjB matrix)
 		eae6320::Math::cVector xVector(xExt, 0.0f, 0.0f);
-		eae6320::Math::cVector AxExtInB = xVector * ObjAToObjB;
+		eae6320::Math::cVector4 AxExtInB = eae6320::Math::cVector4(xVector, 0.0f) * ObjAToObjB;
 
 		eae6320::Math::cVector yVector(0.0f, yExt, 0.0f);
-		eae6320::Math::cVector AyExtInB = yVector * ObjAToObjB;
+		eae6320::Math::cVector4 AyExtInB = eae6320::Math::cVector4(yVector, 0.0f) * ObjAToObjB;
 
 		eae6320::Math::cVector zVector(0.0f, 0.0f, zExt);
-		eae6320::Math::cVector AzExtInB = zVector * ObjAToObjB;
+		eae6320::Math::cVector4 AzExtInB = eae6320::Math::cVector4(zVector, 0.0f) * ObjAToObjB;
 
 		// 3. For each of Object B's axes accumulate the influence of (project) each of the 3 transformed Object A's extent vectors on that axis
 		float totalXExt = abs(AxExtInB.x) + abs(AyExtInB.x) + abs(AzExtInB.x);
@@ -204,11 +204,11 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 		// Find Object A's frame movement vector relative to Object B's (essentially treating Object B as stationary)
 		// 1. Transform both Objects frame movement vectors from World coordinate system to Object B's coordinate system
 
-		eae6320::Math::cVector velocityA = i_VelocityA * WorldToObjB;
-		eae6320::Math::cVector velocityB = i_VelocityB * WorldToObjB;
+		eae6320::Math::cVector4 velocityA = eae6320::Math::cVector4(i_VelocityA, 0.0f) * WorldToObjB;
+		eae6320::Math::cVector4 velocityB = eae6320::Math::cVector4(i_VelocityB, 0.0f) * WorldToObjB;
 
 		// 2. Subtract Object A's frame movement vector (calculated in Object B's coordinate system) from Object B's (also in it's coordinate system)
-		eae6320::Math::cVector vAtoB = velocityA - velocityB;
+		eae6320::Math::cVector4 vAtoB = velocityA - velocityB;
 		AToBVelocity = vAtoB;
 
 		// Calculate the begin and end point for each axis.
@@ -248,20 +248,20 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 		eae6320::Math::cMatrix_transformation ObjBToObjA = i_ObjBtoWorld * WorldToObjA;
 
 		eae6320::Math::cVector Center(0.0f, 0.0f, 0.0f);
-		eae6320::Math::cVector BCenterInA = Center * ObjBToObjA;
+		eae6320::Math::cVector4 BCenterInA = eae6320::Math::cVector4(Center, 1.0f) * ObjBToObjA;
 
 		float xExt = i_BoxB.x;
 		float yExt = i_BoxB.y;
 		float zExt = i_BoxB.z;
 
 		eae6320::Math::cVector xVector(xExt, 0.0f, 0.0f);
-		eae6320::Math::cVector BxExtInA = xVector * ObjBToObjA;
+		eae6320::Math::cVector4 BxExtInA = eae6320::Math::cVector4(xVector, 0.0f) * ObjBToObjA;
 
 		eae6320::Math::cVector yVector(0.0f, yExt, 0.0f);
-		eae6320::Math::cVector ByExtInA = yVector * ObjBToObjA;
+		eae6320::Math::cVector4 ByExtInA = eae6320::Math::cVector4(yVector, 0.0f) * ObjBToObjA;
 
 		eae6320::Math::cVector zVector(0.0f, 0.0f, zExt);
-		eae6320::Math::cVector BzExtInA = zVector * ObjBToObjA;
+		eae6320::Math::cVector4 BzExtInA = eae6320::Math::cVector4(zVector, 0.0f) * ObjBToObjA;
 
 		float totalXExt = abs(BxExtInA.x) + abs(ByExtInA.x) + abs(BzExtInA.x);
 		float totalYExt = abs(BxExtInA.y) + abs(ByExtInA.y) + abs(BzExtInA.y);
@@ -274,9 +274,9 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 		float ZMin = -totalZExt - i_BoxA.z;
 		float ZMax = -ZMin;
 
-		eae6320::Math::cVector velocityB = i_VelocityB * WorldToObjA;
-		eae6320::Math::cVector velocityA = i_VelocityA * WorldToObjA;
-		eae6320::Math::cVector vBtoA = velocityB - velocityA;
+		eae6320::Math::cVector4 velocityB = eae6320::Math::cVector4(i_VelocityB, 0.0f) * WorldToObjA;
+		eae6320::Math::cVector4 velocityA = eae6320::Math::cVector4(i_VelocityA, 0.0f) * WorldToObjA;
+		eae6320::Math::cVector4 vBtoA = velocityB - velocityA;
 		BToAVelocity = vBtoA;
 
 		float XBegin = BCenterInA.x;
@@ -356,7 +356,8 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 					temp.z = AToBZDirection;
 				}
 				//the vector is in B. Use i_ObjBtoWorld to transform the vector from B to World.
-				o_Normal = temp * i_ObjBtoWorld;
+				eae6320::Math::cVector4 tempNormal = eae6320::Math::cVector4(temp, 0.0f) * i_ObjBtoWorld;
+				o_Normal = eae6320::Math::cVector(tempNormal.x, tempNormal.y, tempNormal.z);
 			}
 			//if collide happens on axises in BToA
 			else if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(BToAOverlapTime, OverlapTime, EPSILON, EPSILON))
@@ -378,7 +379,8 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 					temp.z = BToAZDirection;
 				}
 				//the vector is in A. Use i_ObjBtoWorld to transform the vector from A to World.
-				o_Normal = temp * i_ObjAtoWorld;
+				eae6320::Math::cVector4 tempNormal = eae6320::Math::cVector4(temp, 0.0f) * i_ObjAtoWorld;
+				o_Normal = eae6320::Math::cVector(tempNormal.x, tempNormal.y, tempNormal.z);
 			}
 		}
 		return true;

@@ -72,7 +72,7 @@ void eae6320::Core::Physics::Update(float dt)
 		for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)
 		{
 			eae6320::Core::Entity* entity = eae6320::Core::EntityManager::Get().GetHandleAtIndex(i).ToEntity();
-			eae6320::Core::TransformHelper::UpdateTransform(*entity->m_transform, *entity->m_renderable->m_material->m_effect, dt);
+			eae6320::Core::TransformHelper::UpdateTransform(*entity->m_transform, *entity->m_renderable->m_material->m_effect, updateTime);
 		}
 		totalTime -= updateTime;
 	}

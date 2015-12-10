@@ -6,7 +6,7 @@
 
 float eae6320::Math::MathFloat::GetLambda(float i_a, float i_b, float i_y)
 {
-	assert(FloatPointUtils::AlmostEqualRelativeAndAbs(i_a, i_b));
+	assert(!FloatPointUtils::AlmostEqualRelativeAndAbs(i_a, i_b));
 	return (i_y - i_a) / (i_b - i_a);
 }
 float eae6320::Math::MathFloat::sgn(float i_a)

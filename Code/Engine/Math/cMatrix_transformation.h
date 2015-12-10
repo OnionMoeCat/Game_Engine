@@ -20,6 +20,8 @@
 #ifndef EAE6320_MATH_CMATRIX_TRANSFORMATION_H
 #define EAE6320_MATH_CMATRIX_TRANSFORMATION_H
 
+#include "cVector4.h"
+
 // Forward Declarations
 //=====================
 
@@ -62,7 +64,8 @@ namespace eae6320
 			// Data
 			//=====
 			cMatrix_transformation friend operator*(const cMatrix_transformation& lhs, const cMatrix_transformation& rhs);
-			cVector friend operator*(const cVector& lhs, const cMatrix_transformation& rhs);
+			//cVector friend operator*(const cVector& lhs, const cMatrix_transformation& rhs);
+			cVector4 friend operator*(const cVector4& lhs, const cMatrix_transformation& rhs);
 
 		private:
 

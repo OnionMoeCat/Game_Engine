@@ -22,6 +22,7 @@
     <ClCompile Include="cMatrix_transformation.cpp" />
     <ClCompile Include="cQuaternion.cpp" />
     <ClCompile Include="cVector.cpp" />
+    <ClCompile Include="cVector4.cpp" />
     <ClCompile Include="FloatPointUtils.cpp" />
     <ClCompile Include="Functions.cpp" />
     <ClCompile Include="MathFloat.cpp" />
@@ -30,6 +31,7 @@
     <ClInclude Include="cMatrix_transformation.h" />
     <ClInclude Include="cQuaternion.h" />
     <ClInclude Include="cVector.h" />
+    <ClInclude Include="cVector4.h" />
     <ClInclude Include="FloatPointUtils.h" />
     <ClInclude Include="Functions.h" />
     <ClInclude Include="MathFloat.h" />

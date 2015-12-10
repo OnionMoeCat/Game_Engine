@@ -115,7 +115,7 @@ eae6320::Math::cMatrix_transformation::cMatrix_transformation(
 
 }
 
-eae6320::Math::cVector eae6320::Math::operator*(const cVector& lhs, const cMatrix_transformation& rhs)
+/*eae6320::Math::cVector eae6320::Math::operator*(const cVector& lhs, const cMatrix_transformation& rhs)
 {
 	float normalW = 1.0f;
 	float t0 = lhs.x * rhs.m_00 + lhs.y * rhs.m_10 + lhs.z * rhs.m_20 + normalW * rhs.m_30;
@@ -124,6 +124,15 @@ eae6320::Math::cVector eae6320::Math::operator*(const cVector& lhs, const cMatri
 	float t3 = lhs.x * rhs.m_03 + lhs.y * rhs.m_13 + lhs.z * rhs.m_23 + normalW * rhs.m_33;
 	assert(!FloatPointUtils::AlmostEqualRelativeAndAbs(t3, 0.0f));
 	return cVector(t0 / t3, t1 / t3, t2 / t3);
+}*/
+
+eae6320::Math::cVector4 eae6320::Math::operator*(const eae6320::Math::cVector4& lhs, const eae6320::Math::cMatrix_transformation& rhs)
+{
+	float t0 = lhs.x * rhs.m_00 + lhs.y * rhs.m_10 + lhs.z * rhs.m_20 + lhs.w * rhs.m_30;
+	float t1 = lhs.x * rhs.m_01 + lhs.y * rhs.m_11 + lhs.z * rhs.m_21 + lhs.w * rhs.m_31;
+	float t2 = lhs.x * rhs.m_02 + lhs.y * rhs.m_12 + lhs.z * rhs.m_22 + lhs.w * rhs.m_32;
+	float t3 = lhs.x * rhs.m_03 + lhs.y * rhs.m_13 + lhs.z * rhs.m_23 + lhs.w * rhs.m_33;
+	return cVector4(t0, t1, t2, t3);
 }
 
 eae6320::Math::cMatrix_transformation eae6320::Math::operator*(const eae6320::Math::cMatrix_transformation& lhs, const eae6320::Math::cMatrix_transformation& rhs)

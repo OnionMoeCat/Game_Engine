@@ -7,6 +7,7 @@
     <ClCompile Include="Functions.cpp" />
     <ClCompile Include="MathFloat.cpp" />
     <ClCompile Include="FloatPointUtils.cpp" />
+    <ClCompile Include="cVector4.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cMatrix_transformation.h" />
@@ -16,5 +17,6 @@
     <ClInclude Include="FloatPointUtils.h" />
     <ClInclude Include="MathFloat.h" />
     <ClInclude Include="MatrixHelper.h" />
+    <ClInclude Include="cVector4.h" />
   </ItemGroup>
 </Project>

@@ -3,7 +3,7 @@ return
 	vertices =
 	{
 		{
-			position = {-5, -1, 5},
+			position = {-5, 0, 5},
 			color = {0, 0, 1, 1},
 			normal = {0, 1, 2.22045e-16},
 			tangent = {1, -0, 0},
@@ -11,7 +11,7 @@ return
 			texcoord = {0, 0},
 		},
 		{
-			position = {5, -1, 5},
+			position = {5, 0, 5},
 			color = {1, 0, 0, 1},
 			normal = {0, 1, 2.22045e-16},
 			tangent = {1, -0, 0},
@@ -19,7 +19,7 @@ return
 			texcoord = {1, 0},
 		},
 		{
-			position = {-5, -1, -5},
+			position = {-5, 0, -5},
 			color = {1, 1, 1, 1},
 			normal = {0, 1, 2.22045e-16},
 			tangent = {1, -0, 0},
@@ -27,7 +27,7 @@ return
 			texcoord = {0, 1},
 		},
 		{
-			position = {5, -1, -5},
+			position = {5, 0, -5},
 			color = {0, 1, 0, 1},
 			normal = {0, 1, 2.22045e-16},
 			tangent = {1, -0, 0},
