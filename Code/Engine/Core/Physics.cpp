@@ -4,6 +4,7 @@
 #include "../Math/FloatPointUtils.h"
 #include "Collision.h"
 #include "TransformHelper.h"
+#include "MessageSystem.h"
 
 #include <cfloat>
 
@@ -67,7 +68,10 @@ void eae6320::Core::Physics::Update(float dt)
 			//resolve collision
 			Collision::ResolveCollsion(*(A.ToEntity()->m_transform), *(B.ToEntity()->m_transform), *(A.ToEntity()->m_collidable), *(B.ToEntity()->m_collidable), normal);
 			//send message
-			MessageSystem<SmartPtr<GameObject>, SmartPtr<GameObject>>::Get().SendingMessage("Collision", A->GetGameObject(), B->GetGameObject());
+			Event event;
+			event.m_args["AEntityHandleID"] = ;
+			event.m_args["BEntityHandleID"] = ;
+			MessageSystem::Get().SendingMessage("Collision", event);
 		}
 		//update
 		for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)

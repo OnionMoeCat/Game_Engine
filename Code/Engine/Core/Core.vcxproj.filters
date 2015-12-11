@@ -19,6 +19,9 @@
     <ClInclude Include="Variant.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="MessageSystem.h" />
+    <ClInclude Include="MessageHandlerHandle.h" />
+    <ClInclude Include="IMessageHandler.h" />
+    <ClInclude Include="MessageHandlerManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraHelper.cpp" />
@@ -32,5 +35,8 @@
     <ClCompile Include="CollidableHelper.cpp" />
     <ClCompile Include="AI.cpp" />
     <ClCompile Include="MessageSystem.cpp" />
+    <ClCompile Include="MessageHandlerHandle.cpp" />
+    <ClCompile Include="IMessageHandler.cpp" />
+    <ClCompile Include="MessageHandlerManager.cpp" />
   </ItemGroup>
 </Project>

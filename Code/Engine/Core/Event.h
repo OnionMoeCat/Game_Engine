@@ -11,11 +11,6 @@ namespace eae6320
 	{
 		struct Event
 		{
-			enum EventType
-			{
-				TYPE_COUNT // number of unique types
-			};
-			EventType m_type;
 			std::unordered_map<std::string, Variant> m_args;
 		};
 	}

@@ -32,6 +32,9 @@
     <ClInclude Include="EntityHelper.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="Intersection.h" />
+    <ClInclude Include="IMessageHandler.h" />
+    <ClInclude Include="MessageHandlerHandle.h" />
+    <ClInclude Include="MessageHandlerManager.h" />
     <ClInclude Include="MessageSystem.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="Transform.h" />
@@ -47,6 +50,9 @@
     <ClCompile Include="EntityHelper.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="Intersection.cpp" />
+    <ClCompile Include="IMessageHandler.cpp" />
+    <ClCompile Include="MessageHandlerHandle.cpp" />
+    <ClCompile Include="MessageHandlerManager.cpp" />
     <ClCompile Include="MessageSystem.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="TransformHelper.cpp" />
