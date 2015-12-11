@@ -69,8 +69,14 @@ void eae6320::Core::Physics::Update(float dt)
 			Collision::ResolveCollsion(*(A.ToEntity()->m_transform), *(B.ToEntity()->m_transform), *(A.ToEntity()->m_collidable), *(B.ToEntity()->m_collidable), normal);
 			//send message
 			Event event;
-			event.m_args["AEntityHandleID"] = ;
-			event.m_args["BEntityHandleID"] = ;
+			Variant variantA;
+			variantA.m_type = Variant::Type::TYPE_UINTEGER;
+			variantA.m_asUInteger = A.ToEntity()->m_handleIndex;
+			Variant variantB;
+			variantB.m_type = Variant::Type::TYPE_UINTEGER;
+			variantB.m_asUInteger = B.ToEntity()->m_handleIndex;
+			event.m_args["AEntityHandleID"] = variantA;
+			event.m_args["BEntityHandleID"] = variantB;
 			MessageSystem::Get().SendingMessage("Collision", event);
 		}
 		//update
