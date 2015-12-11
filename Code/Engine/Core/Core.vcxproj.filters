@@ -16,6 +16,9 @@
     <ClInclude Include="Physics.h" />
     <ClInclude Include="CollidableHelper.h" />
     <ClInclude Include="AI.h" />
+    <ClInclude Include="Variant.h" />
+    <ClInclude Include="Event.h" />
+    <ClInclude Include="MessageSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CameraHelper.cpp" />
@@ -28,5 +31,6 @@
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="CollidableHelper.cpp" />
     <ClCompile Include="AI.cpp" />
+    <ClCompile Include="MessageSystem.cpp" />
   </ItemGroup>
 </Project>

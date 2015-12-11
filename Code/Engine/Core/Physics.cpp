@@ -66,7 +66,8 @@ void eae6320::Core::Physics::Update(float dt)
 			EntityHandle B = EntityManager::Get().GetHandleAtIndex(index2);
 			//resolve collision
 			Collision::ResolveCollsion(*(A.ToEntity()->m_transform), *(B.ToEntity()->m_transform), *(A.ToEntity()->m_collidable), *(B.ToEntity()->m_collidable), normal);
-			//MessageSystem<SmartPtr<GameObject>, SmartPtr<GameObject>>::Get().SendingMessage("Collision", A->GetGameObject(), B->GetGameObject());
+			//send message
+			MessageSystem<SmartPtr<GameObject>, SmartPtr<GameObject>>::Get().SendingMessage("Collision", A->GetGameObject(), B->GetGameObject());
 		}
 		//update
 		for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)

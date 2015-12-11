@@ -25,15 +25,18 @@
     <ClInclude Include="Collidable.h" />
     <ClInclude Include="CollidableHelper.h" />
     <ClInclude Include="Collision.h" />
+    <ClInclude Include="Event.h" />
     <ClInclude Include="IController.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityHandle.h" />
     <ClInclude Include="EntityHelper.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="Intersection.h" />
+    <ClInclude Include="MessageSystem.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TransformHelper.h" />
+    <ClInclude Include="Variant.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AI.cpp" />
@@ -44,6 +47,7 @@
     <ClCompile Include="EntityHelper.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="Intersection.cpp" />
+    <ClCompile Include="MessageSystem.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="TransformHelper.cpp" />
   </ItemGroup>
