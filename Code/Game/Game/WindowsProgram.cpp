@@ -29,6 +29,10 @@
 #include "../../Engine/Core/TransformHelper.h"
 #include "../../Engine/Core/AI.h"
 #include "../../Engine/Core/Physics.h"
+#include "../../Engine/Core/MessageHandlerHandle.h"
+#include "../../Engine/Core/MessageSystem.h"
+#include "../../Engine/Core/MessageHandlerManager.h"
+#include "../../Engine/Core/IMessageHandler.h"
 
 #include "Controllers/InputController.h"
 #include "Controllers/ConstantController.h"
@@ -70,7 +74,33 @@ namespace
 
 	eae6320::Core::Camera s_camera;
 
-	
+
+	struct CollisionHandler : eae6320::Core::IMessageHandler
+	{
+		void HandleMessage(const std::string i_Message, const eae6320::Core::Event& i_event)
+		{
+			if (i_Message == "Collision")
+			{
+				int handleAInt = i_event.m_args.find("AEntityHandleID")->second.m_asInteger;
+				int handleBInt = i_event.m_args.find("BEntityHandleID")->second.m_asInteger;
+
+				eae6320::Core::EntityHandle A = eae6320::Core::EntityManager::Get().GetHandleAtIndex(handleAInt);
+				eae6320::Core::EntityHandle B = eae6320::Core::EntityManager::Get().GetHandleAtIndex(handleBInt);
+
+				if (A != eae6320::Core::EntityHandle::Null && B != eae6320::Core::EntityHandle::Null)
+				{
+					if (A.ToEntity()->m_name == "" && B.ToEntity()->m_name == "")
+					{
+						eae6320::Core::EntityHelper::SetAlive(*A.ToEntity(), false);
+					}
+					if (A.ToEntity()->m_name == "" && B.ToEntity()->m_name == "")
+					{
+						eae6320::Core::EntityHelper::SetAlive(*B.ToEntity(), false);
+					}
+				}
+			}
+		}
+	};	
 }
 
 // Helper Functions
@@ -554,6 +584,20 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			eae6320::Time::OnNewFrame();
 
 			{
+				for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)
+				{
+					eae6320::Core::EntityHandle entityHandle = eae6320::Core::EntityManager::Get().GetHandleAtIndex(i);
+					if (entityHandle != eae6320::Core::EntityHandle::Null)
+					{
+						if (!(entityHandle.ToEntity()->m_isAlive))
+						{
+							eae6320::Core::EntityManager::Get().Release(entityHandle);
+						}
+					}
+				}
+			}
+
+			{
 				float dt = eae6320::Time::GetSecondsElapsedThisFrame();
 
 				eae6320::Core::AI::Update(dt);
@@ -566,7 +610,11 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			{
 				for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)
 				{
-					eae6320::Core::EntityHelper::ToCameraScreen(*eae6320::Core::EntityManager::Get().GetHandleAtIndex(i).ToEntity(), s_camera);
+					eae6320::Core::EntityHandle entityHandle = eae6320::Core::EntityManager::Get().GetHandleAtIndex(i);
+					if (entityHandle != eae6320::Core::EntityHandle::Null)
+					{
+						eae6320::Core::EntityHelper::ToCameraScreen(*entityHandle.ToEntity(), s_camera);
+					}
 				}
 			}
 
@@ -574,7 +622,11 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			{
 				for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)
 				{
-					eae6320::Core::EntityHelper::Submit(*eae6320::Core::EntityManager::Get().GetHandleAtIndex(i).ToEntity());
+					eae6320::Core::EntityHandle entityHandle = eae6320::Core::EntityManager::Get().GetHandleAtIndex(i);
+					if (entityHandle != eae6320::Core::EntityHandle::Null)
+					{
+						eae6320::Core::EntityHelper::Submit(*entityHandle.ToEntity());
+					}
 				}
 				eae6320::Graphics::Core::Render();
 			}
@@ -649,9 +701,19 @@ namespace
 		bool wereThereErrors = false;
 
 		{
+			eae6320::Core::MessageHandlerHandle messageHandlerHandle = eae6320::Core::MessageHandlerManager::Get().InsertAndGetIndex(new CollisionHandler());
+			eae6320::Core::MessageSystem::Get().AddMessageHandler("Collision", messageHandlerHandle);
+		}
+
+		{
 			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/floor.mesh", s_entity_floor))
 			{
 				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (s_entity_floor == eae6320::Core::EntityHandle::Null)
+			{
 				wereThereErrors = true;
 				goto OnExit;
 			}
@@ -676,10 +738,27 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
+			if (!eae6320::Core::EntityHelper::SetName(*s_entity_floor.ToEntity(), "Floor"))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_floor.ToEntity(), true))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 		}
 
 		{
 			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/ball.mesh", s_entity_ball_moving_iterator))
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (s_entity_ball_moving_iterator == eae6320::Core::EntityHandle::Null)
 			{
 				wereThereErrors = true;
 				goto OnExit;
@@ -705,12 +784,29 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
+			if (!eae6320::Core::EntityHelper::SetName(*s_entity_ball_moving_iterator.ToEntity(), "Player"))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_ball_moving_iterator.ToEntity(), true))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 		}
 
 		{
 			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/red.material", "data/ball.mesh", s_entity_ball_red_iterator))
 			{
 				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (s_entity_ball_red_iterator == eae6320::Core::EntityHandle::Null)
+			{
 				wereThereErrors = true;
 				goto OnExit;
 			}
@@ -735,12 +831,29 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
+			if (!eae6320::Core::EntityHelper::SetName(*s_entity_ball_red_iterator.ToEntity(), "Monster"))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_ball_red_iterator.ToEntity(), true))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 		}
 
 		{
 			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/green.material", "data/ball.mesh", s_entity_ball_green_iterator))
 			{
 				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (s_entity_ball_green_iterator == eae6320::Core::EntityHandle::Null)
+			{
 				wereThereErrors = true;
 				goto OnExit;
 			}
@@ -765,12 +878,29 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
+			if (!eae6320::Core::EntityHelper::SetName(*s_entity_ball_green_iterator.ToEntity(), "Monster"))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_ball_green_iterator.ToEntity(), true))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 		}
 
 		{
 			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/eae6320.material", "data/plane.mesh", s_entity_plane_opaque))
 			{
 				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (s_entity_plane_opaque == eae6320::Core::EntityHandle::Null)
+			{
 				wereThereErrors = true;
 				goto OnExit;
 			}
@@ -783,13 +913,19 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_plane_opaque.ToEntity(), FLT_MAX))
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_plane_opaque.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_plane_opaque.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			if (!eae6320::Core::EntityHelper::SetName(*s_entity_plane_opaque.ToEntity(), "Plane"))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_plane_opaque.ToEntity(), true))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -801,6 +937,11 @@ namespace
 			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/transparent_03.material", "data/ball.mesh", s_entity_ball_transparent_03))
 			{
 				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (s_entity_ball_transparent_03 == eae6320::Core::EntityHandle::Null)
+			{
 				wereThereErrors = true;
 				goto OnExit;
 			}
@@ -824,13 +965,30 @@ namespace
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
-			}			
+			}	
+			if (!eae6320::Core::EntityHelper::SetName(*s_entity_ball_transparent_03.ToEntity(), "Monster"))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_ball_transparent_03.ToEntity(), true))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 		}
 
 		{
 			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/transparent_08.material", "data/ball.mesh", s_entity_ball_transparent_08))
 			{
 				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (s_entity_ball_transparent_08 == eae6320::Core::EntityHandle::Null)
+			{
 				wereThereErrors = true;
 				goto OnExit;
 			}
@@ -855,12 +1013,29 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
+			if (!eae6320::Core::EntityHelper::SetName(*s_entity_ball_transparent_08.ToEntity(), "Monster"))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_ball_transparent_08.ToEntity(), true))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
 		}
 
 		{
 			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/alpha.material", "data/plane.mesh", s_entity_plane_transparent))
 			{
 				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (s_entity_plane_transparent == eae6320::Core::EntityHandle::Null)
+			{
 				wereThereErrors = true;
 				goto OnExit;
 			}
@@ -873,13 +1048,19 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_plane_transparent.ToEntity(), FLT_MAX))
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_plane_transparent.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_plane_transparent.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			if (!eae6320::Core::EntityHelper::SetName(*s_entity_plane_transparent.ToEntity(), "Plane"))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_plane_transparent.ToEntity(), true))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -912,13 +1093,8 @@ namespace
 	{
 		bool wereThereErrors = false;
 		{
-			for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)
-			{
-				if (!eae6320::Core::EntityHelper::CleanUp(*eae6320::Core::EntityManager::Get().GetHandleAtIndex(i).ToEntity()))
-				{
-					wereThereErrors = true;
-				}			
-			}
+			eae6320::Core::MessageHandlerManager::Get().CleanUp();
+			eae6320::Core::EntityManager::Get().CleanUp();
 		}
 		return !wereThereErrors;
 	}

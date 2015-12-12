@@ -21,6 +21,8 @@ namespace eae6320
 			Transform* m_transform = NULL;
 			IController* m_iController = NULL;
 			eae6320::Graphics::Renderable* m_renderable = NULL;
+			char* m_name = NULL;
+			bool m_isAlive = true;
 			uint32_t m_handleIndex;
 			uint32_t m_uniqueId;
 		};

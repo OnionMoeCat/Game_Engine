@@ -27,23 +27,28 @@ void eae6320::Core::Physics::Update(float dt)
 			for (int j = i; j < size; j++)
 			{
 				if (i != j)
-				{
+				{				
 					EntityHandle A = EntityManager::Get().GetHandleAtIndex(i);
 					EntityHandle B = EntityManager::Get().GetHandleAtIndex(j);
-
-					eae6320::Math::cVector tempNormal;
-					float tempTime = FLT_MAX;
-					//check if A and B is colliding in totalTime
-					bool collide = Collision::CheckOOBBCollision(*(A.ToEntity()->m_transform),
-						*(B.ToEntity()->m_transform), totalTime, tempNormal, tempTime);
-					if (collide)
+					if (A != EntityHandle::Null && B != EntityHandle::Null)
 					{
-						if (tempTime < minTime)
+						if (A.ToEntity()->m_collidable != NULL && B.ToEntity()->m_collidable != NULL)
 						{
-							index1 = i;
-							index2 = j;
-							minTime = fmax(tempTime, 0.0f);
-							normal = tempNormal;
+							eae6320::Math::cVector tempNormal;
+							float tempTime = FLT_MAX;
+							//check if A and B is colliding in totalTime
+							bool collide = Collision::CheckOOBBCollision(*(A.ToEntity()->m_transform),
+								*(B.ToEntity()->m_transform), totalTime, tempNormal, tempTime);
+							if (collide)
+							{
+								if (tempTime < minTime)
+								{
+									index1 = i;
+									index2 = j;
+									minTime = fmax(tempTime, 0.0f);
+									normal = tempNormal;
+								}
+							}
 						}
 					}
 				}
@@ -65,19 +70,22 @@ void eae6320::Core::Physics::Update(float dt)
 			//set collidable->colliding (which object the collidable is collding with)
 			EntityHandle A = EntityManager::Get().GetHandleAtIndex(index1);
 			EntityHandle B = EntityManager::Get().GetHandleAtIndex(index2);
-			//resolve collision
-			Collision::ResolveCollsion(*(A.ToEntity()->m_transform), *(B.ToEntity()->m_transform), *(A.ToEntity()->m_collidable), *(B.ToEntity()->m_collidable), normal);
-			//send message
-			Event event;
-			Variant variantA;
-			variantA.m_type = Variant::Type::TYPE_UINTEGER;
-			variantA.m_asUInteger = A.ToEntity()->m_handleIndex;
-			Variant variantB;
-			variantB.m_type = Variant::Type::TYPE_UINTEGER;
-			variantB.m_asUInteger = B.ToEntity()->m_handleIndex;
-			event.m_args["AEntityHandleID"] = variantA;
-			event.m_args["BEntityHandleID"] = variantB;
-			MessageSystem::Get().SendingMessage("Collision", event);
+			if (A != EntityHandle::Null && B != EntityHandle::Null)
+			{
+				//resolve collision
+				Collision::ResolveCollsion(*(A.ToEntity()->m_transform), *(B.ToEntity()->m_transform), *(A.ToEntity()->m_collidable), *(B.ToEntity()->m_collidable), normal);
+				//send message
+				Event event;
+				Variant variantA;
+				variantA.m_type = Variant::Type::TYPE_UINTEGER;
+				variantA.m_asUInteger = A.ToEntity()->m_handleIndex;
+				Variant variantB;
+				variantB.m_type = Variant::Type::TYPE_UINTEGER;
+				variantB.m_asUInteger = B.ToEntity()->m_handleIndex;
+				event.m_args["AEntityHandleID"] = variantA;
+				event.m_args["BEntityHandleID"] = variantB;
+				MessageSystem::Get().SendingMessage("Collision", event);
+			}
 		}
 		//update
 		for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)

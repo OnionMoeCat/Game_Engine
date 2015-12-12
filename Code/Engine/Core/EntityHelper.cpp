@@ -142,3 +142,20 @@ bool eae6320::Core::EntityHelper::SetCollidable(Entity& i_entity, const float i_
 	}
 	return true;
 }
+
+bool eae6320::Core::EntityHelper::SetName(Entity& i_entity, const char* const i_name)
+{
+	if (i_entity.m_name != NULL)
+	{
+		free(i_entity.m_name);
+		i_entity.m_name = NULL;
+	}
+	i_entity.m_name = _strdup(i_name);
+	return (i_entity.m_name != NULL);
+}
+
+bool eae6320::Core::EntityHelper::SetAlive(Entity& i_entity, const bool i_alive)
+{
+	i_entity.m_isAlive = i_alive;
+	return true;
+}

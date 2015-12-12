@@ -80,5 +80,9 @@ size_t eae6320::Core::EntityManager::GetEntitySize()
 
 eae6320::Core::EntityHandle eae6320::Core::EntityManager::GetHandleAtIndex(size_t i_index)
 {
+	if (m_list[i_index] == NULL)
+	{	
+		return EntityHandle::Null;
+	}
 	return EntityHandle(*m_list[i_index]);
 }

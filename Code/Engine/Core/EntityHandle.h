@@ -12,9 +12,9 @@ namespace eae6320
 		struct EntityHandle
 		{
 		private:
-			uint32_t m_handleIndex; // index into the handle
+			int32_t m_handleIndex = -1; // index into the handle
 							  // table
-			uint32_t m_uniqueId; // unique id avoids stale
+			uint32_t m_uniqueId = 0; // unique id avoids stale
 									 // handles
 		public:
 			explicit EntityHandle(const Entity& entity);
@@ -23,6 +23,7 @@ namespace eae6320
 			Entity* ToEntity() const;
 			bool operator==(const EntityHandle& rhs);
 			bool operator!=(const EntityHandle& rhs);
+			const static EntityHandle Null;
 		};
 	}
 }

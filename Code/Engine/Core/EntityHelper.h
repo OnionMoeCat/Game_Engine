@@ -17,6 +17,8 @@ namespace eae6320
 			bool static SetTransform(Entity& i_entity, const eae6320::Math::cVector& i_position, const eae6320::Math::cQuaternion& i_quaternion, const eae6320::Math::cVector& i_AABB);
 			bool static SetController(Entity& i_entity, IController* i_controller);
 			bool static SetCollidable(Entity& i_entity, const float i_mass);
+			bool static SetName(Entity& i_entity, const char* const i_name);
+			bool static SetAlive(Entity& i_entity, const bool i_alive);
 			bool static CleanUp(Entity& i_entity);
 			bool static ToCameraScreen(Entity& i_entity, const Camera& i_camera);
 			bool static Submit(Entity& i_entity);

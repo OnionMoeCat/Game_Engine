@@ -16,7 +16,7 @@ namespace eae6320
 			uint32_t m_uniqueId; // unique id avoids stale
 								 // handles
 			virtual ~IMessageHandler();
-			virtual void HandleMessage(const std::string i_Message, const Event& i_event) = 0;;
+			virtual void HandleMessage(const std::string i_Message, const Event& i_event) = 0;
 		};
 	}
 }

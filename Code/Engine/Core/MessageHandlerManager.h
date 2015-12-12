@@ -24,6 +24,7 @@ namespace eae6320
 		public:
 			static MessageHandlerManager& Get();
 			void CleanUp();
+			MessageHandlerHandle InsertAndGetIndex(IMessageHandler* i_entity);
 			friend struct MessageHandlerHandle;
 		private:
 			static uint32_t g_UniqueID;
@@ -31,7 +32,6 @@ namespace eae6320
 			MessageHandlerList m_list;
 			static MessageHandlerManager m_Instance;
 			MessageHandlerManager();
-			MessageHandlerHandle InsertAndGetIndex(IMessageHandler* i_entity);
 		};
 	}
 }
