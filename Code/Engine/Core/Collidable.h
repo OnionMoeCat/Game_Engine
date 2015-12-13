@@ -10,6 +10,7 @@ namespace eae6320
 		struct Collidable
 		{
 			float m_mass;
+			EntityHandle m_colliding = EntityHandle::Null;
 		};
 	}
 }

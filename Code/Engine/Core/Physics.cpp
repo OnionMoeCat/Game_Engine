@@ -39,7 +39,9 @@ void eae6320::Core::Physics::Update(float dt)
 							//check if A and B is colliding in totalTime
 							bool collide = Collision::CheckOOBBCollision(*(A.ToEntity()->m_transform),
 								*(B.ToEntity()->m_transform), totalTime, tempNormal, tempTime);
-							if (collide)
+							EntityHandle AColliding = A.ToEntity()->m_collidable->m_colliding;
+							EntityHandle BColliding = B.ToEntity()->m_collidable->m_colliding;
+							if (collide && !(AColliding == B && BColliding == A))
 							{
 								if (tempTime < minTime)
 								{
@@ -47,6 +49,17 @@ void eae6320::Core::Physics::Update(float dt)
 									index2 = j;
 									minTime = fmax(tempTime, 0.0f);
 									normal = tempNormal;
+								}
+							}
+							else
+							{
+								if (AColliding == B)
+								{
+									A.ToEntity()->m_collidable->m_colliding = EntityHandle::Null;
+								}
+								if (BColliding == A)
+								{
+									B.ToEntity()->m_collidable->m_colliding = EntityHandle::Null;
 								}
 							}
 						}
@@ -70,8 +83,12 @@ void eae6320::Core::Physics::Update(float dt)
 			//set collidable->colliding (which object the collidable is collding with)
 			EntityHandle A = EntityManager::Get().GetHandleAtIndex(index1);
 			EntityHandle B = EntityManager::Get().GetHandleAtIndex(index2);
+
 			if (A != EntityHandle::Null && B != EntityHandle::Null)
 			{
+				A.ToEntity()->m_collidable->m_colliding = B;
+				B.ToEntity()->m_collidable->m_colliding = A;
+
 				//resolve collision
 				Collision::ResolveCollsion(*(A.ToEntity()->m_transform), *(B.ToEntity()->m_transform), *(A.ToEntity()->m_collidable), *(B.ToEntity()->m_collidable), normal);
 				//send message

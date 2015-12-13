@@ -13,6 +13,7 @@ namespace eae6320
 		namespace CollidableHelper
 		{
 			void SetMass(Collidable& i_collidable, const float i_elapsedTime);
+			void SetColliding(Collidable& i_collidable, const EntityHandle& i_colliding);
 		};
 	}
 }

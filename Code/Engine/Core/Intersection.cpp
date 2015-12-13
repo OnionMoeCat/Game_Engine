@@ -327,67 +327,58 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 		//So, for each axis, -1 means colliding with negative face(left, down, bottom), 0 means no colliding, 1 means collding with positive face.
 		//We can consider axis seperately.
 		//This vector is related to cube, we need to transform it from cube's coordinate to world.
-		if ((OverlapTime > 0.0f
-			|| eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(OverlapTime, 0.0f, EPSILON, EPSILON))
-			&& (OverlapTime < 1.0f
-				|| eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(OverlapTime, 1.0f, EPSILON, EPSILON)))
+
+		//if collide happens on axises in AToB
+		if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(AToBOverlapTime, OverlapTime, EPSILON, EPSILON))
 		{
-			//if collide happens on axises in AToB
-			if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(AToBOverlapTime, OverlapTime, EPSILON, EPSILON))
+			//normal vector
+			eae6320::Math::cVector temp(0.0f, 0.0f, 0.0f);
+			//if collides happens on X, set temp.X
+			if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(AToBXOverlapTime, OverlapTime, EPSILON, EPSILON))
 			{
-				//normal vector
-				eae6320::Math::cVector temp(0.0f, 0.0f, 0.0f);
-				//if collides happens on X, set temp.X
-				if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(AToBXOverlapTime, OverlapTime, EPSILON, EPSILON))
-				{
-					//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(AToBVelocity.X(), 0.0f, EPSILON, EPSILON), "vx should not be 0");
-					temp.x = AToBXDirection;
-				}
-				//if collides happens on Y, set temp.Y
-				if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(AToBYOverlapTime, OverlapTime, EPSILON, EPSILON))
-				{
-					//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(AToBVelocity.Y(), 0.0f, EPSILON, EPSILON), "vy should not be 0");
-					temp.y = AToBYDirection;
-				}
-				//if collides happens on Z, set temp.Z
-				if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(AToBZOverlapTime, OverlapTime, EPSILON, EPSILON))
-				{
-					//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(AToBVelocity.Z(), 0.0f, EPSILON, EPSILON), "vz should not be 0");
-					temp.z = AToBZDirection;
-				}
-				//the vector is in B. Use i_ObjBtoWorld to transform the vector from B to World.
-				eae6320::Math::cVector4 tempNormal = eae6320::Math::cVector4(temp, 0.0f) * i_ObjBtoWorld;
-				o_Normal = eae6320::Math::cVector(tempNormal.x, tempNormal.y, tempNormal.z);
+				//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(AToBVelocity.X(), 0.0f, EPSILON, EPSILON), "vx should not be 0");
+				temp.x = AToBXDirection;
 			}
-			//if collide happens on axises in BToA
-			else if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(BToAOverlapTime, OverlapTime, EPSILON, EPSILON))
+			//if collides happens on Y, set temp.Y
+			if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(AToBYOverlapTime, OverlapTime, EPSILON, EPSILON))
 			{
-				eae6320::Math::cVector temp(0.0f, 0.0f, 0.0f);
-				if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(BToAXOverlapTime, OverlapTime, EPSILON, EPSILON))
-				{
-					//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(BToAVelocity.X(), 0.0f, EPSILON, EPSILON), "vx should not be 0");
-					temp.x = BToAXDirection;
-				}
-				if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(BToAYOverlapTime, OverlapTime, EPSILON, EPSILON))
-				{
-					//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(BToAVelocity.Y(), 0.0f, EPSILON, EPSILON), "vy should not be 0");
-					temp.y = BToAYDirection;
-				}
-				if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(BToAZOverlapTime, OverlapTime, EPSILON, EPSILON))
-				{
-					//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(BToAVelocity.Z(), 0.0f, EPSILON, EPSILON), "vz should not be 0");
-					temp.z = BToAZDirection;
-				}
-				//the vector is in A. Use i_ObjBtoWorld to transform the vector from A to World.
-				eae6320::Math::cVector4 tempNormal = eae6320::Math::cVector4(temp, 0.0f) * i_ObjAtoWorld;
-				o_Normal = eae6320::Math::cVector(tempNormal.x, tempNormal.y, tempNormal.z);
+				//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(AToBVelocity.Y(), 0.0f, EPSILON, EPSILON), "vy should not be 0");
+				temp.y = AToBYDirection;
 			}
-			return true;
+			//if collides happens on Z, set temp.Z
+			if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(AToBZOverlapTime, OverlapTime, EPSILON, EPSILON))
+			{
+				//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(AToBVelocity.Z(), 0.0f, EPSILON, EPSILON), "vz should not be 0");
+				temp.z = AToBZDirection;
+			}
+			//the vector is in B. Use i_ObjBtoWorld to transform the vector from B to World.
+			eae6320::Math::cVector4 tempNormal = eae6320::Math::cVector4(temp, 0.0f) * i_ObjBtoWorld;
+			o_Normal = eae6320::Math::cVector(tempNormal.x, tempNormal.y, tempNormal.z);
 		}
-		else
+		//if collide happens on axises in BToA
+		else if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(BToAOverlapTime, OverlapTime, EPSILON, EPSILON))
 		{
-			return false;
+			eae6320::Math::cVector temp(0.0f, 0.0f, 0.0f);
+			if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(BToAXOverlapTime, OverlapTime, EPSILON, EPSILON))
+			{
+				//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(BToAVelocity.X(), 0.0f, EPSILON, EPSILON), "vx should not be 0");
+				temp.x = BToAXDirection;
+			}
+			if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(BToAYOverlapTime, OverlapTime, EPSILON, EPSILON))
+			{
+				//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(BToAVelocity.Y(), 0.0f, EPSILON, EPSILON), "vy should not be 0");
+				temp.y = BToAYDirection;
+			}
+			if (eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(BToAZOverlapTime, OverlapTime, EPSILON, EPSILON))
+			{
+				//MessagedAssert(!FloatPointUtils::AlmostEqualRelativeAndAbs(BToAVelocity.Z(), 0.0f, EPSILON, EPSILON), "vz should not be 0");
+				temp.z = BToAZDirection;
+			}
+			//the vector is in A. Use i_ObjBtoWorld to transform the vector from A to World.
+			eae6320::Math::cVector4 tempNormal = eae6320::Math::cVector4(temp, 0.0f) * i_ObjAtoWorld;
+			o_Normal = eae6320::Math::cVector(tempNormal.x, tempNormal.y, tempNormal.z);
 		}
+		return true;
 	}
 	else
 	{

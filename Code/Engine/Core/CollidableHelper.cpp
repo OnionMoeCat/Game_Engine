@@ -4,3 +4,8 @@ void eae6320::Core::CollidableHelper::SetMass(Collidable& i_collidable, const fl
 {
 	i_collidable.m_mass = i_mass;
 }
+
+void eae6320::Core::CollidableHelper::SetColliding(Collidable& i_collidable, const EntityHandle& i_colliding)
+{
+	i_collidable.m_colliding = i_colliding;
+}
