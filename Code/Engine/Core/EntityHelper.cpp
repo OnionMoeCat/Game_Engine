@@ -74,7 +74,7 @@ bool eae6320::Core::EntityHelper::CleanUp(Entity& i_entity)
 	}
 	return !wereThereErrors;
 }
-bool eae6320::Core::EntityHelper::ToCameraScreen(Entity& i_entity, const Camera& i_camera)
+bool eae6320::Core::EntityHelper::ToCameraScreen(Entity& i_entity, const ICamera& i_camera)
 {
 	if (i_entity.m_renderable == NULL)
 	{
@@ -95,7 +95,8 @@ bool eae6320::Core::EntityHelper::ToCameraScreen(Entity& i_entity, const Camera&
 		return false;
 	}
 	eae6320::Graphics::EffectHelper::CreateWorldToViewTransform(*i_entity.m_renderable->m_material->m_effect, i_camera.m_rotation, i_camera.m_position);
-	eae6320::Graphics::EffectHelper::CreateViewToScreenTransform(*i_entity.m_renderable->m_material->m_effect, i_camera.m_fov, i_camera.m_aspect, i_camera.m_nearZ, i_camera.m_farZ);
+	eae6320::Math::cMatrix_transformation viewToScreenTransform = i_camera.GetViewToScreenTransformMatrix();
+	eae6320::Graphics::EffectHelper::SetViewToScreenTransform(*i_entity.m_renderable->m_material->m_effect, viewToScreenTransform);
 	return true;
 }
 bool eae6320::Core::EntityHelper::Submit(Entity& i_entity)

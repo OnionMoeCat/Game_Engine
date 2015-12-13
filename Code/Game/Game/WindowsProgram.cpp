@@ -21,8 +21,8 @@
 #include "../../Engine/Math/cVector.h"
 #include "../../Engine/UserInput/UserInput.h"
 #include "../../Engine/Time/Time.h"
-#include "../../Engine/Core/Camera.h"
-#include "../../Engine/Core/CameraHelper.h"
+#include "../../Engine/Core/ICamera.h"
+#include "../../Engine/Core/CameraPerspective.h"
 #include "../../Engine/Core/Entity.h"
 #include "../../Engine/Core/EntityHelper.h"
 #include "../../Engine/Core/EntityManager.h"
@@ -72,8 +72,7 @@ namespace
 
 	eae6320::Core::EntityHandle s_entity_plane_transparent;
 
-	eae6320::Core::Camera s_camera;
-
+	eae6320::Core::CameraPerspective* s_camera = NULL;
 
 	struct CollisionHandler : eae6320::Core::IMessageHandler
 	{
@@ -613,7 +612,7 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 					eae6320::Core::EntityHandle entityHandle = eae6320::Core::EntityManager::Get().GetHandleAtIndex(i);
 					if (entityHandle != eae6320::Core::EntityHandle::Null)
 					{
-						eae6320::Core::EntityHelper::ToCameraScreen(*entityHandle.ToEntity(), s_camera);
+						eae6320::Core::EntityHelper::ToCameraScreen(*entityHandle.ToEntity(), *s_camera);
 					}
 				}
 			}
@@ -693,7 +692,7 @@ namespace
 		// that encapsulates a mesh, an effect, and a position offset.
 		// You don't have to do it this way for your assignment!
 		// You just need a way to update the position offset associated with the colorful rectangle.
-		eae6320::Core::CameraHelper::OffsetPosition(s_camera, offset);
+		s_camera->OffsetPosition(offset);
 	}
 
 	bool Initialize()
@@ -1077,7 +1076,12 @@ namespace
 			const float aspect = static_cast<float>(desiredWidth) / static_cast<float>(desiredHeight);
 			const float nearZ = 0.1f;
 			const float farZ = 100.0f;
-			eae6320::Core::CameraHelper::Initialize(s_camera, identityRotation, position, fov, aspect, nearZ, farZ);
+			s_camera = new eae6320::Core::CameraPerspective(position, identityRotation, fov, aspect, nearZ, farZ);
+			if (s_camera == NULL)
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
 		}
 
 	OnExit:
@@ -1095,6 +1099,11 @@ namespace
 		{
 			eae6320::Core::MessageHandlerManager::Get().CleanUp();
 			eae6320::Core::EntityManager::Get().CleanUp();
+			if (s_camera != NULL)
+			{
+				delete s_camera;
+			}
+			s_camera = NULL;
 		}
 		return !wereThereErrors;
 	}

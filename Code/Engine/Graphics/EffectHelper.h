@@ -39,7 +39,8 @@ namespace eae6320
 			bool static Bind(Effect& i_effect, const Context& i_context);
 			void static CreateLocalToWorldTransform(Effect& i_effect, const eae6320::Math::cQuaternion& i_rotation, const eae6320::Math::cVector& i_position);
 			void static CreateWorldToViewTransform(Effect& i_effect, const eae6320::Math::cQuaternion& i_cameraQuaternion, const eae6320::Math::cVector& i_cameraPosition);
-			void static CreateViewToScreenTransform(Effect& i_effect, const float i_fov, const float i_aspect, const float i_nearZ, const float i_farZ);
+			void static CreateViewToScreenTransformPerspective(Effect& i_effect, const float i_fov, const float i_aspect, const float i_nearZ, const float i_farZ);
+			void static SetViewToScreenTransform(Effect& i_effect, const eae6320::Math::cMatrix_transformation& i_viewToScreenTransform);
 			bool static GetUniformHandler(const Effect& i_effect, const char* i_name, ShaderTypes::eShaderType i_shaderType, tUniformHandle* i_uniformHandle);
 			bool static SetUniform(Effect& i_effect, const float* i_values, const size_t i_valueLength, const tUniformHandle i_uniformHandle, ShaderTypes::eShaderType i_shaderType, const Context& i_context);
 		};

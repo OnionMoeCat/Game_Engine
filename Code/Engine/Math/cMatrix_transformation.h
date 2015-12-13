@@ -50,9 +50,12 @@ namespace eae6320
 
 			static cMatrix_transformation CreateWorldToViewTransform(
 				const cQuaternion& i_cameraOrientation, const cVector& i_cameraPosition );
-			static cMatrix_transformation CreateViewToScreenTransform(
+			static cMatrix_transformation CreateViewToScreenTransformPerspective(
 				const float i_fieldOfView_y, const float i_aspectRatio,
 				const float i_z_nearPlane, const float i_z_farPlane );
+			static cMatrix_transformation CreateViewToScreenTransformOrthographic(
+				const float i_x_halfLength, const float i_y_halfLength,
+				const float i_z_nearPlane, const float i_z_farPlane);
 		    static cMatrix_transformation Invert(const cMatrix_transformation& i_matrix);
 
 			// Initialization / Shut Down

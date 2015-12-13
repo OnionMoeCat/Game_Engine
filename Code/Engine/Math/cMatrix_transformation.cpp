@@ -28,7 +28,7 @@ eae6320::Math::cMatrix_transformation eae6320::Math::cMatrix_transformation::Cre
 		0.0f, 0.0f, 0.0f, 1.0f );
 }
 
-eae6320::Math::cMatrix_transformation eae6320::Math::cMatrix_transformation::CreateViewToScreenTransform(
+eae6320::Math::cMatrix_transformation eae6320::Math::cMatrix_transformation::CreateViewToScreenTransformPerspective(
 	const float i_fieldOfView_y, const float i_aspectRatio,
 	const float i_z_nearPlane, const float i_z_farPlane )
 {
@@ -48,6 +48,27 @@ eae6320::Math::cMatrix_transformation eae6320::Math::cMatrix_transformation::Cre
 		0.0f, yScale, 0.0f, 0.0f,
 		0.0f, 0.0f, ( i_z_nearPlane + i_z_farPlane ) * zDistanceScale, ( 2.0f * i_z_nearPlane * i_z_farPlane ) * zDistanceScale,
 		0.0f, 0.0f, -1.0f, 0.0f );
+#endif
+}
+
+eae6320::Math::cMatrix_transformation eae6320::Math::cMatrix_transformation::CreateViewToScreenTransformOrthographic(
+	const float i_x_halfLength, const float i_y_halfLength,
+	const float i_z_nearPlane, const float i_z_farPlane)
+{
+	const float yScale = 1.0f / i_y_halfLength;
+	const float xScale = 1.0f / i_x_halfLength;
+#if defined( EAE6320_PLATFORM_D3D )
+	return cMatrix_transformation(
+		xScale, 0.0f, 0.0f, 0.0f,
+		0.0f, yScale, 0.0f, 0.0f,
+		0.0f, 0.0f, -1.0f / (i_z_farPlane - i_z_nearPlane), - i_z_nearPlane / (i_z_farPlane - i_z_nearPlane),
+		0.0f, 0.0f, -1.0f, 0.0f);
+#elif defined( EAE6320_PLATFORM_GL )
+	return cMatrix_transformation(
+		xScale, 0.0f, 0.0f, 0.0f,
+		0.0f, yScale, 0.0f, 0.0f,
+		0.0f, 0.0f, -2.0f / (i_z_farPlane - i_z_nearPlane), - (i_z_farPlane + i_z_nearPlane) / (i_z_farPlane - i_z_nearPlane),
+		0.0f, 0.0f, 0.0f, 1.0f);
 #endif
 }
 

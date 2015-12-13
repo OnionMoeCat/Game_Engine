@@ -20,12 +20,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="CameraHelper.h" />
+    <ClInclude Include="CameraOrthographic.h" />
+    <ClInclude Include="CameraPerspective.h" />
     <ClInclude Include="Collidable.h" />
     <ClInclude Include="CollidableHelper.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Event.h" />
+    <ClInclude Include="ICamera.h" />
     <ClInclude Include="IController.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityHandle.h" />
@@ -43,12 +44,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AI.cpp" />
-    <ClCompile Include="CameraHelper.cpp" />
+    <ClCompile Include="CameraOrthographic.cpp" />
+    <ClCompile Include="CameraPerspective.cpp" />
     <ClCompile Include="CollidableHelper.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="EntityHandle.cpp" />
     <ClCompile Include="EntityHelper.cpp" />
     <ClCompile Include="EntityManager.cpp" />
+    <ClCompile Include="ICamera.cpp" />
     <ClCompile Include="Intersection.cpp" />
     <ClCompile Include="IMessageHandler.cpp" />
     <ClCompile Include="MessageHandlerHandle.cpp" />

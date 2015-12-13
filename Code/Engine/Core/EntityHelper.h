@@ -5,7 +5,7 @@
 //=============
 
 #include "Entity.h"
-#include "Camera.h"
+#include "ICamera.h"
 
 namespace eae6320
 {
@@ -20,7 +20,7 @@ namespace eae6320
 			bool static SetName(Entity& i_entity, const char* const i_name);
 			bool static SetAlive(Entity& i_entity, const bool i_alive);
 			bool static CleanUp(Entity& i_entity);
-			bool static ToCameraScreen(Entity& i_entity, const Camera& i_camera);
+			bool static ToCameraScreen(Entity& i_entity, const ICamera& i_camera);
 			bool static Submit(Entity& i_entity);
 		};
 	}
