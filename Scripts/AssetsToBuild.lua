@@ -4,6 +4,10 @@ return
 		builder = "MeshBuilder.exe",
 		assets = {
 			{
+				source = "icecube.meshraw",
+				target = "icecube.mesh",
+			},
+			{
 				source = "plane.meshraw",
 				target = "plane.mesh",
 			},
