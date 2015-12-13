@@ -19,10 +19,11 @@
 // UserOutput.h is UserOutput system
 #include "../../Engine/UserOutput/UserOutput.h"
 #include "../../Engine/Math/cVector.h"
+#include "../../Engine/Math/Functions.h"
 #include "../../Engine/UserInput/UserInput.h"
 #include "../../Engine/Time/Time.h"
 #include "../../Engine/Core/ICamera.h"
-#include "../../Engine/Core/CameraPerspective.h"
+#include "../../Engine/Core/CameraOrthographic.h"
 #include "../../Engine/Core/Entity.h"
 #include "../../Engine/Core/EntityHelper.h"
 #include "../../Engine/Core/EntityManager.h"
@@ -72,7 +73,7 @@ namespace
 
 	eae6320::Core::EntityHandle s_entity_plane_transparent;
 
-	eae6320::Core::CameraPerspective* s_camera = NULL;
+	eae6320::Core::CameraOrthographic* s_camera = NULL;
 
 	struct CollisionHandler : eae6320::Core::IMessageHandler
 	{
@@ -1068,7 +1069,7 @@ namespace
 		}
 
 		{
-			const int desiredWidth = 800;
+			/*const int desiredWidth = 800;
 			const int desiredHeight = 600;
 			const eae6320::Math::cQuaternion identityRotation;
 			const eae6320::Math::cVector position(0.0f, 5.0f, 10.0f);
@@ -1077,6 +1078,18 @@ namespace
 			const float nearZ = 0.1f;
 			const float farZ = 100.0f;
 			s_camera = new eae6320::Core::CameraPerspective(position, identityRotation, fov, aspect, nearZ, farZ);
+			if (s_camera == NULL)
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}*/
+			const float desiredHalfXLen = 8;
+			const float desiredHalfYLen = 6;
+			const eae6320::Math::cQuaternion isometricRotation(eae6320::Math::ConvertDegreesToRadians(30.0f), eae6320::Math::ConvertDegreesToRadians(-45.0f), eae6320::Math::ConvertDegreesToRadians(0.0f));
+			const eae6320::Math::cVector position(5.0f, 3.0f, 5.0f);
+			const float nearZ = 0.1f;
+			const float farZ = 100.0f;
+			s_camera = new eae6320::Core::CameraOrthographic(position, isometricRotation, desiredHalfXLen, desiredHalfYLen, nearZ, farZ);
 			if (s_camera == NULL)
 			{
 				wereThereErrors = true;

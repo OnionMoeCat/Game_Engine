@@ -62,7 +62,7 @@ eae6320::Math::cMatrix_transformation eae6320::Math::cMatrix_transformation::Cre
 		xScale, 0.0f, 0.0f, 0.0f,
 		0.0f, yScale, 0.0f, 0.0f,
 		0.0f, 0.0f, -1.0f / (i_z_farPlane - i_z_nearPlane), - i_z_nearPlane / (i_z_farPlane - i_z_nearPlane),
-		0.0f, 0.0f, -1.0f, 0.0f);
+		0.0f, 0.0f, 0.0f, 1.0f);
 #elif defined( EAE6320_PLATFORM_GL )
 	return cMatrix_transformation(
 		xScale, 0.0f, 0.0f, 0.0f,

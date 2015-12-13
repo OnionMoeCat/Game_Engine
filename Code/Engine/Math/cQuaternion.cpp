@@ -97,3 +97,21 @@ eae6320::Math::cQuaternion::cQuaternion( const float i_w, const float i_x, const
 {
 
 }
+
+eae6320::Math::cQuaternion::cQuaternion(const float i_xInRadians, const float i_yInRadians, const float i_zInRadians)
+{
+	const float x_half = i_xInRadians / 2;
+	const float y_half = i_yInRadians / 2;
+	const float z_half = i_zInRadians / 2;
+	const float cosX = std::cos(x_half);
+	const float sinX = std::sin(x_half);
+	const float cosY = std::cos(y_half);
+	const float sinY = std::sin(y_half);
+	const float cosZ = std::cos(z_half);
+	const float sinZ = std::sin(z_half);
+
+	m_w = cosX * cosY * cosZ + sinX * sinY * sinZ;
+	m_x = sinX * cosY * cosZ - cosX * sinY * sinZ;
+	m_y = cosX * sinY * cosZ + sinX * cosY * sinZ;
+	m_z = cosX * cosY * sinZ - sinX * sinY * cosZ;
+}
