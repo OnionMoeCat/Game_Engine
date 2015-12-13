@@ -111,6 +111,7 @@ namespace
 	void UpdateCamera(float dt);
 	bool Initialize();
 	bool CleanUp();
+	bool SpawnWall(const int width, const int height, const eae6320::Math::cVector& i_start, const float i_intervalX, const float i_intervalY);
 }
 
 // Main Function
@@ -799,290 +800,14 @@ namespace
 		}
 
 		{
-			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/red.material", "data/ball.mesh", s_entity_ball_red_iterator))
+			if (!SpawnWall(7, 5, eae6320::Math::cVector(-3.7f, 0.6f, -4.0f), 1.2f, 1.2f))
 			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (s_entity_ball_red_iterator == eae6320::Core::EntityHandle::Null)
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			eae6320::Math::cVector ball_position(-4.0f, 1.2f, 3.0f);
-			eae6320::Math::cQuaternion ball_rotation;
-			eae6320::Math::cVector ball_AABB(1.0f, 1.0f, 1.0f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_red_iterator.ToEntity(), ball_position, ball_rotation, ball_AABB))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_ball_red_iterator.ToEntity(), 1.0f))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_red_iterator.ToEntity(), new eae6320::Game::ConstantController(0.0f)))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetName(*s_entity_ball_red_iterator.ToEntity(), "Monster"))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_ball_red_iterator.ToEntity(), true))
-			{
-				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
 		}
 
 		{
-			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/green.material", "data/ball.mesh", s_entity_ball_green_iterator))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (s_entity_ball_green_iterator == eae6320::Core::EntityHandle::Null)
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			eae6320::Math::cVector ball_position(-1.5f, 1.2f, 3.0f);
-			eae6320::Math::cQuaternion ball_rotation;
-			eae6320::Math::cVector ball_AABB(1.0f, 1.0f, 1.0f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_green_iterator.ToEntity(), ball_position, ball_rotation, ball_AABB))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_ball_green_iterator.ToEntity(), 1.0f))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_green_iterator.ToEntity(), new eae6320::Game::ConstantController(0.0f)))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetName(*s_entity_ball_green_iterator.ToEntity(), "Monster"))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_ball_green_iterator.ToEntity(), true))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-		}
-
-		{
-			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/eae6320.material", "data/plane.mesh", s_entity_plane_opaque))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (s_entity_plane_opaque == eae6320::Core::EntityHandle::Null)
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			eae6320::Math::cVector plane_position(0.0f, 2.0f, -3.0f);
-			eae6320::Math::cQuaternion plane_rotation;
-			eae6320::Math::cVector plane_AABB(1.0f, 1.0f, 0.0001f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_plane_opaque.ToEntity(), plane_position, plane_rotation, plane_AABB))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_plane_opaque.ToEntity(), new eae6320::Game::ConstantController(0.0f)))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetName(*s_entity_plane_opaque.ToEntity(), "Plane"))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_plane_opaque.ToEntity(), true))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-		}
-
-		{
-			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/transparent_03.material", "data/ball.mesh", s_entity_ball_transparent_03))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (s_entity_ball_transparent_03 == eae6320::Core::EntityHandle::Null)
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			eae6320::Math::cVector ball_position(1.5f, 1.2f, 3.0f);
-			eae6320::Math::cQuaternion ball_rotation;
-			eae6320::Math::cVector ball_AABB(1.0f, 1.0f, 1.0f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_transparent_03.ToEntity(), ball_position, ball_rotation, ball_AABB))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_ball_transparent_03.ToEntity(), 1.0f))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_transparent_03.ToEntity(), new eae6320::Game::ConstantController(0.0f)))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}	
-			if (!eae6320::Core::EntityHelper::SetName(*s_entity_ball_transparent_03.ToEntity(), "Monster"))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_ball_transparent_03.ToEntity(), true))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-		}
-
-		{
-			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/transparent_08.material", "data/ball.mesh", s_entity_ball_transparent_08))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (s_entity_ball_transparent_08 == eae6320::Core::EntityHandle::Null)
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			eae6320::Math::cVector ball_position(4.0f, 1.2f, 3.0f);
-			eae6320::Math::cQuaternion ball_rotation;
-			eae6320::Math::cVector ball_AABB(1.0f, 1.0f, 1.0f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_transparent_08.ToEntity(), ball_position, ball_rotation, ball_AABB))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_ball_transparent_08.ToEntity(), 1.0f))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_transparent_08.ToEntity(), new eae6320::Game::ConstantController(0.0f)))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetName(*s_entity_ball_transparent_08.ToEntity(), "Monster"))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_ball_transparent_08.ToEntity(), true))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-		}
-
-		{
-			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/alpha.material", "data/plane.mesh", s_entity_plane_transparent))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (s_entity_plane_transparent == eae6320::Core::EntityHandle::Null)
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			eae6320::Math::cVector plane_position(0.0f, 1.2f, 5.0f);
-			eae6320::Math::cQuaternion plane_rotation;
-			eae6320::Math::cVector plane_AABB(1.0f, 1.0f, 0.0001f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_plane_transparent.ToEntity(), plane_position, plane_rotation, plane_AABB))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_plane_transparent.ToEntity(), new eae6320::Game::ConstantController(0.0f)))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetName(*s_entity_plane_transparent.ToEntity(), "Plane"))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_plane_transparent.ToEntity(), true))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-		}
-
-		{
-			/*const int desiredWidth = 800;
-			const int desiredHeight = 600;
-			const eae6320::Math::cQuaternion identityRotation;
-			const eae6320::Math::cVector position(0.0f, 5.0f, 10.0f);
-			const float fov = 60.0f;
-			const float aspect = static_cast<float>(desiredWidth) / static_cast<float>(desiredHeight);
-			const float nearZ = 0.1f;
-			const float farZ = 100.0f;
-			s_camera = new eae6320::Core::CameraPerspective(position, identityRotation, fov, aspect, nearZ, farZ);
-			if (s_camera == NULL)
-			{
-				wereThereErrors = true;
-				goto OnExit;
-			}*/
 			const float desiredHalfXLen = 8;
 			const float desiredHalfYLen = 6;
 			const eae6320::Math::cQuaternion isometricRotation(eae6320::Math::ConvertDegreesToRadians(30.0f), eae6320::Math::ConvertDegreesToRadians(-45.0f), eae6320::Math::ConvertDegreesToRadians(0.0f));
@@ -1117,6 +842,71 @@ namespace
 				delete s_camera;
 			}
 			s_camera = NULL;
+		}
+		return !wereThereErrors;
+	}
+
+	bool SpawnWall(const int width, const int height, const eae6320::Math::cVector& i_start, const float i_intervalX, const float i_intervalY)
+	{
+		bool wereThereErrors = false;
+
+		for (int i = 0; i < width; i++)
+		{
+			for (int j = 0; j < height; j++)
+			{
+				const eae6320::Math::cVector position = i_start + eae6320::Math::cVector(i_intervalX * i, i_intervalY * j);
+				eae6320::Core::EntityHandle icecube;
+				if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/icecube.mesh", icecube))
+				{
+					//TODO: find a way to show error message
+					wereThereErrors = true;
+					goto OnExit;
+				}
+				if (icecube == eae6320::Core::EntityHandle::Null)
+				{
+					wereThereErrors = true;
+					goto OnExit;
+				}
+				eae6320::Math::cQuaternion plane_rotation;
+				eae6320::Math::cVector plane_AABB(0.5f, 0.5f, 0.5f);
+				if (!eae6320::Core::EntityHelper::SetTransform(*icecube.ToEntity(), position, plane_rotation, plane_AABB))
+				{
+					//TODO: find a way to show error message
+					wereThereErrors = true;
+					goto OnExit;
+				}
+				if (!eae6320::Core::EntityHelper::SetCollidable(*icecube.ToEntity(), 1.0f))
+				{
+					//TODO: find a way to show error message
+					wereThereErrors = true;
+					goto OnExit;
+				}
+				if (!eae6320::Core::EntityHelper::SetController(*icecube.ToEntity(), new eae6320::Game::ConstantController(eae6320::Math::cVector(0.0f, 0.0f, 1.0f))))
+				{
+					//TODO: find a way to show error message
+					wereThereErrors = true;
+					goto OnExit;
+				}
+				if (!eae6320::Core::EntityHelper::SetName(*icecube.ToEntity(), "Monster"))
+				{
+					//TODO: find a way to show error message
+					wereThereErrors = true;
+					goto OnExit;
+				}
+				if (!eae6320::Core::EntityHelper::SetAlive(*icecube.ToEntity(), true))
+				{
+					//TODO: find a way to show error message
+					wereThereErrors = true;
+					goto OnExit;
+				}
+			}
+		}
+
+	OnExit:
+
+		if (wereThereErrors)
+		{
+			CleanUp();
 		}
 		return !wereThereErrors;
 	}
