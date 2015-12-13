@@ -28,8 +28,11 @@ void eae6320::Core::EntityManager::CleanUp()
 {
 	for (size_t i = 0; i < m_list.size(); i++)
 	{
-		EntityHelper::CleanUp(*m_list[i]);
-		delete m_list[i];
+		if (m_list[i] != NULL)
+		{
+			EntityHelper::CleanUp(*m_list[i]);
+			delete m_list[i];
+		}
 	}
 	m_list.clear();
 }

@@ -75,6 +75,8 @@ bool eae6320::Graphics::Core::ShutDown()
 		if (s_direct3dDevice)
 		{
 			RenderableManager::Get().CleanUp();	
+		
+			s_direct3dDevice->SetVertexDeclaration(NULL);
 
 			s_direct3dDevice->Release();
 			s_direct3dDevice = NULL;

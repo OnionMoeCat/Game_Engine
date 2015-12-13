@@ -8,7 +8,7 @@ eae6320::Game::InputController::InputController(const float i_velocityMag) : m_v
 
 void eae6320::Game::InputController::UpdateEntity(eae6320::Core::Entity& i_entity, float dt)
 {
-	eae6320::Math::cVector velocity(0.0f, 0.0f);
+	eae6320::Math::cVector velocity(0.0f, 0.0f, 0.0f);
 	{
 		// Get the direction
 		{
@@ -27,6 +27,14 @@ void eae6320::Game::InputController::UpdateEntity(eae6320::Core::Entity& i_entit
 			if (eae6320::UserInput::IsKeyPressed(VK_DOWN))
 			{
 				velocity.y -= 1.0f;
+			}
+			if (eae6320::UserInput::IsKeyPressed(VK_HOME))
+			{
+				velocity.z += 1.0f;
+			}
+			if (eae6320::UserInput::IsKeyPressed(VK_END))
+			{
+				velocity.z -= 1.0f;
 			}
 		}	
 		velocity *= m_velocityMag;

@@ -89,11 +89,11 @@ namespace
 
 				if (A != eae6320::Core::EntityHandle::Null && B != eae6320::Core::EntityHandle::Null)
 				{
-					if (A.ToEntity()->m_name == "" && B.ToEntity()->m_name == "")
+					if (strcmp(A.ToEntity()->m_name, "Monster") == 0 && strcmp(B.ToEntity()->m_name, "Player") == 0)
 					{
 						eae6320::Core::EntityHelper::SetAlive(*A.ToEntity(), false);
 					}
-					if (A.ToEntity()->m_name == "" && B.ToEntity()->m_name == "")
+					if (strcmp(A.ToEntity()->m_name, "Player") == 0 && strcmp(B.ToEntity()->m_name, "Monster") == 0)
 					{
 						eae6320::Core::EntityHelper::SetAlive(*B.ToEntity(), false);
 					}
@@ -726,13 +726,13 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_ball_moving_iterator.ToEntity(), FLT_MAX))
+			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_floor.ToEntity(), FLT_MAX))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_floor.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_floor.ToEntity(), new eae6320::Game::ConstantController(0.0f)))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -825,7 +825,7 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_red_iterator.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_red_iterator.ToEntity(), new eae6320::Game::ConstantController(0.0f)))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -872,7 +872,7 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_green_iterator.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_green_iterator.ToEntity(), new eae6320::Game::ConstantController(0.0f)))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -913,7 +913,7 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_plane_opaque.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_plane_opaque.ToEntity(), new eae6320::Game::ConstantController(0.0f)))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -960,7 +960,7 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_transparent_03.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_transparent_03.ToEntity(), new eae6320::Game::ConstantController(0.0f)))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -1007,7 +1007,7 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_transparent_08.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_transparent_08.ToEntity(), new eae6320::Game::ConstantController(0.0f)))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -1048,7 +1048,7 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_plane_transparent.ToEntity(), new eae6320::Game::ConstantController(1.0f)))
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_plane_transparent.ToEntity(), new eae6320::Game::ConstantController(0.0f)))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -1072,7 +1072,7 @@ namespace
 			const int desiredWidth = 800;
 			const int desiredHeight = 600;
 			const eae6320::Math::cQuaternion identityRotation;
-			const eae6320::Math::cVector position(0.0f, 0.0f, 10.0f);
+			const eae6320::Math::cVector position(0.0f, 5.0f, 10.0f);
 			const float fov = 60.0f;
 			const float aspect = static_cast<float>(desiredWidth) / static_cast<float>(desiredHeight);
 			const float nearZ = 0.1f;

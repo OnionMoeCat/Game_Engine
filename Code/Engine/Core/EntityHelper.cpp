@@ -52,15 +52,25 @@ bool eae6320::Core::EntityHelper::CleanUp(Entity& i_entity)
 		delete i_entity.m_renderable;
 		i_entity.m_renderable = NULL;
 	}
-	if (i_entity.m_renderable)
+	if (i_entity.m_transform)
 	{
-		delete i_entity.m_renderable;
-		i_entity.m_renderable = NULL;
+		delete i_entity.m_transform;
+		i_entity.m_transform = NULL;
 	}
 	if (i_entity.m_iController)
 	{
 		delete i_entity.m_iController;
 		i_entity.m_iController = NULL;
+	}
+	if (i_entity.m_collidable)
+	{
+		delete i_entity.m_collidable;
+		i_entity.m_collidable = NULL;
+	}
+	if (i_entity.m_name)
+	{
+		free(i_entity.m_name);
+		i_entity.m_name = NULL;
 	}
 	return !wereThereErrors;
 }

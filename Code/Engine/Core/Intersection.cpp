@@ -382,8 +382,12 @@ bool eae6320::Core::Intersection::CheckOOBBIntersection(const eae6320::Math::cVe
 				eae6320::Math::cVector4 tempNormal = eae6320::Math::cVector4(temp, 0.0f) * i_ObjAtoWorld;
 				o_Normal = eae6320::Math::cVector(tempNormal.x, tempNormal.y, tempNormal.z);
 			}
+			return true;
 		}
-		return true;
+		else
+		{
+			return false;
+		}
 	}
 	else
 	{

@@ -27,7 +27,6 @@ void eae6320::Core::MessageHandlerManager::CleanUp()
 {
 	for (size_t i = 0; i < m_list.size(); i++)
 	{
-		//TODO: cleanup
 		delete m_list[i];
 	}
 	m_list.clear();

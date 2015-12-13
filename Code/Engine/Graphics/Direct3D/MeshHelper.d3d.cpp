@@ -292,7 +292,6 @@ bool eae6320::Graphics::MeshHelper::CleanUp(Mesh& i_mesh, const Context& i_conte
 	}
 	if (i_mesh.m_vertexDeclaration)
 	{
-		i_context.device->SetVertexDeclaration(NULL);
 		i_mesh.m_vertexDeclaration->Release();
 		i_mesh.m_vertexDeclaration = NULL;
 	}
