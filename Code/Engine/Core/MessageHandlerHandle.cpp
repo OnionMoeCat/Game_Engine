@@ -27,12 +27,12 @@ eae6320::Core::IMessageHandler* eae6320::Core::MessageHandlerHandle::ToMessageHa
 	return NULL;
 }
 
-bool eae6320::Core::MessageHandlerHandle::operator==(const MessageHandlerHandle& rhs)
+bool eae6320::Core::MessageHandlerHandle::operator==(const MessageHandlerHandle& rhs) const
 {
 	return (this->m_uniqueId == rhs.m_uniqueId && this->m_handleIndex == rhs.m_handleIndex);
 }
 
-bool eae6320::Core::MessageHandlerHandle::operator!=(const MessageHandlerHandle& rhs)
+bool eae6320::Core::MessageHandlerHandle::operator!=(const MessageHandlerHandle& rhs) const
 {
 	return !(*this == rhs);
 }

@@ -21,8 +21,8 @@ namespace eae6320
 			MessageHandlerHandle();
 			// This function dereferences the handle.
 			IMessageHandler* ToMessageHandler() const;
-			bool operator==(const MessageHandlerHandle& rhs);
-			bool operator!=(const MessageHandlerHandle& rhs);
+			bool operator==(const MessageHandlerHandle& rhs) const;
+			bool operator!=(const MessageHandlerHandle& rhs) const;
 		};
 	}
 }

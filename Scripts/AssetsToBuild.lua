@@ -19,6 +19,10 @@ return
 				source = "ball.meshraw",
 				target = "ball.mesh",
 			},
+			{
+				source = "bullet.meshraw",
+				target = "bullet.mesh",
+			},
 		},
 	},
 	{

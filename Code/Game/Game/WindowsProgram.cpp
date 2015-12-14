@@ -38,6 +38,9 @@
 #include "Controllers/InputController.h"
 #include "Controllers/ConstantController.h"
 
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>  
+
 // Static Data Initialization
 //===========================
 
@@ -60,20 +63,17 @@ namespace
 	// as one of your classmate's
 	const char* s_mainWindowClass_name = "Yuchen Zhang's Main Window Class";
 
-	eae6320::Core::EntityHandle s_entity_ball_moving_iterator;
-	eae6320::Core::EntityHandle s_entity_ball_red_iterator;
-	eae6320::Core::EntityHandle s_entity_ball_green_iterator;
-
-	eae6320::Core::EntityHandle s_entity_ball_transparent_03;
-	eae6320::Core::EntityHandle s_entity_ball_transparent_08;
+	eae6320::Core::EntityHandle s_entity_player;
 
 	eae6320::Core::EntityHandle s_entity_floor;
 
-	eae6320::Core::EntityHandle s_entity_plane_opaque;
-
-	eae6320::Core::EntityHandle s_entity_plane_transparent;
-
 	eae6320::Core::CameraOrthographic* s_camera = NULL;
+
+	float s_spawn_wall_time = 0.0f;
+	float s_spawn_bullet_time = 0.0f;
+
+	float s_wall_displacement_x = 1.2f;
+	float s_wall_displacement_y = 1.2f;
 
 	struct CollisionHandler : eae6320::Core::IMessageHandler
 	{
@@ -91,11 +91,11 @@ namespace
 				{
 					if (strcmp(A.ToEntity()->m_name, "Monster") == 0 && strcmp(B.ToEntity()->m_name, "Player") == 0)
 					{
-						eae6320::Core::EntityHelper::SetAlive(*A.ToEntity(), false);
+						eae6320::Core::EntityHelper::SetAlive(*B.ToEntity(), false);
 					}
 					if (strcmp(A.ToEntity()->m_name, "Player") == 0 && strcmp(B.ToEntity()->m_name, "Monster") == 0)
 					{
-						eae6320::Core::EntityHelper::SetAlive(*B.ToEntity(), false);
+						eae6320::Core::EntityHelper::SetAlive(*A.ToEntity(), false);
 					}
 				}
 			}
@@ -112,6 +112,7 @@ namespace
 	bool Initialize();
 	bool CleanUp();
 	bool SpawnWall(const int width, const int height, const eae6320::Math::cVector& i_start, const float i_intervalX, const float i_intervalY);
+	bool SpawnBullet(const eae6320::Core::EntityHandle& i_player, const eae6320::Math::cVector& i_displacement);
 }
 
 // Main Function
@@ -601,11 +602,42 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			{
 				float dt = eae6320::Time::GetSecondsElapsedThisFrame();
 
+				s_spawn_wall_time += dt;
+				s_spawn_bullet_time += dt;
+
+				float wall_interval = 10.0f;
+				float bullet_interval = 2.0f;
+
+				if (s_spawn_wall_time > wall_interval)
+				{
+					s_spawn_wall_time -= wall_interval;
+					SpawnWall(7, 5, eae6320::Math::cVector(-3.7f, 0.6f, -10.0f), 1.2f, 1.2f);
+				}
+
+				if (s_spawn_bullet_time > bullet_interval)
+				{
+					s_spawn_bullet_time -= bullet_interval;
+					
+					SpawnBullet(s_entity_player, eae6320::Math::cVector(0.0f, 0.0f, -1.5f));
+				}
+
 				eae6320::Core::AI::Update(dt);
 
 				eae6320::Core::Physics::Update(dt);
 
 				UpdateCamera(dt);
+
+				for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)
+				{
+					eae6320::Core::EntityHandle entityHandle = eae6320::Core::EntityManager::Get().GetHandleAtIndex(i);
+					if (entityHandle != eae6320::Core::EntityHandle::Null)
+					{
+						if (entityHandle.ToEntity()->m_transform->m_position.z > 4.1f)
+						{
+							eae6320::Core::EntityHelper::SetAlive(*entityHandle.ToEntity(), false);
+						}
+					}
+				}
 			}
 
 			{
@@ -618,6 +650,7 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 					}
 				}
 			}
+
 
 			//TODO: find a good way to show error message here
 			{
@@ -699,6 +732,8 @@ namespace
 
 	bool Initialize()
 	{
+		srand(static_cast<unsigned int>(time(NULL)));
+
 		bool wereThereErrors = false;
 
 		{
@@ -718,9 +753,9 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector floor_position(0.0f, -1.0f, 0.0f);
+			eae6320::Math::cVector floor_position(0.0f, 0.0f, 0.0f);
 			eae6320::Math::cQuaternion floor_rotation;
-			eae6320::Math::cVector floor_AABB(5.0f, 0.00001f, 5.0f);
+			eae6320::Math::cVector floor_AABB(5.0f, 0.00001f, 4.0f);
 			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_floor.ToEntity(), floor_position, floor_rotation, floor_AABB))
 			{
 				//TODO: find a way to show error message
@@ -754,44 +789,44 @@ namespace
 		}
 
 		{
-			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/ball.mesh", s_entity_ball_moving_iterator))
+			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/icecube.mesh", s_entity_player))
 			{
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (s_entity_ball_moving_iterator == eae6320::Core::EntityHandle::Null)
+			if (s_entity_player == eae6320::Core::EntityHandle::Null)
 			{
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector ball_position(0.0f, 1.2f, -1.0f);
+			eae6320::Math::cVector ball_position(-3.7f, 0.6f, 3.0f);
 			eae6320::Math::cQuaternion ball_rotation;
-			eae6320::Math::cVector ball_AABB(1.0f, 1.0f, 1.0f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_ball_moving_iterator.ToEntity(), ball_position, ball_rotation, ball_AABB))
+			eae6320::Math::cVector ball_AABB(0.5f, 0.5f, 0.5f);
+			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_player.ToEntity(), ball_position, ball_rotation, ball_AABB))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_ball_moving_iterator.ToEntity(), 10000.0f))
+			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_player.ToEntity(), 1.0f))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_ball_moving_iterator.ToEntity(), new eae6320::Game::InputController(1.0f)))
+			if (!eae6320::Core::EntityHelper::SetController(*s_entity_player.ToEntity(), new eae6320::Game::InputController(s_wall_displacement_x, eae6320::Math::cVector(-3.8f, -0.1f), eae6320::Math::cVector(3.7f, 5.6f))))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetName(*s_entity_ball_moving_iterator.ToEntity(), "Player"))
+			if (!eae6320::Core::EntityHelper::SetName(*s_entity_player.ToEntity(), "Player"))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_ball_moving_iterator.ToEntity(), true))
+			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_player.ToEntity(), true))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -800,7 +835,7 @@ namespace
 		}
 
 		{
-			if (!SpawnWall(7, 5, eae6320::Math::cVector(-3.7f, 0.6f, -4.0f), 1.2f, 1.2f))
+			if (!SpawnWall(7, 5, eae6320::Math::cVector(-3.7f, 0.6f, -10.0f), s_wall_displacement_x, s_wall_displacement_y))
 			{
 				wereThereErrors = true;
 				goto OnExit;
@@ -808,8 +843,8 @@ namespace
 		}
 
 		{
-			const float desiredHalfXLen = 8;
-			const float desiredHalfYLen = 6;
+			const float desiredHalfXLen = 12;
+			const float desiredHalfYLen = 9;
 			const eae6320::Math::cQuaternion isometricRotation(eae6320::Math::ConvertDegreesToRadians(30.0f), eae6320::Math::ConvertDegreesToRadians(-45.0f), eae6320::Math::ConvertDegreesToRadians(0.0f));
 			const eae6320::Math::cVector position(5.0f, 3.0f, 5.0f);
 			const float nearZ = 0.1f;
@@ -850,55 +885,124 @@ namespace
 	{
 		bool wereThereErrors = false;
 
+		int x = rand() % width;
+		int y = rand() % height;
+
 		for (int i = 0; i < width; i++)
 		{
 			for (int j = 0; j < height; j++)
 			{
-				const eae6320::Math::cVector position = i_start + eae6320::Math::cVector(i_intervalX * i, i_intervalY * j);
-				eae6320::Core::EntityHandle icecube;
-				if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/icecube.mesh", icecube))
+				if (i != x || j != y)
 				{
-					//TODO: find a way to show error message
-					wereThereErrors = true;
-					goto OnExit;
-				}
-				if (icecube == eae6320::Core::EntityHandle::Null)
-				{
-					wereThereErrors = true;
-					goto OnExit;
-				}
-				eae6320::Math::cQuaternion plane_rotation;
-				eae6320::Math::cVector plane_AABB(0.5f, 0.5f, 0.5f);
-				if (!eae6320::Core::EntityHelper::SetTransform(*icecube.ToEntity(), position, plane_rotation, plane_AABB))
-				{
-					//TODO: find a way to show error message
-					wereThereErrors = true;
-					goto OnExit;
-				}
-				if (!eae6320::Core::EntityHelper::SetCollidable(*icecube.ToEntity(), 1.0f))
-				{
-					//TODO: find a way to show error message
-					wereThereErrors = true;
-					goto OnExit;
-				}
-				if (!eae6320::Core::EntityHelper::SetController(*icecube.ToEntity(), new eae6320::Game::ConstantController(eae6320::Math::cVector(0.0f, 0.0f, 1.0f))))
-				{
-					//TODO: find a way to show error message
-					wereThereErrors = true;
-					goto OnExit;
-				}
-				if (!eae6320::Core::EntityHelper::SetName(*icecube.ToEntity(), "Monster"))
-				{
-					//TODO: find a way to show error message
-					wereThereErrors = true;
-					goto OnExit;
-				}
-				if (!eae6320::Core::EntityHelper::SetAlive(*icecube.ToEntity(), true))
-				{
-					//TODO: find a way to show error message
-					wereThereErrors = true;
-					goto OnExit;
-				}
+					const eae6320::Math::cVector position = i_start + eae6320::Math::cVector(i_intervalX * i, i_intervalY * j);
+					eae6320::Core::EntityHandle icecube;
+					if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/icecube.mesh", icecube))
+					{
+						//TODO: find a way to show error message
+						wereThereErrors = true;
+						goto OnExit;
+					}
+					if (icecube == eae6320::Core::EntityHandle::Null)
+					{
+						wereThereErrors = true;
+						goto OnExit;
+					}
+					eae6320::Math::cQuaternion plane_rotation;
+					eae6320::Math::cVector plane_AABB(0.5f, 0.5f, 0.5f);
+					if (!eae6320::Core::EntityHelper::SetTransform(*icecube.ToEntity(), position, plane_rotation, plane_AABB))
+					{
+						//TODO: find a way to show error message
+						wereThereErrors = true;
+						goto OnExit;
+					}
+					if (!eae6320::Core::EntityHelper::SetCollidable(*icecube.ToEntity(), FLT_MAX))
+					{
+						//TODO: find a way to show error message
+						wereThereErrors = true;
+						goto OnExit;
+					}
+					if (!eae6320::Core::EntityHelper::SetController(*icecube.ToEntity(), new eae6320::Game::ConstantController(eae6320::Math::cVector(0.0f, 0.0f, 1.0f))))
+					{
+						//TODO: find a way to show error message
+						wereThereErrors = true;
+						goto OnExit;
+					}
+					if (!eae6320::Core::EntityHelper::SetName(*icecube.ToEntity(), "Monster"))
+					{
+						//TODO: find a way to show error message
+						wereThereErrors = true;
+						goto OnExit;
+					}
+					if (!eae6320::Core::EntityHelper::SetAlive(*icecube.ToEntity(), true))
+					{
+						//TODO: find a way to show error message
+						wereThereErrors = true;
+						goto OnExit;
+					}
+				}				
+			}
+		}
+
+	OnExit:
+
+		if (wereThereErrors)
+		{
+			CleanUp();
+		}
+		return !wereThereErrors;
+	}
+
+	bool SpawnBullet(const eae6320::Core::EntityHandle& i_player, const eae6320::Math::cVector& i_displacement)
+	{		
+		bool wereThereErrors = false;
+		if (i_player.ToEntity() != NULL)
+		{
+			eae6320::Math::cVector bullet_position = i_player.ToEntity()->m_transform->m_position + i_displacement;
+			eae6320::Math::cQuaternion bullet_rotation;
+			eae6320::Math::cVector bullet_AABB(0.1f, 0.1f, 0.5f);
+
+			eae6320::Core::EntityHandle bullet;
+			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/bullet.mesh", bullet))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (bullet == eae6320::Core::EntityHandle::Null)
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+
+			if (!eae6320::Core::EntityHelper::SetTransform(*bullet.ToEntity(), bullet_position, bullet_rotation, bullet_AABB))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetCollidable(*bullet.ToEntity(), 1.0f))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetController(*bullet.ToEntity(), new eae6320::Game::ConstantController(eae6320::Math::cVector(0.0f, 0.0f, -1.0f))))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetName(*bullet.ToEntity(), "Player"))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			if (!eae6320::Core::EntityHelper::SetAlive(*bullet.ToEntity(), true))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
 			}
 		}
 

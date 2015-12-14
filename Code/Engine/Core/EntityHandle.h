@@ -21,8 +21,8 @@ namespace eae6320
 			EntityHandle();
 			// This function dereferences the handle.
 			Entity* ToEntity() const;
-			bool operator==(const EntityHandle& rhs);
-			bool operator!=(const EntityHandle& rhs);
+			bool operator==(const EntityHandle& rhs) const;
+			bool operator!=(const EntityHandle& rhs) const;
 			const static EntityHandle Null;
 		};
 	}
