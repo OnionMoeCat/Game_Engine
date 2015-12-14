@@ -71,6 +71,7 @@ namespace
 
 	float s_spawn_wall_time = 0.0f;
 	float s_spawn_bullet_time = 0.0f;
+	float s_spawn_floor_time = 0.0f;
 
 	float s_wall_displacement_x = 1.2f;
 	float s_wall_displacement_y = 1.2f;
@@ -113,6 +114,7 @@ namespace
 	bool CleanUp();
 	bool SpawnWall(const int width, const int height, const eae6320::Math::cVector& i_start, const float i_intervalX, const float i_intervalY);
 	bool SpawnBullet(const eae6320::Core::EntityHandle& i_player, const eae6320::Math::cVector& i_displacement);
+	bool SpawnFloor(const eae6320::Math::cVector i_position);
 }
 
 // Main Function
@@ -604,14 +606,16 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 
 				s_spawn_wall_time += dt;
 				s_spawn_bullet_time += dt;
+				s_spawn_floor_time += dt;
 
 				float wall_interval = 10.0f;
 				float bullet_interval = 2.0f;
+				float floor_interval = 10.1f;
 
 				if (s_spawn_wall_time > wall_interval)
 				{
 					s_spawn_wall_time -= wall_interval;
-					SpawnWall(7, 5, eae6320::Math::cVector(-3.7f, 0.6f, -10.0f), 1.2f, 1.2f);
+					SpawnWall(7, 5, eae6320::Math::cVector(-3.7f, 0.6f, -20.0f), 1.2f, 1.2f);
 				}
 
 				if (s_spawn_bullet_time > bullet_interval)
@@ -619,6 +623,13 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 					s_spawn_bullet_time -= bullet_interval;
 					
 					SpawnBullet(s_entity_player, eae6320::Math::cVector(0.0f, 0.0f, -1.5f));
+				}
+				
+				if (s_spawn_floor_time > floor_interval)
+				{
+					s_spawn_floor_time -= floor_interval;
+
+					SpawnFloor(eae6320::Math::cVector(0.0f, 0.0f, -30.3f));
 				}
 
 				eae6320::Core::AI::Update(dt);
@@ -632,7 +643,11 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 					eae6320::Core::EntityHandle entityHandle = eae6320::Core::EntityManager::Get().GetHandleAtIndex(i);
 					if (entityHandle != eae6320::Core::EntityHandle::Null)
 					{
-						if (entityHandle.ToEntity()->m_transform->m_position.z > 4.1f)
+						if (strcmp(entityHandle.ToEntity()->m_name, "Monster") == 0 && entityHandle.ToEntity()->m_transform->m_position.z > 4.1f)
+						{
+							eae6320::Core::EntityHelper::SetAlive(*entityHandle.ToEntity(), false);
+						}
+						if (strcmp(entityHandle.ToEntity()->m_name, "Floor") == 0 && entityHandle.ToEntity()->m_transform->m_position.z > 10.0f)
 						{
 							eae6320::Core::EntityHelper::SetAlive(*entityHandle.ToEntity(), false);
 						}
@@ -742,47 +757,26 @@ namespace
 		}
 
 		{
-			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/floor.mesh", s_entity_floor))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (s_entity_floor == eae6320::Core::EntityHandle::Null)
+			if (!SpawnFloor(eae6320::Math::cVector(0.0f, 0.0f, 0.0f)))
 			{
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector floor_position(0.0f, 0.0f, 0.0f);
-			eae6320::Math::cQuaternion floor_rotation;
-			eae6320::Math::cVector floor_AABB(5.0f, 0.00001f, 4.0f);
-			if (!eae6320::Core::EntityHelper::SetTransform(*s_entity_floor.ToEntity(), floor_position, floor_rotation, floor_AABB))
+
+			if (!SpawnFloor(eae6320::Math::cVector(0.0f, 0.0f, -10.1f)))
 			{
-				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetCollidable(*s_entity_floor.ToEntity(), FLT_MAX))
+
+			if (!SpawnFloor(eae6320::Math::cVector(0.0f, 0.0f, -20.2f)))
 			{
-				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetController(*s_entity_floor.ToEntity(), new eae6320::Game::ConstantController(0.0f)))
+
+			if (!SpawnFloor(eae6320::Math::cVector(0.0f, 0.0f, -30.3f)))
 			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetName(*s_entity_floor.ToEntity(), "Floor"))
-			{
-				//TODO: find a way to show error message
-				wereThereErrors = true;
-				goto OnExit;
-			}
-			if (!eae6320::Core::EntityHelper::SetAlive(*s_entity_floor.ToEntity(), true))
-			{
-				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
@@ -836,6 +830,12 @@ namespace
 
 		{
 			if (!SpawnWall(7, 5, eae6320::Math::cVector(-3.7f, 0.6f, -10.0f), s_wall_displacement_x, s_wall_displacement_y))
+			{
+				wereThereErrors = true;
+				goto OnExit;
+			}
+
+			if (!SpawnWall(7, 5, eae6320::Math::cVector(-3.7f, 0.6f, -20.0f), s_wall_displacement_x, s_wall_displacement_y))
 			{
 				wereThereErrors = true;
 				goto OnExit;
@@ -1004,6 +1004,64 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
+		}
+
+	OnExit:
+
+		if (wereThereErrors)
+		{
+			CleanUp();
+		}
+		return !wereThereErrors;
+	}
+
+	bool SpawnFloor(const eae6320::Math::cVector i_position)
+	{
+		bool wereThereErrors = false;
+		eae6320::Core::EntityHandle floor;
+		eae6320::Math::cQuaternion floor_rotation;
+		eae6320::Math::cVector floor_AABB(5.0f, 0.00001f, 5.0f);
+		if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/floor.mesh", floor))
+		{
+			//TODO: find a way to show error message
+			wereThereErrors = true;
+			goto OnExit;
+		}
+		if (floor == eae6320::Core::EntityHandle::Null)
+		{
+			wereThereErrors = true;
+			goto OnExit;
+		}
+
+		if (!eae6320::Core::EntityHelper::SetTransform(*floor.ToEntity(), i_position, floor_rotation, floor_AABB))
+		{
+			//TODO: find a way to show error message
+			wereThereErrors = true;
+			goto OnExit;
+		}
+		if (!eae6320::Core::EntityHelper::SetCollidable(*floor.ToEntity(), FLT_MAX))
+		{
+			//TODO: find a way to show error message
+			wereThereErrors = true;
+			goto OnExit;
+		}
+		if (!eae6320::Core::EntityHelper::SetController(*floor.ToEntity(), new eae6320::Game::ConstantController(eae6320::Math::cVector(0.0f, 0.0f, 1.0f))))
+		{
+			//TODO: find a way to show error message
+			wereThereErrors = true;
+			goto OnExit;
+		}
+		if (!eae6320::Core::EntityHelper::SetName(*floor.ToEntity(), "Floor"))
+		{
+			//TODO: find a way to show error message
+			wereThereErrors = true;
+			goto OnExit;
+		}
+		if (!eae6320::Core::EntityHelper::SetAlive(*floor.ToEntity(), true))
+		{
+			//TODO: find a way to show error message
+			wereThereErrors = true;
+			goto OnExit;
 		}
 
 	OnExit:

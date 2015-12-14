@@ -2,6 +2,8 @@
 #include "Intersection.h"
 #include "TransformHelper.h"
 
+#include "../Math/FloatPointUtils.h"
+
 #include <cassert>
 
 //given two gameobjects and time, check if they collide in the time, if they collide, return true and write time to o_time, write normal to o_Normal.
@@ -22,13 +24,17 @@ void eae6320::Core::Collision::ResolveCollsion(Transform& i_A, Transform& i_B, c
 	//va' = va + (j / ma)n
 	//vb' = vb - (j / mb)n
 	//j = -(1+e)(va - vb)n /((1/ma + 1/mb)n*n)
-	eae6320::Math::cVector vA = i_A.m_velocity;
-	eae6320::Math::cVector vB = i_B.m_velocity;
-	eae6320::Math::cVector vAB = vA - vB;
-	float mA = i_collidableA.m_mass;
-	float mB = i_collidableB.m_mass;
-	float j = - 2 * (eae6320::Math::Dot(vAB, i_normal) / eae6320::Math::Dot(i_normal, i_normal) / (1 / mA + 1 / mB));
-	assert(!(j != j));
-	TransformHelper::SetVelocity(i_A, vA + i_normal * (j / mA));
-	TransformHelper::SetVelocity(i_B, vB - i_normal * (j / mB));
+	if (!eae6320::Math::FloatPointUtils::AlmostEqualRelativeAndAbs(i_normal.GetLength(), 0.0f))
+	{
+		eae6320::Math::cVector vA = i_A.m_velocity;
+		eae6320::Math::cVector vB = i_B.m_velocity;
+		eae6320::Math::cVector vAB = vA - vB;
+		float mA = i_collidableA.m_mass;
+		float mB = i_collidableB.m_mass;
+		float j = -2 * (eae6320::Math::Dot(vAB, i_normal) / eae6320::Math::Dot(i_normal, i_normal) / (1 / mA + 1 / mB));
+		assert(!(j != j));
+		TransformHelper::SetVelocity(i_A, vA + i_normal * (j / mA));
+		TransformHelper::SetVelocity(i_B, vB - i_normal * (j / mB));
+	}
+
 }
