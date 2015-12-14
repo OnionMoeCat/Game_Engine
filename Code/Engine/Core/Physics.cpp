@@ -5,6 +5,7 @@
 #include "Collision.h"
 #include "TransformHelper.h"
 #include "MessageSystem.h"
+#include "CollidableHelper.h"
 
 #include <cfloat>
 
@@ -39,9 +40,9 @@ void eae6320::Core::Physics::Update(float dt)
 							//check if A and B is colliding in totalTime
 							bool collide = Collision::CheckOOBBCollision(*(A.ToEntity()->m_transform),
 								*(B.ToEntity()->m_transform), totalTime, tempNormal, tempTime);
-							EntityHandle AColliding = A.ToEntity()->m_collidable->m_colliding;
-							EntityHandle BColliding = B.ToEntity()->m_collidable->m_colliding;
-							if (collide && !(AColliding == B && BColliding == A))
+							bool ACollidingB = CollidableHelper::IsColliding(*A.ToEntity()->m_collidable, B);
+							bool BCollidingA = CollidableHelper::IsColliding(*B.ToEntity()->m_collidable, A);
+							if (collide && !(ACollidingB && BCollidingA))
 							{
 								if (tempTime < minTime)
 								{
@@ -53,13 +54,13 @@ void eae6320::Core::Physics::Update(float dt)
 							}
 							else
 							{
-								if (AColliding == B)
+								if (ACollidingB)
 								{
-									A.ToEntity()->m_collidable->m_colliding = EntityHandle::Null;
+									CollidableHelper::RemoveColliding(*A.ToEntity()->m_collidable, B);
 								}
-								if (BColliding == A)
+								if (BCollidingA)
 								{
-									B.ToEntity()->m_collidable->m_colliding = EntityHandle::Null;
+									CollidableHelper::RemoveColliding(*B.ToEntity()->m_collidable, A);
 								}
 							}
 						}
@@ -86,8 +87,8 @@ void eae6320::Core::Physics::Update(float dt)
 
 			if (A != EntityHandle::Null && B != EntityHandle::Null)
 			{
-				A.ToEntity()->m_collidable->m_colliding = B;
-				B.ToEntity()->m_collidable->m_colliding = A;
+				CollidableHelper::SetColliding(*A.ToEntity()->m_collidable, B);
+				CollidableHelper::SetColliding(*B.ToEntity()->m_collidable, A);
 
 				//resolve collision
 				Collision::ResolveCollsion(*(A.ToEntity()->m_transform), *(B.ToEntity()->m_transform), *(A.ToEntity()->m_collidable), *(B.ToEntity()->m_collidable), normal);

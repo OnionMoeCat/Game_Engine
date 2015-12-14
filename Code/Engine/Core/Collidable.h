@@ -3,6 +3,8 @@
 
 #include "EntityHandle.h"
 
+#include <vector>
+
 namespace eae6320
 {
 	namespace Core
@@ -10,7 +12,7 @@ namespace eae6320
 		struct Collidable
 		{
 			float m_mass;
-			EntityHandle m_colliding = EntityHandle::Null;
+			std::vector<EntityHandle> m_collidings;
 		};
 	}
 }

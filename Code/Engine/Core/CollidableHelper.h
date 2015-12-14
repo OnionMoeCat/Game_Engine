@@ -14,6 +14,8 @@ namespace eae6320
 		{
 			void SetMass(Collidable& i_collidable, const float i_elapsedTime);
 			void SetColliding(Collidable& i_collidable, const EntityHandle& i_colliding);
+			bool IsColliding(Collidable& i_collidable, const EntityHandle& i_colliding);
+			void RemoveColliding(Collidable& i_collidable, const EntityHandle& i_colliding);
 		};
 	}
 }
