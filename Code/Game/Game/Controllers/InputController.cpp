@@ -16,37 +16,49 @@ void eae6320::Game::InputController::UpdateEntity(eae6320::Core::Entity& i_entit
 	{
 		// Get the direction
 		{
-			if (eae6320::UserInput::IsKeyPressed(VK_LEFT) && !GetKeyPressed(VK_LEFT))
+			if (eae6320::UserInput::IsKeyPressed(VK_LEFT))
 			{
-				deltaPosition.x -= m_displacement;
-				SetKeyPressed(VK_LEFT, true);
+				if (!GetKeyPressed(VK_LEFT))
+				{
+					deltaPosition.x -= m_displacement;
+					SetKeyPressed(VK_LEFT, true);
+				}
 			}
 			else
 			{
 				SetKeyPressed(VK_LEFT, false);
 			}
-			if (eae6320::UserInput::IsKeyPressed(VK_RIGHT) && !GetKeyPressed(VK_RIGHT))
+			if (eae6320::UserInput::IsKeyPressed(VK_RIGHT))
 			{
-				deltaPosition.x += m_displacement;
-				SetKeyPressed(VK_RIGHT, true);
+				if (!GetKeyPressed(VK_RIGHT))
+				{
+					deltaPosition.x += m_displacement;
+					SetKeyPressed(VK_RIGHT, true);
+				}
 			}
 			else
 			{
 				SetKeyPressed(VK_RIGHT, false);
 			}
-			if (eae6320::UserInput::IsKeyPressed(VK_UP) && !GetKeyPressed(VK_UP))
+			if (eae6320::UserInput::IsKeyPressed(VK_UP))
 			{
-				deltaPosition.y += m_displacement;
-				SetKeyPressed(VK_UP, true);
+				if (!GetKeyPressed(VK_UP))
+				{
+					deltaPosition.y += m_displacement;
+					SetKeyPressed(VK_UP, true);
+				}
 			}
 			else
 			{
 				SetKeyPressed(VK_UP, false);
 			}
-			if (eae6320::UserInput::IsKeyPressed(VK_DOWN) && !GetKeyPressed(VK_DOWN))
+			if (eae6320::UserInput::IsKeyPressed(VK_DOWN))
 			{
-				deltaPosition.y -= m_displacement;
-				SetKeyPressed(VK_DOWN, true);
+				if (!GetKeyPressed(VK_DOWN))
+				{
+					deltaPosition.y -= m_displacement;
+					SetKeyPressed(VK_DOWN, true);
+				}
 			}
 			else
 			{

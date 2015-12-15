@@ -612,11 +612,11 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 				float bullet_interval = 2.0f;
 				float floor_interval = 10.1f;
 
-				if (s_spawn_wall_time > wall_interval)
+				/*if (s_spawn_wall_time > wall_interval)
 				{
 					s_spawn_wall_time -= wall_interval;
 					SpawnWall(7, 5, eae6320::Math::cVector(-3.7f, 0.6f, -20.0f), 1.2f, 1.2f);
-				}
+				}*/
 
 				if (s_spawn_bullet_time > bullet_interval)
 				{
@@ -625,18 +625,21 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 					SpawnBullet(s_entity_player, eae6320::Math::cVector(0.0f, 0.0f, -1.5f));
 				}
 				
-				if (s_spawn_floor_time > floor_interval)
+				/*if (s_spawn_floor_time > floor_interval)
 				{
 					s_spawn_floor_time -= floor_interval;
 
 					SpawnFloor(eae6320::Math::cVector(0.0f, 0.0f, -30.3f));
-				}
+				}*/
 
 				eae6320::Core::AI::Update(dt);
 
 				eae6320::Core::Physics::Update(dt);
 
 				UpdateCamera(dt);
+
+				eae6320::Math::cVector displacementWall(0.0f, 0.0f, -20.0f);
+				eae6320::Math::cVector displacementFloor(0.0f, 0.0f, -30.3f);
 
 				for (size_t i = 0; i < eae6320::Core::EntityManager::Get().GetEntitySize(); i++)
 				{
@@ -645,9 +648,13 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 					{
 						if (strcmp(entityHandle.ToEntity()->m_name, "Monster") == 0 && entityHandle.ToEntity()->m_transform->m_position.z > 4.1f)
 						{
-							eae6320::Core::EntityHelper::SetAlive(*entityHandle.ToEntity(), false);
+							eae6320::Core::TransformHelper::SetPosition(*entityHandle.ToEntity()->m_transform, *entityHandle.ToEntity()->m_renderable->m_material->m_effect, entityHandle.ToEntity()->m_transform->m_position + displacementWall);
 						}
 						if (strcmp(entityHandle.ToEntity()->m_name, "Floor") == 0 && entityHandle.ToEntity()->m_transform->m_position.z > 10.0f)
+						{
+							eae6320::Core::TransformHelper::SetPosition(*entityHandle.ToEntity()->m_transform, *entityHandle.ToEntity()->m_renderable->m_material->m_effect, entityHandle.ToEntity()->m_transform->m_position + displacementFloor);
+						}
+						if (strcmp(entityHandle.ToEntity()->m_name, "Bullet") == 0 && entityHandle.ToEntity()->m_transform->m_position.z < -15.0f)
 						{
 							eae6320::Core::EntityHelper::SetAlive(*entityHandle.ToEntity(), false);
 						}
@@ -829,13 +836,13 @@ namespace
 		}
 
 		{
-			if (!SpawnWall(7, 5, eae6320::Math::cVector(-3.7f, 0.6f, -10.0f), s_wall_displacement_x, s_wall_displacement_y))
+			if (!SpawnWall(7, 5, eae6320::Math::cVector(-3.7f, 0.6f, -6.0f), s_wall_displacement_x, s_wall_displacement_y))
 			{
 				wereThereErrors = true;
 				goto OnExit;
 			}
 
-			if (!SpawnWall(7, 5, eae6320::Math::cVector(-3.7f, 0.6f, -20.0f), s_wall_displacement_x, s_wall_displacement_y))
+			if (!SpawnWall(7, 5, eae6320::Math::cVector(-3.7f, 0.6f, -16.0f), s_wall_displacement_x, s_wall_displacement_y))
 			{
 				wereThereErrors = true;
 				goto OnExit;
@@ -921,7 +928,7 @@ namespace
 						wereThereErrors = true;
 						goto OnExit;
 					}
-					if (!eae6320::Core::EntityHelper::SetController(*icecube.ToEntity(), new eae6320::Game::ConstantController(eae6320::Math::cVector(0.0f, 0.0f, 1.0f))))
+					if (!eae6320::Core::EntityHelper::SetController(*icecube.ToEntity(), new eae6320::Game::ConstantController(eae6320::Math::cVector(0.0f, 0.0f, 2.0f))))
 					{
 						//TODO: find a way to show error message
 						wereThereErrors = true;
@@ -986,7 +993,7 @@ namespace
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			if (!eae6320::Core::EntityHelper::SetController(*bullet.ToEntity(), new eae6320::Game::ConstantController(eae6320::Math::cVector(0.0f, 0.0f, -1.0f))))
+			if (!eae6320::Core::EntityHelper::SetController(*bullet.ToEntity(), new eae6320::Game::ConstantController(eae6320::Math::cVector(0.0f, 0.0f, -2.0f))))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
@@ -1045,7 +1052,7 @@ namespace
 			wereThereErrors = true;
 			goto OnExit;
 		}
-		if (!eae6320::Core::EntityHelper::SetController(*floor.ToEntity(), new eae6320::Game::ConstantController(eae6320::Math::cVector(0.0f, 0.0f, 1.0f))))
+		if (!eae6320::Core::EntityHelper::SetController(*floor.ToEntity(), new eae6320::Game::ConstantController(eae6320::Math::cVector(0.0f, 0.0f, 2.0f))))
 		{
 			//TODO: find a way to show error message
 			wereThereErrors = true;
