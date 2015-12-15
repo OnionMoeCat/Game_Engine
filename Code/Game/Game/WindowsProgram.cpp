@@ -783,7 +783,7 @@ namespace
 		}
 
 		{
-			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/icecube.mesh", s_entity_player))
+			if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/player.material", "data/player.mesh", s_entity_player))
 			{
 				wereThereErrors = true;
 				goto OnExit;
@@ -896,7 +896,7 @@ namespace
 				{
 					const eae6320::Math::cVector position = i_start + eae6320::Math::cVector(i_intervalX * i, i_intervalY * j);
 					eae6320::Core::EntityHandle icecube;
-					if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/icecube.mesh", icecube))
+					if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/icecube.material", "data/icecube.mesh", icecube))
 					{
 						//TODO: find a way to show error message
 						wereThereErrors = true;
@@ -1021,7 +1021,7 @@ namespace
 		eae6320::Core::EntityHandle floor;
 		eae6320::Math::cQuaternion floor_rotation;
 		eae6320::Math::cVector floor_AABB(5.0f, 0.00001f, 5.0f);
-		if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/default.material", "data/floor.mesh", floor))
+		if (!eae6320::Core::EntityManager::Get().CreateEntityFromFile("data/tundra.material", "data/floor.mesh", floor))
 		{
 			//TODO: find a way to show error message
 			wereThereErrors = true;

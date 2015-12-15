@@ -1,0 +1,23 @@
+return
+{
+	paths =
+	{
+		effect_path = "data/default.effect",
+	},
+	uniforms =
+	{
+		{
+			name = "g_color_uniform",
+			values = {1.0, 1.0, 1.0},
+			shader_type = "fragment",
+		},
+	},
+	textures =
+	{
+		{
+			name = "g_sampler",
+			path = "data/player.dds",
+			shader_type = "fragment",
+		},
+	},
+}

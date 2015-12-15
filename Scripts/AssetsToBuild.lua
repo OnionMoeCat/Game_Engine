@@ -23,6 +23,10 @@ return
 				source = "bullet.meshraw",
 				target = "bullet.mesh",
 			},
+			{
+				source = "player.meshraw",
+				target = "player.mesh",
+			},
 		},
 	},
 	{
@@ -98,6 +102,18 @@ return
 				source = "alpha.material.raw",
 				target = "alpha.material",
 			},
+			{
+				source = "icecube.material.raw",
+				target = "icecube.material",
+			},
+			{
+				source = "tundra.material.raw",
+				target = "tundra.material",
+			},
+			{
+				source = "player.material.raw",
+				target = "player.material",
+			},
 		},
 	},
 	{
@@ -118,6 +134,18 @@ return
 			{
 				source = "alpha.png",
 				target = "alpha.dds",
+			},
+			{
+				source = "icecube.jpg",
+				target = "icecube.dds",
+			},
+			{
+				source = "tundra.jpg",
+				target = "tundra.dds",
+			},
+			{
+				source = "player.jpg",
+				target = "player.dds",
 			},
 		},
 	},
