@@ -4,10 +4,11 @@
 #include <sstream>
 
 #include "EntityHelper.h"
+#include "CameraHelper.h"
 #include "../UserOutput/UserOutput.h"
 #include "../Graphics/RenderableHelper.h"
 #include "../Graphics/RenderableManager.h"
-#include "../Graphics/EffectHelper.h"
+#include "../Graphics/MaterialHelper.h"
 
 // Interface
 //==========
@@ -56,7 +57,8 @@ bool eae6320::Core::EntityHelper::OffsetPosition(Entity& i_entity, const eae6320
 		return false;
 	}
 	i_entity.m_position += i_offset_position;
-	eae6320::Graphics::EffectHelper::CreateLocalToWorldTransform(*i_entity.m_renderable->m_material->m_effect, i_entity.m_rotation, i_entity.m_position);
+	eae6320::Math::cMatrix_transformation&& temp = CameraHelper::CreateLocalToWorldTransform(i_entity.m_rotation, i_entity.m_position);
+	eae6320::Graphics::MaterialHelper::UpdateMaterialUniformMatrix(*i_entity.m_renderable->m_material, "g_transform_localToWorld", temp, eae6320::Graphics::ShaderTypes::Vertex);
 	return true;
 }
 bool eae6320::Core::EntityHelper::CleanUp(Entity& i_entity)
@@ -96,8 +98,16 @@ bool eae6320::Core::EntityHelper::ToCameraScreen(Entity& i_entity, const Camera&
 		eae6320::UserOutput::Print("entity.m_renderable->m_material->m_effect not null expected");
 		return false;
 	}
-	eae6320::Graphics::EffectHelper::CreateWorldToViewTransform(*i_entity.m_renderable->m_material->m_effect, i_camera.m_rotation, i_camera.m_position);
-	eae6320::Graphics::EffectHelper::CreateViewToScreenTransform(*i_entity.m_renderable->m_material->m_effect, i_camera.m_fov, i_camera.m_aspect, i_camera.m_nearZ, i_camera.m_farZ);
+
+	{
+		eae6320::Math::cMatrix_transformation&& temp = CameraHelper::CreateWorldToViewTransform(i_camera.m_rotation, i_camera.m_position);
+		eae6320::Graphics::MaterialHelper::UpdateMaterialUniformMatrix(*i_entity.m_renderable->m_material, "g_transform_worldToView", temp, eae6320::Graphics::ShaderTypes::Vertex);
+	}
+
+	{
+		eae6320::Math::cMatrix_transformation&& temp = CameraHelper::CreateViewToScreenTransform(i_camera.m_fov, i_camera.m_aspect, i_camera.m_nearZ, i_camera.m_farZ);
+		eae6320::Graphics::MaterialHelper::UpdateMaterialUniformMatrix(*i_entity.m_renderable->m_material, "g_transform_viewToScreen", temp, eae6320::Graphics::ShaderTypes::Vertex);
+	}
 	return true;
 }
 bool eae6320::Core::EntityHelper::Submit(Entity& i_entity)

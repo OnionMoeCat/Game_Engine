@@ -16,7 +16,7 @@ namespace
 	
 	std::string effectPath;
 	uint32_t uniformSize = 0;
-	eae6320::Graphics::Uniform* uniforms = NULL;
+	eae6320::Graphics::UniformVector* uniforms = NULL;
 	char** uniformNames = NULL;
 
 	uint32_t textureSize = 0;
@@ -206,7 +206,7 @@ namespace
 			}
 
 			uniformSize = static_cast<uint32_t>(count);
-			uniforms = reinterpret_cast<eae6320::Graphics::Uniform*>(malloc(sizeof(eae6320::Graphics::Uniform) * uniformSize));
+			uniforms = reinterpret_cast<eae6320::Graphics::UniformVector*>(malloc(sizeof(eae6320::Graphics::UniformVector) * uniformSize));
 			uniformNames = reinterpret_cast<char**>(malloc(sizeof(char*) * uniformSize));
 			if (uniforms == NULL)
 			{
@@ -854,7 +854,7 @@ namespace
 
 		for (size_t i = 0; i < uniformSize; i++)
 		{
-			bytesToWrite = (DWORD)sizeof(eae6320::Graphics::Uniform);
+			bytesToWrite = (DWORD)sizeof(eae6320::Graphics::UniformVector);
 			if (!WriteBufferToFile(i_path, fileHandle, &uniforms[i], bytesToWrite))
 			{
 				wereThereErrors = true;

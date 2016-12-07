@@ -3,6 +3,10 @@
 
 #include "CameraHelper.h"
 
+#include <utility>
+
+#include "../Math/Functions.h"
+
 // Interface
 //==========
 
@@ -20,4 +24,17 @@ bool eae6320::Core::CameraHelper::OffsetPosition(Camera& i_camera, const eae6320
 {
 	i_camera.m_position += i_offset_position;
 	return true;
+}
+
+eae6320::Math::cMatrix_transformation eae6320::Core::CameraHelper::CreateLocalToWorldTransform(const eae6320::Math::cQuaternion& i_rotation, const eae6320::Math::cVector& i_position)
+{
+	return std::move(eae6320::Math::cMatrix_transformation(i_rotation, i_position));
+}
+eae6320::Math::cMatrix_transformation eae6320::Core::CameraHelper::CreateWorldToViewTransform(const eae6320::Math::cQuaternion& i_cameraQuaternion, const eae6320::Math::cVector& i_cameraPosition)
+{
+	return std::move(eae6320::Math::cMatrix_transformation::CreateWorldToViewTransform(i_cameraQuaternion, i_cameraPosition));
+}
+eae6320::Math::cMatrix_transformation eae6320::Core::CameraHelper::CreateViewToScreenTransform(const float i_fov, const float i_aspect, const float i_nearZ, const float i_farZ)
+{
+	return std::move(eae6320::Math::cMatrix_transformation::CreateViewToScreenTransform(eae6320::Math::ConvertDegreesToRadians(i_fov), i_aspect, i_nearZ, i_farZ));
 }

@@ -230,22 +230,6 @@ bool eae6320::Graphics::EffectHelper::CleanUp(Effect& i_effect, const Context& i
 	}
 	return !wereThereErrors;
 }
-bool eae6320::Graphics::EffectHelper::SetDrawCallUniforms(Effect& i_effect, const Context& i_Context)
-{
-	if (!SetMatrixUniform(i_effect, "g_transform_localToWorld", i_effect.m_transform_localToWorld))
-	{
-		return false;
-	}
-	if (!SetMatrixUniform(i_effect, "g_transform_worldToView", i_effect.m_transform_worldToView))
-	{
-		return false;
-	}
-	if (!SetMatrixUniform(i_effect, "g_transform_viewToScreen", i_effect.m_transform_viewToScreen))
-	{
-		return false;
-	}
-	return true;
-}
 
 bool eae6320::Graphics::EffectHelper::GetUniformHandler(const Effect& i_effect, const char* i_name, ShaderTypes::eShaderType i_shaderType, tUniformHandle* i_uniformHandle)
 {
@@ -281,6 +265,14 @@ bool eae6320::Graphics::EffectHelper::SetUniform(Effect& i_effect, const float* 
 	return (glGetError() == GL_NO_ERROR);
 }
 
+
+bool eae6320::Graphics::EffectHelper::SetMatrixUniform(Effect& i_effect, const float* i_values, const tUniformHandle i_uniformHandle, ShaderTypes::eShaderType i_shaderType, const Context& i_context)
+{
+	const GLboolean dontTranspose = false; // Matrices are already in the correct format
+	const GLsizei uniformCountToSet = 1;
+	glUniformMatrix4fv(i_uniformHandle, uniformCountToSet, dontTranspose, reinterpret_cast<const GLfloat*>(i_values));
+	return (glGetError() == GL_NO_ERROR);
+}
 // Helper Function Declarations
 //=============================
 
