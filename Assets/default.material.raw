@@ -7,10 +7,10 @@ return
 	uniforms =
 	{
 		{
-			name = "g_color_uniform",
-			values = {1.0, 1.0, 1.0},
+			name = "g_ambient_light",
+			values = {0.5, 0.5, 0.5, 1},
 			shader_type = "fragment",
-		},
+		}
 	},
 	textures =
 	{

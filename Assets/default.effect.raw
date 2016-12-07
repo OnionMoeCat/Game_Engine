@@ -2,8 +2,8 @@ return
 {
 	paths =
 	{
-		vertex_shader_path = "data/vertex.shader",
-		fragment_shader_path = "data/fragment.shader",
+		vertex_shader_path = "data/VertexShaderCode.shader",
+		fragment_shader_path = "data/FragmentShaderCode.shader",
 	},
 	render_states =
 	{
