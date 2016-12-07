@@ -8,6 +8,7 @@
 uniform float4x4 g_transform_localToWorld;
 uniform float4x4 g_transform_worldToView;
 uniform float4x4 g_transform_viewToScreen;
+uniform float4x4 g_transform_normalMatrix;
 
 #if defined( EAE6320_PLATFORM_D3D )
 
@@ -57,7 +58,10 @@ void main(
 // These values come from one of the sVertex that we filled the vertex buffer with in C code
 layout( location = 0 ) in vec3 i_position_local;
 layout( location = 1 ) in vec4 i_color;
-layout( location = 2 ) in vec2 i_texcoords;
+layout( location = 2 ) in vec3 i_normal;
+layout( location = 3 ) in vec3 i_tangent;
+layout( location = 4 ) in vec3 i_bitangent;
+layout( location = 5 ) in vec2 i_texcoords;
 
 // Output
 //=======
@@ -73,8 +77,10 @@ layout( location = 2 ) in vec2 i_texcoords;
 // The locations are used to match the vertex shader outputs
 // with the fragment shader inputs
 // (note that Direct3D uses arbitrarily assignable "semantics").
-layout( location = 0 ) out vec4 o_color;
-layout( location = 1 ) out vec2 o_texcoords;
+layout( location = 0 ) out vec4 o_position_world;
+layout( location = 1 ) out vec4 o_color;
+layout( location = 2 ) out vec2 o_texcoords;
+layout( location = 3 ) out mat3 o_TBN;
 
 // Entry Point
 //============
@@ -101,10 +107,19 @@ void main()
 		// Any matrix transformations that include translation
 		// will operate on a float4 position,
 		// which _must_ have 1 for the w value
-		float4 position_world = Transform( float4( i_position_local, 1.0 ), g_transform_localToWorld );
-		float4 position_view = Transform( position_world, g_transform_worldToView );
+		o_position_world = Transform( float4( i_position_local, 1 ), g_transform_localToWorld );
+		float4 position_view = Transform( o_position_world, g_transform_worldToView );
 		O_POSITION_SCREEN = Transform( position_view, g_transform_viewToScreen );
 	}
+
+	// Calculate the normal in the world
+	{
+		float3 normalWorld = normalize((Transform( float4(i_normal, 0), g_transform_normalMatrix)).xyz);
+		float3 tangentWorld = normalize((Transform(float4(i_tangent, 0), g_transform_localToWorld)).xyz);
+		float3 bitangentWorld = cross(normalWorld, tangentWorld);
+		o_TBN = transpose(mat3(tangentWorld, bitangentWorld, normalWorld));
+	}
+
 	// Pass the input color to the fragment shader unchanged:
 	{
 		o_color = i_color;

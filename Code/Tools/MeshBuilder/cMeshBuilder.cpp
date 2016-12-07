@@ -33,6 +33,12 @@ namespace
 	bool LoadTableValues_vertices_array_position_xyz(lua_State& io_luaState, unsigned int i_index);
 	bool LoadTableValues_vertices_array_color(lua_State& io_luaState, unsigned int i_index);
 	bool LoadTableValues_vertices_array_color_rgba(lua_State& io_luaState, unsigned int i_index);
+	bool LoadTableValues_vertices_array_normal(lua_State& io_luaState, unsigned int i_index);
+	bool LoadTableValues_vertices_array_normal_xyz(lua_State& io_luaState, unsigned int i_index);
+	bool LoadTableValues_vertices_array_tangent(lua_State& io_luaState, unsigned int i_index);
+	bool LoadTableValues_vertices_array_tangent_xyz(lua_State& io_luaState, unsigned int i_index);
+	bool LoadTableValues_vertices_array_bitangent(lua_State& io_luaState, unsigned int i_index);
+	bool LoadTableValues_vertices_array_bitangent_xyz(lua_State& io_luaState, unsigned int i_index);
 	bool LoadTableValues_vertices_array_texcoord(lua_State& io_luaState, unsigned int i_index);
 	bool LoadTableValues_vertices_array_texcoord_uv(lua_State& io_luaState, unsigned int i_index);
 
@@ -177,6 +183,30 @@ namespace
 				lua_pop(&io_luaState, 1);
 				std::stringstream errorMessage;
 				errorMessage << "Fail to get value of \"color\" for \"vertices\" expected at index: " << i;
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				return false;
+			}
+			if (!LoadTableValues_vertices_array_normal(io_luaState, i))
+			{
+				lua_pop(&io_luaState, 1);
+				std::stringstream errorMessage;
+				errorMessage << "Fail to get value of \"normal\" for \"vertices\" expected at index: " << i;
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				return false;
+			}
+			if (!LoadTableValues_vertices_array_tangent(io_luaState, i))
+			{
+				lua_pop(&io_luaState, 1);
+				std::stringstream errorMessage;
+				errorMessage << "Fail to get value of \"tangent\" for \"vertices\" expected at index: " << i;
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				return false;
+			}
+			if (!LoadTableValues_vertices_array_bitangent(io_luaState, i))
+			{
+				lua_pop(&io_luaState, 1);
+				std::stringstream errorMessage;
+				errorMessage << "Fail to get value of \"bitangent\" for \"vertices\" expected at index: " << i;
 				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
 				return false;
 			}
@@ -337,6 +367,219 @@ namespace
 		vertices[i_index - 1].g = tempRGBA[1];
 		vertices[i_index - 1].b = tempRGBA[2];
 		vertices[i_index - 1].a = tempRGBA[3];
+
+		return true;
+	}
+
+	bool LoadTableValues_vertices_array_normal(lua_State& io_luaState, unsigned int i_index)
+	{
+		bool wereThereErrors = false;
+
+		const char* key = "normal";
+		lua_pushstring(&io_luaState, key);
+		lua_gettable(&io_luaState, -2);
+
+		if (!lua_istable(&io_luaState, -1))
+		{
+			std::stringstream errorMessage;
+			errorMessage << "The value at key \"" << key << "\" must be a table (instead of a " << luaL_typename(&io_luaState, -1);
+			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+			wereThereErrors = true;
+			goto OnExit;
+		}
+
+		if (!LoadTableValues_vertices_array_normal_xyz(io_luaState, i_index))
+		{
+			std::stringstream errorMessage;
+			errorMessage << "Fail to get value of \"" << key << "\" for \"vertices\" at index: " << i_index;
+			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+			wereThereErrors = true;
+			goto OnExit;
+		}
+
+	OnExit:
+
+		lua_pop(&io_luaState, 1);
+		return !wereThereErrors;
+	}
+
+	bool LoadTableValues_vertices_array_normal_xyz(lua_State& io_luaState, unsigned int i_index)
+	{
+		const int xyzLength = luaL_len(&io_luaState, -1);
+		const int LENGTH = 3;
+		const char charMap[LENGTH] = { 'x','y','z' };
+
+		const char* key = "normal";
+
+		float tempXYZ[LENGTH];
+		if (xyzLength != LENGTH)
+		{
+			std::stringstream errorMessage;
+			errorMessage << "3 elements (x, y, z) in key \"" << key << "\" expected for \"vertices\" at index: " << i_index;
+			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+			return false;
+		}
+		for (int i = 1; i <= xyzLength; i++)
+		{
+			lua_pushinteger(&io_luaState, i);
+			lua_gettable(&io_luaState, -2);
+			if (lua_type(&io_luaState, -1) != LUA_TNUMBER)
+			{
+				std::stringstream errorMessage;
+				errorMessage << "Number value expected for " << charMap[i - 1] << " in key \"" << key << "\" for \"vertices\" at index: " << i_index;
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+			tempXYZ[i - 1] = static_cast<float>(lua_tonumber(&io_luaState, -1));
+			lua_pop(&io_luaState, 1);
+		}
+
+		vertices[i_index - 1].nx = tempXYZ[0];
+		vertices[i_index - 1].ny = tempXYZ[1];
+		vertices[i_index - 1].nz = tempXYZ[2];
+
+		return true;
+	}
+
+	bool LoadTableValues_vertices_array_tangent(lua_State& io_luaState, unsigned int i_index)
+	{
+		bool wereThereErrors = false;
+
+		const char* key = "tangent";
+		lua_pushstring(&io_luaState, key);
+		lua_gettable(&io_luaState, -2);
+
+		if (!lua_istable(&io_luaState, -1))
+		{
+			std::stringstream errorMessage;
+			errorMessage << "The value at key \"" << key << "\" must be a table (instead of a " << luaL_typename(&io_luaState, -1);
+			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+			wereThereErrors = true;
+			goto OnExit;
+		}
+
+		if (!LoadTableValues_vertices_array_tangent_xyz(io_luaState, i_index))
+		{
+			std::stringstream errorMessage;
+			errorMessage << "Fail to get value of \"" << key << "\" for \"vertices\" at index: " << i_index;
+			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+			wereThereErrors = true;
+			goto OnExit;
+		}
+
+	OnExit:
+
+		lua_pop(&io_luaState, 1);
+		return !wereThereErrors;
+	}
+
+	bool LoadTableValues_vertices_array_tangent_xyz(lua_State& io_luaState, unsigned int i_index)
+	{
+		const int xyzLength = luaL_len(&io_luaState, -1);
+		const int LENGTH = 3;
+		const char charMap[LENGTH] = { 'x','y','z' };
+
+		const char* key = "tangent";
+
+		float tempXYZ[LENGTH];
+		if (xyzLength != LENGTH)
+		{
+			std::stringstream errorMessage;
+			errorMessage << "3 elements (x, y, z) in key \"" << key << "\" expected for \"vertices\" at index: " << i_index;
+			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+			return false;
+		}
+		for (int i = 1; i <= xyzLength; i++)
+		{
+			lua_pushinteger(&io_luaState, i);
+			lua_gettable(&io_luaState, -2);
+			if (lua_type(&io_luaState, -1) != LUA_TNUMBER)
+			{
+				std::stringstream errorMessage;
+				errorMessage << "Number value expected for " << charMap[i - 1] << " in key \"" << key << "\" for \"vertices\" at index: " << i_index;
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+			tempXYZ[i - 1] = static_cast<float>(lua_tonumber(&io_luaState, -1));
+			lua_pop(&io_luaState, 1);
+		}
+
+		vertices[i_index - 1].tx = tempXYZ[0];
+		vertices[i_index - 1].ty = tempXYZ[1];
+		vertices[i_index - 1].tz = tempXYZ[2];
+
+		return true;
+	}
+
+	bool LoadTableValues_vertices_array_bitangent(lua_State& io_luaState, unsigned int i_index)
+	{
+		bool wereThereErrors = false;
+
+		const char* key = "bitangent";
+		lua_pushstring(&io_luaState, key);
+		lua_gettable(&io_luaState, -2);
+
+		if (!lua_istable(&io_luaState, -1))
+		{
+			std::stringstream errorMessage;
+			errorMessage << "The value at key \"" << key << "\" must be a table (instead of a " << luaL_typename(&io_luaState, -1);
+			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+			wereThereErrors = true;
+			goto OnExit;
+		}
+
+		if (!LoadTableValues_vertices_array_bitangent_xyz(io_luaState, i_index))
+		{
+			std::stringstream errorMessage;
+			errorMessage << "Fail to get value of \"" << key << "\" for \"vertices\" at index: " << i_index;
+			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+			wereThereErrors = true;
+			goto OnExit;
+		}
+
+	OnExit:
+
+		lua_pop(&io_luaState, 1);
+		return !wereThereErrors;
+	}
+
+	bool LoadTableValues_vertices_array_bitangent_xyz(lua_State& io_luaState, unsigned int i_index)
+	{
+		const int xyzLength = luaL_len(&io_luaState, -1);
+		const int LENGTH = 3;
+		const char charMap[LENGTH] = { 'x','y','z' };
+
+		const char* key = "bitangent";
+
+		float tempXYZ[LENGTH];
+		if (xyzLength != LENGTH)
+		{
+			std::stringstream errorMessage;
+			errorMessage << "3 elements (x, y, z) in key \"" << key << "\" expected for \"vertices\" at index: " << i_index;
+			eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+			return false;
+		}
+		for (int i = 1; i <= xyzLength; i++)
+		{
+			lua_pushinteger(&io_luaState, i);
+			lua_gettable(&io_luaState, -2);
+			if (lua_type(&io_luaState, -1) != LUA_TNUMBER)
+			{
+				std::stringstream errorMessage;
+				errorMessage << "Number value expected for " << charMap[i - 1] << " in key \"" << key << "\" for \"vertices\" at index: " << i_index;
+				eae6320::OutputErrorMessage(errorMessage.str().c_str(), __FILE__);
+				lua_pop(&io_luaState, 1);
+				return false;
+			}
+			tempXYZ[i - 1] = static_cast<float>(lua_tonumber(&io_luaState, -1));
+			lua_pop(&io_luaState, 1);
+		}
+
+		vertices[i_index - 1].bx = tempXYZ[0];
+		vertices[i_index - 1].by = tempXYZ[1];
+		vertices[i_index - 1].bz = tempXYZ[2];
 
 		return true;
 	}

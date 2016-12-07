@@ -48,19 +48,11 @@ namespace
 	// as one of your classmate's
 	const char* s_mainWindowClass_name = "Yuchen Zhang's Main Window Class";
 
-	eae6320::Core::Entity s_entity_ball_moving;
-
-	eae6320::Core::Entity s_entity_ball_red;
-	eae6320::Core::Entity s_entity_ball_green;
-
-	eae6320::Core::Entity s_entity_ball_transparent_03;
-	eae6320::Core::Entity s_entity_ball_transparent_08;
+	eae6320::Core::Entity s_entity_ball;
 
 	eae6320::Core::Entity s_entity_floor;
 
-	eae6320::Core::Entity s_entity_plane_opaque;
-
-	eae6320::Core::Entity s_entity_plane_transparent;
+	eae6320::Core::Entity s_entity_light;
 
 	eae6320::Core::Camera s_camera;
 }
@@ -550,13 +542,22 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 
 			{
 				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_floor, s_camera);
-				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball_moving, s_camera);
+				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball, s_camera);
+				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_light, s_camera);
+			}
+
+			{
+				eae6320::Math::cVector lightPosition = s_entity_light.m_position + eae6320::Math::cVector(0.0f, 0.2f, 0.0f);
+				eae6320::Core::EntityHelper::AddLights(s_entity_floor, lightPosition);
+				eae6320::Core::EntityHelper::AddLights(s_entity_ball, lightPosition);
+				eae6320::Core::EntityHelper::AddLights(s_entity_light, lightPosition);
 			}
 
 			//TODO: find a good way to show error message here
 			{
 				eae6320::Core::EntityHelper::Submit(s_entity_floor);
-				eae6320::Core::EntityHelper::Submit(s_entity_ball_moving);
+				//eae6320::Core::EntityHelper::Submit(s_entity_ball);
+				eae6320::Core::EntityHelper::Submit(s_entity_light);
 				eae6320::Graphics::Core::Render();
 			}
 		}
@@ -590,7 +591,7 @@ namespace
 {
 	void UpdateEntities()
 	{
-		eae6320::Math::cVector offset(0.0f, 0.0f);
+		eae6320::Math::cVector offset(0.0f, 0.0f, 0.0f);
 		{
 			// Get the direction
 			{
@@ -604,9 +605,17 @@ namespace
 				}
 				if (eae6320::UserInput::IsKeyPressed(VK_UP))
 				{
-					offset.y += 1.0f;
+					offset.z -= 1.0f;
 				}
 				if (eae6320::UserInput::IsKeyPressed(VK_DOWN))
+				{
+					offset.z += 1.0f;
+				}
+				if (eae6320::UserInput::IsKeyPressed('N'))
+				{
+					offset.y += 1.0f;
+				}
+				if (eae6320::UserInput::IsKeyPressed('M'))
 				{
 					offset.y -= 1.0f;
 				}
@@ -621,43 +630,96 @@ namespace
 		// that encapsulates a mesh, an effect, and a position offset.
 		// You don't have to do it this way for your assignment!
 		// You just need a way to update the position offset associated with the colorful rectangle.
-		eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_moving, offset);
+		eae6320::Core::EntityHelper::OffsetTransform(s_entity_light, offset, eae6320::Math::cQuaternion());
 	}
 
 	void UpdateCamera()
 	{
-		eae6320::Math::cVector offset(0.0f, 0.0f);
+		eae6320::Math::cVector offset(0.0f, 0.0f, 0.0f);
+		float zRotation = 0.0f;
+		float yRotation = 0.0f;
+		float xRotation = 0.0f;
+		// Get the direction
 		{
-			// Get the direction
+			if (eae6320::UserInput::IsKeyPressed('Q'))
 			{
-				if (eae6320::UserInput::IsKeyPressed('A'))
-				{
-					offset.x -= 1.0f;
-				}
-				if (eae6320::UserInput::IsKeyPressed('D'))
-				{
-					offset.x += 1.0f;
-				}
-				if (eae6320::UserInput::IsKeyPressed('W'))
-				{
-					offset.y += 1.0f;
-				}
-				if (eae6320::UserInput::IsKeyPressed('S'))
-				{
-					offset.y -= 1.0f;
-				}
+				offset.x -= 1.0f;
 			}
-			// Get the speed
-			const float unitsPerSecond = 1.0f;	// This is arbitrary
-			const float unitsToMove = unitsPerSecond * eae6320::Time::GetSecondsElapsedThisFrame();	// This makes the speed frame-rate-independent
-																									// Normalize the offset
-			offset *= unitsToMove;
+			if (eae6320::UserInput::IsKeyPressed('A'))
+			{
+				offset.x += 1.0f;
+			}
+			if (eae6320::UserInput::IsKeyPressed('W'))
+			{
+				offset.y += 1.0f;
+			}
+			if (eae6320::UserInput::IsKeyPressed('S'))
+			{
+				offset.y -= 1.0f;
+			}
+			if (eae6320::UserInput::IsKeyPressed('E'))
+			{
+				offset.z += 1.0f;
+			}
+			if (eae6320::UserInput::IsKeyPressed('D'))
+			{
+				offset.z -= 1.0f;
+			}
+			// x Rotation plus
+			if (eae6320::UserInput::IsKeyPressed('U'))
+			{
+				xRotation += 1.0f;
+			}
+			// x Rotation minus
+			if (eae6320::UserInput::IsKeyPressed('J'))
+			{
+				xRotation -= 1.0f;
+			}
+			// y Rotation plus
+			if (eae6320::UserInput::IsKeyPressed('I'))
+			{
+				yRotation += 1.0f;
+			}
+			// y Rotation minus
+			if (eae6320::UserInput::IsKeyPressed('K'))
+			{
+				yRotation -= 1.0f;
+			}
+			// z Rotation plus
+			if (eae6320::UserInput::IsKeyPressed('O'))
+			{
+				zRotation += 1.0f;
+			}
+			// z Rotation minus
+			if (eae6320::UserInput::IsKeyPressed('L'))
+			{
+				zRotation -= 1.0f;
+			}
 		}
+
+		const float deltaTime = eae6320::Time::GetSecondsElapsedThisFrame();
+
+		// Get the speed
+		const float unitsPerSecond = 1.0f;	// This is arbitrary
+		const float unitsToMove = unitsPerSecond * deltaTime;	// This makes the speed frame-rate-independent
+																								// Normalize the offset
+		offset *= unitsToMove;
+
+		// Get the rotation
+		const float radianPerSecond = 1.0f;
+		const float radianToMove = radianPerSecond * deltaTime;
+
+		eae6320::Math::cQuaternion rotationX(radianToMove * xRotation, eae6320::Math::cVector(1.0f, 0.0f, 0.0f));
+		eae6320::Math::cQuaternion rotationY(radianToMove * yRotation, eae6320::Math::cVector(0.0f, 1.0f, 0.0f));
+		eae6320::Math::cQuaternion rotationZ(radianToMove * zRotation, eae6320::Math::cVector(0.0f, 0.0f, 1.0f));
+		// Euler ZYX, rotation sequence: Z, Y, X
+		// Quaternion compsite rule: prev * diff
+		eae6320::Math::cQuaternion rotation = rotationZ * rotationY * rotationX;
 		// The following line assumes there is some "entity" for the rectangle that the game code controls
 		// that encapsulates a mesh, an effect, and a position offset.
 		// You don't have to do it this way for your assignment!
 		// You just need a way to update the position offset associated with the colorful rectangle.
-		eae6320::Core::CameraHelper::OffsetPosition(s_camera, offset);
+		eae6320::Core::CameraHelper::OffsetTransform(s_camera, offset, rotation);
 	}
 
 	bool Initialize()
@@ -665,14 +727,14 @@ namespace
 		bool wereThereErrors = false;
 
 		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_ball_moving, "data/default.material", "data/cube.mesh"))
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_ball, "data/default.material", "data/cube.mesh"))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
 			eae6320::Math::cVector ball_position_offset(0.0f, 0.2f, -1.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(s_entity_ball_moving, ball_position_offset);
+			eae6320::Core::EntityHelper::OffsetTransform(s_entity_ball, ball_position_offset, eae6320::Math::cQuaternion());
 		}
 
 		{
@@ -683,7 +745,20 @@ namespace
 				goto OnExit;
 			}
 			eae6320::Math::cVector floor_position_offset(0.0f, 0.0f, 0.0f);
-			eae6320::Core::EntityHelper::OffsetPosition(s_entity_floor, floor_position_offset);
+			eae6320::Core::EntityHelper::OffsetTransform(s_entity_floor, floor_position_offset, eae6320::Math::cQuaternion());
+		}
+
+		{
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_light, "data/default.material", "data/cube.mesh"))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			eae6320::Math::cVector light_position_offset(0.0f, 4.0f, -1.0f);
+			eae6320::Math::cVector light_scale(0.1f, 0.1f, 0.1f);
+			eae6320::Core::EntityHelper::Scale(s_entity_light, light_scale);
+			eae6320::Core::EntityHelper::OffsetTransform(s_entity_light, light_position_offset, eae6320::Math::cQuaternion());
 		}
 
 		{
@@ -711,23 +786,7 @@ namespace
 	{
 		bool wereThereErrors = false;
 		{
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_moving))
-			{
-				wereThereErrors = true;
-			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_red))
-			{
-				wereThereErrors = true;
-			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_green))
-			{
-				wereThereErrors = true;
-			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_transparent_03))
-			{
-				wereThereErrors = true;
-			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball_transparent_08))
+			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball))
 			{
 				wereThereErrors = true;
 			}
@@ -735,11 +794,7 @@ namespace
 			{
 				wereThereErrors = true;
 			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_plane_opaque))
-			{
-				wereThereErrors = true;
-			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_plane_transparent))
+			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_light))
 			{
 				wereThereErrors = true;
 			}

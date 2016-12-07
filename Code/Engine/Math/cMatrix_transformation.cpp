@@ -49,6 +49,12 @@ eae6320::Math::cMatrix_transformation eae6320::Math::cMatrix_transformation::Cre
 #endif
 }
 
+eae6320::Math::cMatrix_transformation eae6320::Math::cMatrix_transformation::CreateNormalMatrix(const cQuaternion& i_rotation, const cVector& i_translation, const cVector& i_scale)
+{
+	const cVector scale{ 1 / i_scale.x, 1 / i_scale.y, 1 / i_scale.z };
+	return cMatrix_transformation(i_rotation, cVector(), scale);
+}
+
 // Initialization / Shut Down
 //---------------------------
 
@@ -91,6 +97,49 @@ eae6320::Math::cMatrix_transformation::cMatrix_transformation( const cQuaternion
 	m_02 = _2xz + _2yw;
 	m_12 = _2yz - _2xw;
 	m_22 = 1.0f - _2xx - _2yy;
+}
+
+eae6320::Math::cMatrix_transformation::cMatrix_transformation(const cQuaternion& i_rotation, const cVector& i_translation, const cVector& i_scale)
+	:
+	m_30(i_translation.x), m_31(i_translation.y), m_32(i_translation.z),
+	m_03(0.0f), m_13(0.0f), m_23(0.0f), m_33(1.0f)
+{
+	const float _2x = i_rotation.m_x + i_rotation.m_x;
+	const float _2y = i_rotation.m_y + i_rotation.m_y;
+	const float _2z = i_rotation.m_z + i_rotation.m_z;
+	const float _2xx = i_rotation.m_x * _2x;
+	const float _2xy = _2x * i_rotation.m_y;
+	const float _2xz = _2x * i_rotation.m_z;
+	const float _2xw = _2x * i_rotation.m_w;
+	const float _2yy = _2y * i_rotation.m_y;
+	const float _2yz = _2y * i_rotation.m_z;
+	const float _2yw = _2y * i_rotation.m_w;
+	const float _2zz = _2z * i_rotation.m_z;
+	const float _2zw = _2z * i_rotation.m_w;
+
+	m_00 = 1.0f - _2yy - _2zz;
+	m_10 = _2xy + _2zw;
+	m_20 = _2xz - _2yw;
+
+	m_01 = _2xy - _2zw;
+	m_11 = 1.0f - _2xx - _2zz;
+	m_21 = _2yz + _2xw;
+
+	m_02 = _2xz + _2yw;
+	m_12 = _2yz - _2xw;
+	m_22 = 1.0f - _2xx - _2yy;
+
+	m_00 = m_00 * i_scale.x;
+	m_01 = m_01 * i_scale.x;
+	m_02 = m_02 * i_scale.x;
+
+	m_10 = m_10 * i_scale.y;
+	m_11 = m_11 * i_scale.y;
+	m_12 = m_12 * i_scale.y;
+
+	m_20 = m_20 * i_scale.z;
+	m_21 = m_21 * i_scale.z;
+	m_22 = m_22 * i_scale.z;
 }
 
 // Implementation

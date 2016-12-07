@@ -251,7 +251,7 @@ bool eae6320::Graphics::MaterialHelper::UpdateMaterialUniformMatrix(Material& i_
 		if (iterator != i_material.m_uniformMatrixMap.end()) {
 			uint32_t index = iterator->second;
 			memcpy(i_material.m_uniformMatrixAdded[index].values,
-				reinterpret_cast<GLfloat*>(&i_matrix), sizeof(i_matrix));
+				reinterpret_cast<float*>(&i_matrix), sizeof(i_matrix));
 			return true;
 		}
 	}
@@ -290,7 +290,7 @@ bool eae6320::Graphics::MaterialHelper::UpdateMaterialUniformMatrix(Material& i_
 		i_material.m_uniformMatrixAdded[i_material.m_uniformMatrixAddedCount].shaderType = i_shader_type;
 		i_material.m_uniformMatrixAdded[i_material.m_uniformMatrixAddedCount].uniformHandle = temp;
 		memcpy(i_material.m_uniformMatrixAdded[i_material.m_uniformMatrixAddedCount].values,
-			reinterpret_cast<GLfloat*>(&i_matrix), sizeof(i_matrix));
+			reinterpret_cast<float*>(&i_matrix), sizeof(i_matrix));
 		i_material.m_uniformMatrixMap[i_name] = i_material.m_uniformMatrixAddedCount;
 		i_material.m_uniformMatrixAddedCount++;
 	}
@@ -312,29 +312,29 @@ bool eae6320::Graphics::MaterialHelper::UpdateMaterialUniformVector(Material& i_
 			uint32_t index = iterator->second;
 			i_material.m_uniformVectorAdded[index].valueCountToSet = i_count;
 			memcpy(i_material.m_uniformVectorAdded[index].values,
-				reinterpret_cast<GLfloat*>(&i_vector), i_count * sizeof(GLfloat));
+				i_vector, i_count * sizeof(float));
 			return true;
 		}
 	}
 
 	// Initialize if empty
-	if (!i_material.m_uniformVector) {
+	if (!i_material.m_uniformVectorAdded) {
 		const int INTIALIZESIZE = 1;
 		UniformVector* temp = reinterpret_cast<UniformVector*>(malloc(sizeof(UniformVector) * INTIALIZESIZE));
 		if (!temp) {
 			return false;
 		}
 		i_material.m_uniformVectorAddedCapacity = INTIALIZESIZE;
-		i_material.m_uniformVector = temp;
+		i_material.m_uniformVectorAdded = temp;
 		i_material.m_uniformVectorAddedCount = 0;
 	}
 	// Resize if full
 	if (i_material.m_uniformVectorAddedCount == i_material.m_uniformVectorAddedCapacity) {
-		UniformVector* temp = reinterpret_cast<UniformVector*>(realloc(i_material.m_uniformVector, sizeof(UniformVector) * i_material.m_uniformVectorAddedCapacity * 2));
+		UniformVector* temp = reinterpret_cast<UniformVector*>(realloc(i_material.m_uniformVectorAdded, sizeof(UniformVector) * i_material.m_uniformVectorAddedCapacity * 2));
 		if (!temp) {
 			return false;
 		}
-		i_material.m_uniformVector = temp;
+		i_material.m_uniformVectorAdded = temp;
 		i_material.m_uniformVectorAddedCapacity *= 2;
 	}
 	// Add one
@@ -349,7 +349,7 @@ bool eae6320::Graphics::MaterialHelper::UpdateMaterialUniformVector(Material& i_
 		i_material.m_uniformVectorAdded[i_material.m_uniformVectorAddedCount].shaderType = i_shader_type;
 		i_material.m_uniformVectorAdded[i_material.m_uniformVectorAddedCount].uniformHandle = temp;
 		memcpy(i_material.m_uniformVectorAdded[i_material.m_uniformVectorAddedCount].values,
-			reinterpret_cast<GLfloat*>(&i_vector), i_count * sizeof(GLfloat));
+			i_vector, i_count * sizeof(float));
 		i_material.m_uniformVectorMap[i_name] = i_material.m_uniformVectorAddedCount;
 		i_material.m_uniformVectorAddedCount++;
 	}

@@ -60,6 +60,10 @@ return
 				source = "default.jpg",
 				target = "default.dds",
 			},
+			{
+				source = "normal_map.png",
+				target = "normal_map.dds",
+			},
 		},
 	},
 }

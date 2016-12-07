@@ -8,15 +8,40 @@ return
 	{
 		{
 			name = "g_ambient_light",
-			values = {0.5, 0.5, 0.5, 1},
+			values = {0.0, 0.0, 0.4},
 			shader_type = "fragment",
-		}
+		},
+		{
+			name = "g_diffuse_light",
+			values = {0, 1, 0},
+			shader_type = "fragment",
+		},
+		{
+			name = "g_k0",
+			values = {1},
+			shader_type = "fragment",
+		},
+		{
+			name = "g_k1",
+			values = {2 / 10},
+			shader_type = "fragment",
+		},
+		{
+			name = "g_k2",
+			values = {1 / 10 / 10},
+			shader_type = "fragment",
+		},
 	},
 	textures =
 	{
 		{
-			name = "g_sampler",
+			name = "g_texture",
 			path = "data/default.dds",
+			shader_type = "fragment",
+		},
+		{
+			name = "g_normal_map",
+			path = "data/normal_map.dds",
 			shader_type = "fragment",
 		},
 	},

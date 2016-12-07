@@ -81,9 +81,21 @@ namespace eae6320
 #elif defined( EAE6320_PLATFORM_GL )
 			uint8_t r, g, b, a;	// Direct3D expects the byte layout of a color to be different from what you might expect
 #endif
+			// NORMAL
+			// 3 floats == 12 bits
+			// Offset = 16
+			float nx, ny, nz;
+			// TANGENT
+			// 3 floats == 12 bits
+			// Offset = 28
+			float tx, ty, tz;
+			// BITANGENT
+			// 3 floats == 12 bits
+			// Offset = 40
+			float bx, by, bz;
 			// TEXTURE COORDINATE
 			// 2 floats == 8 bytes
-			// Offset = 16
+			// Offset = 52
 			float u, v;
 		};
 

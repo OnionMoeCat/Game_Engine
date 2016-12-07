@@ -13,6 +13,10 @@
 // Interface
 //==========
 
+eae6320::Math::cMatrix_transformation eae6320::Core::EntityHelper::CreateLocalToWorldTransform(const eae6320::Math::cQuaternion& i_rotation, const eae6320::Math::cVector& i_position, const eae6320::Math::cVector& i_scale)
+{
+	return std::move(eae6320::Math::cMatrix_transformation(i_rotation, i_position, i_scale));
+}
 bool eae6320::Core::EntityHelper::LoadEntityFromFile(Entity& i_entity, const char* const i_materialPath, const char* i_meshPath)
 {
 	if (i_entity.m_renderable == NULL)
@@ -36,7 +40,7 @@ bool eae6320::Core::EntityHelper::LoadEntityFromFile(Entity& i_entity, const cha
 	}
 	return true;
 }
-bool eae6320::Core::EntityHelper::OffsetPosition(Entity& i_entity, const eae6320::Math::cVector& i_offset_position)
+bool eae6320::Core::EntityHelper::OffsetTransform(Entity& i_entity, const eae6320::Math::cVector& i_offset_position, const eae6320::Math::cQuaternion& i_offset_rotation)
 {
 	if (i_entity.m_renderable == NULL)
 	{
@@ -57,9 +61,23 @@ bool eae6320::Core::EntityHelper::OffsetPosition(Entity& i_entity, const eae6320
 		return false;
 	}
 	i_entity.m_position += i_offset_position;
-	eae6320::Math::cMatrix_transformation&& temp = CameraHelper::CreateLocalToWorldTransform(i_entity.m_rotation, i_entity.m_position);
-	eae6320::Graphics::MaterialHelper::UpdateMaterialUniformMatrix(*i_entity.m_renderable->m_material, "g_transform_localToWorld", temp, eae6320::Graphics::ShaderTypes::Vertex);
+	i_entity.m_rotation = i_entity.m_rotation * i_offset_rotation;
+	
+	{
+		eae6320::Math::cMatrix_transformation&& temp = CreateLocalToWorldTransform(i_entity.m_rotation, i_entity.m_position, i_entity.m_scale);
+		eae6320::Graphics::MaterialHelper::UpdateMaterialUniformMatrix(*i_entity.m_renderable->m_material, "g_transform_localToWorld", temp, eae6320::Graphics::ShaderTypes::Vertex);
+	}
+
+	{
+		eae6320::Math::cMatrix_transformation&& temp = eae6320::Math::cMatrix_transformation::CreateNormalMatrix(i_entity.m_rotation, i_entity.m_position, i_entity.m_scale);
+		eae6320::Graphics::MaterialHelper::UpdateMaterialUniformMatrix(*i_entity.m_renderable->m_material, "g_transform_normalMatrix", temp, eae6320::Graphics::ShaderTypes::Vertex);
+	}
+
 	return true;
+}
+void eae6320::Core::EntityHelper::Scale(Entity& i_entity, const eae6320::Math::cVector& i_scale)
+{
+	i_entity.m_scale = i_scale;
 }
 bool eae6320::Core::EntityHelper::CleanUp(Entity& i_entity)
 {
@@ -120,4 +138,9 @@ bool eae6320::Core::EntityHelper::Submit(Entity& i_entity)
 	}
 	eae6320::Graphics::RenderableManager::Get().Submit(*i_entity.m_renderable);
 	return true;
+}
+
+bool eae6320::Core::EntityHelper::AddLights(Entity& i_entity, eae6320::Math::cVector& i_light_position)
+{
+	return eae6320::Graphics::MaterialHelper::UpdateMaterialUniformVector(*i_entity.m_renderable->m_material, "g_light_position_world", reinterpret_cast<float*>(&i_light_position), static_cast<uint8_t>(sizeof(eae6320::Math::cVector)/sizeof(float)), eae6320::Graphics::ShaderTypes::Fragment);
 }

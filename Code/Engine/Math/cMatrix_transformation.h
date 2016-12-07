@@ -52,11 +52,14 @@ namespace eae6320
 				const float i_fieldOfView_y, const float i_aspectRatio,
 				const float i_z_nearPlane, const float i_z_farPlane );
 
+			static cMatrix_transformation CreateNormalMatrix( const cQuaternion& i_rotation, const cVector& i_translation, const cVector& i_scale );
+
 			// Initialization / Shut Down
 			//---------------------------
 
 			cMatrix_transformation();	// Identity
 			cMatrix_transformation( const cQuaternion& i_rotation, const cVector& i_translation );
+			cMatrix_transformation( const cQuaternion& i_rotation, const cVector& i_translation, const cVector& i_scale );
 
 			// Data
 			//=====

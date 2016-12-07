@@ -15,6 +15,7 @@ namespace eae6320
 			eae6320::Graphics::Renderable* m_renderable = NULL;
 			eae6320::Math::cVector m_position;
 			eae6320::Math::cQuaternion m_rotation;
+			eae6320::Math::cVector m_scale{ 1.0f, 1.0f, 1.0f };
 		};
 	}
 }
