@@ -51,6 +51,10 @@ return
 				source = "default.material.raw",
 				target = "default.material",
 			},
+			{
+				source = "flat.material.raw",
+				target = "flat.material",
+			},
 		},
 	},
 	{
@@ -63,6 +67,14 @@ return
 			{
 				source = "normal_map.png",
 				target = "normal_map.dds",
+			},
+			{
+				source = "default_normal_map.jpeg",
+				target = "default_normal_map.dds",
+			},
+			{
+				source = "onionmoecat.png",
+				target = "onionmoecat.dds",
 			},
 		},
 	},

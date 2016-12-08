@@ -48,11 +48,13 @@ namespace
 	// as one of your classmate's
 	const char* s_mainWindowClass_name = "Yuchen Zhang's Main Window Class";
 
-	eae6320::Core::Entity s_entity_ball;
+	eae6320::Core::Entity s_entity_cube;
 
 	eae6320::Core::Entity s_entity_floor;
 
 	eae6320::Core::Entity s_entity_light;
+
+	eae6320::Core::Entity s_entity_texture_cube;
 
 	eae6320::Core::Camera s_camera;
 }
@@ -542,28 +544,32 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 
 			{
 				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_floor, s_camera);
-				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ball, s_camera);
+				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_cube, s_camera);
 				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_light, s_camera);
+				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_texture_cube, s_camera);
 			}
 
 			{
 				eae6320::Core::EntityHelper::EyePosition(s_entity_floor, s_camera.m_position);
-				eae6320::Core::EntityHelper::EyePosition(s_entity_ball, s_camera.m_position);
+				eae6320::Core::EntityHelper::EyePosition(s_entity_cube, s_camera.m_position);
 				eae6320::Core::EntityHelper::EyePosition(s_entity_light, s_camera.m_position);
+				eae6320::Core::EntityHelper::EyePosition(s_entity_texture_cube, s_camera.m_position);
 			}
 
 			{
 				eae6320::Math::cVector lightPosition = s_entity_light.m_position + eae6320::Math::cVector(0.0f, 0.2f, 0.0f);
 				eae6320::Core::EntityHelper::AddLights(s_entity_floor, lightPosition);
-				eae6320::Core::EntityHelper::AddLights(s_entity_ball, lightPosition);
+				eae6320::Core::EntityHelper::AddLights(s_entity_cube, lightPosition);
 				eae6320::Core::EntityHelper::AddLights(s_entity_light, lightPosition);
+				eae6320::Core::EntityHelper::AddLights(s_entity_texture_cube, lightPosition);
 			}
 
 			//TODO: find a good way to show error message here
 			{
 				eae6320::Core::EntityHelper::Submit(s_entity_floor);
-				//eae6320::Core::EntityHelper::Submit(s_entity_ball);
+				eae6320::Core::EntityHelper::Submit(s_entity_cube);
 				eae6320::Core::EntityHelper::Submit(s_entity_light);
+				eae6320::Core::EntityHelper::Submit(s_entity_texture_cube);
 				eae6320::Graphics::Core::Render();
 			}
 		}
@@ -733,14 +739,27 @@ namespace
 		bool wereThereErrors = false;
 
 		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_ball, "data/default.material", "data/cube.mesh"))
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_cube, "data/default.material", "data/cube.mesh"))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector ball_position_offset(0.0f, 0.2f, -1.0f);
-			eae6320::Core::EntityHelper::OffsetTransform(s_entity_ball, ball_position_offset, eae6320::Math::cQuaternion());
+			eae6320::Math::cVector cube_position_offset(0.0f, 2.0f, -1.0f);
+			eae6320::Math::cQuaternion cube_rotation_x(0.1f, eae6320::Math::cVector(1.0f, 0.0f, 0.0f));
+			eae6320::Math::cQuaternion cube_rotation_z(0.2f, eae6320::Math::cVector(0.0f, 0.0f, 1.0f));
+			eae6320::Core::EntityHelper::OffsetTransform(s_entity_cube, cube_position_offset, cube_rotation_z * cube_rotation_x);
+		}
+
+		{
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_texture_cube, "data/flat.material", "data/cube.mesh"))
+			{
+				//TODO: find a way to show error message
+				wereThereErrors = true;
+				goto OnExit;
+			}
+			eae6320::Math::cVector cube_position_offset(-3.0f, 2.0f, 2.0f);
+			eae6320::Core::EntityHelper::OffsetTransform(s_entity_texture_cube, cube_position_offset, eae6320::Math::cQuaternion());
 		}
 
 		{
@@ -792,7 +811,7 @@ namespace
 	{
 		bool wereThereErrors = false;
 		{
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ball))
+			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_cube))
 			{
 				wereThereErrors = true;
 			}
