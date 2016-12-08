@@ -54,6 +54,8 @@ namespace eae6320
 
 			static cMatrix_transformation CreateNormalMatrix( const cQuaternion& i_rotation, const cVector& i_translation, const cVector& i_scale );
 
+			friend cVector operator *(const cVector& i_lhs, const cMatrix_transformation& i_rhs);
+
 			// Initialization / Shut Down
 			//---------------------------
 

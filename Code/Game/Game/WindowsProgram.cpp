@@ -19,6 +19,7 @@
 // UserOutput.h is UserOutput system
 #include "../../Engine/UserOutput/UserOutput.h"
 #include "../../Engine/Math/cVector.h"
+#include "../../Engine/Math/Functions.h"
 #include "../../Engine/UserInput/UserInput.h"
 #include "../../Engine/Time/Time.h"
 #include "../../Engine/Core/Camera.h"
@@ -48,6 +49,9 @@ namespace
 	// as one of your classmate's
 	const char* s_mainWindowClass_name = "Yuchen Zhang's Main Window Class";
 
+	// Rect of the window
+	RECT s_mainWindow_rect;
+
 	eae6320::Core::Entity s_entity_cube;
 
 	eae6320::Core::Entity s_entity_floor;
@@ -57,6 +61,8 @@ namespace
 	eae6320::Core::Entity s_entity_texture_cube;
 
 	eae6320::Core::Camera s_camera;
+
+	eae6320::Math::cVector s_older_mouse_position;
 }
 
 // Helper Functions
@@ -68,6 +74,7 @@ namespace
 	void UpdateCamera();
 	bool Initialize();
 	bool CleanUp();
+	bool GetMousePosition(POINT& cursor, HWND hwnd);
 }
 
 // Main Function
@@ -119,6 +126,10 @@ bool CreateMainWindow( const HINSTANCE i_thisInstanceOfTheProgram, const int i_i
 	{
 		s_mainWindow = CreateMainWindowHandle( i_thisInstanceOfTheProgram, i_initialWindowDisplayState );
 		if ( s_mainWindow == NULL )
+		{
+			goto OnError;
+		}
+		if (!GetClientRect(s_mainWindow, &s_mainWindow_rect))
 		{
 			goto OnError;
 		}
@@ -623,11 +634,11 @@ namespace
 				{
 					offset.z += 1.0f;
 				}
-				if (eae6320::UserInput::IsKeyPressed('N'))
+				if (eae6320::UserInput::IsKeyPressed('O'))
 				{
 					offset.y += 1.0f;
 				}
-				if (eae6320::UserInput::IsKeyPressed('M'))
+				if (eae6320::UserInput::IsKeyPressed('L'))
 				{
 					offset.y -= 1.0f;
 				}
@@ -645,67 +656,75 @@ namespace
 		eae6320::Core::EntityHelper::OffsetTransform(s_entity_light, offset, eae6320::Math::cQuaternion());
 	}
 
+	bool GetMousePosition(POINT& cursor)
+	{
+		if (!GetCursorPos(&cursor))
+		{
+			return false;
+		}
+		if (!ScreenToClient(s_mainWindow, &cursor))
+		{
+			return false;
+		}
+		if (cursor.x < s_mainWindow_rect.left || cursor.x > s_mainWindow_rect.right || cursor.y < s_mainWindow_rect.top || cursor.y > s_mainWindow_rect.bottom)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	void UpdateCamera()
 	{
-		eae6320::Math::cVector offset(0.0f, 0.0f, 0.0f);
-		float zRotation = 0.0f;
-		float yRotation = 0.0f;
-		float xRotation = 0.0f;
-		// Get the direction
+		// Get the axis of camera
+		const eae6320::Math::cVector up = eae6320::Core::CameraHelper::Up(s_camera);
+		const eae6320::Math::cVector front = eae6320::Core::CameraHelper::Front(s_camera);
+		const eae6320::Math::cVector side = eae6320::Core::CameraHelper::Side(s_camera);
+
+		// Get the rotation of camera
+		eae6320::Math::cQuaternion rotation;
 		{
-			if (eae6320::UserInput::IsKeyPressed('Q'))
+			POINT cursor;
+			if (GetMousePosition(cursor))
 			{
-				offset.x -= 1.0f;
+				const eae6320::Math::cVector newMousePosition(static_cast<float>(cursor.x), static_cast<float>(cursor.y));
+				const eae6320::Math::cVector mouseDelta = newMousePosition - s_older_mouse_position;
+				const float MAX_DISTANCE = 50.0f;
+				if (mouseDelta.GetLength() < MAX_DISTANCE) 
+				{
+					const float ROTATIONAL_SPEED = eae6320::Math::ConvertDegreesToRadians(0.2f);
+					rotation = eae6320::Math::cQuaternion(-mouseDelta.y * ROTATIONAL_SPEED, side) * eae6320::Math::cQuaternion(mouseDelta.x * ROTATIONAL_SPEED, up);
+				}
+				s_older_mouse_position = newMousePosition;
 			}
+		}
+
+		// Get the movement of camera
+		eae6320::Math::cVector offset(0.0f, 0.0f, 0.0f);
+		{
 			if (eae6320::UserInput::IsKeyPressed('A'))
 			{
-				offset.x += 1.0f;
-			}
-			if (eae6320::UserInput::IsKeyPressed('W'))
-			{
-				offset.y += 1.0f;
-			}
-			if (eae6320::UserInput::IsKeyPressed('S'))
-			{
-				offset.y -= 1.0f;
-			}
-			if (eae6320::UserInput::IsKeyPressed('E'))
-			{
-				offset.z += 1.0f;
+				offset += side * 1.0f;
 			}
 			if (eae6320::UserInput::IsKeyPressed('D'))
 			{
-				offset.z -= 1.0f;
+				offset -= side * 1.0f;
 			}
-			// x Rotation plus
-			if (eae6320::UserInput::IsKeyPressed('U'))
+			if (eae6320::UserInput::IsKeyPressed('W'))
 			{
-				xRotation += 1.0f;
+				offset += front * 1.0f;
 			}
-			// x Rotation minus
-			if (eae6320::UserInput::IsKeyPressed('J'))
+			if (eae6320::UserInput::IsKeyPressed('S'))
 			{
-				xRotation -= 1.0f;
+				offset -= front * 1.0f;
 			}
-			// y Rotation plus
-			if (eae6320::UserInput::IsKeyPressed('I'))
+			if (eae6320::UserInput::IsKeyPressed('R'))
 			{
-				yRotation += 1.0f;
+				offset += up * 1.0f;
 			}
-			// y Rotation minus
-			if (eae6320::UserInput::IsKeyPressed('K'))
+			if (eae6320::UserInput::IsKeyPressed('F'))
 			{
-				yRotation -= 1.0f;
-			}
-			// z Rotation plus
-			if (eae6320::UserInput::IsKeyPressed('O'))
-			{
-				zRotation += 1.0f;
-			}
-			// z Rotation minus
-			if (eae6320::UserInput::IsKeyPressed('L'))
-			{
-				zRotation -= 1.0f;
+				offset -= up * 1.0f;
 			}
 		}
 
@@ -717,16 +736,6 @@ namespace
 																								// Normalize the offset
 		offset *= unitsToMove;
 
-		// Get the rotation
-		const float radianPerSecond = 1.0f;
-		const float radianToMove = radianPerSecond * deltaTime;
-
-		eae6320::Math::cQuaternion rotationX(radianToMove * xRotation, eae6320::Math::cVector(1.0f, 0.0f, 0.0f));
-		eae6320::Math::cQuaternion rotationY(radianToMove * yRotation, eae6320::Math::cVector(0.0f, 1.0f, 0.0f));
-		eae6320::Math::cQuaternion rotationZ(radianToMove * zRotation, eae6320::Math::cVector(0.0f, 0.0f, 1.0f));
-		// Euler ZYX, rotation sequence: Z, Y, X
-		// Quaternion compsite rule: prev * diff
-		eae6320::Math::cQuaternion rotation = rotationZ * rotationY * rotationX;
 		// The following line assumes there is some "entity" for the rectangle that the game code controls
 		// that encapsulates a mesh, an effect, and a position offset.
 		// You don't have to do it this way for your assignment!

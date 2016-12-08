@@ -161,3 +161,12 @@ eae6320::Math::cMatrix_transformation::cMatrix_transformation(
 {
 
 }
+
+eae6320::Math::cVector eae6320::Math::operator *(const eae6320::Math::cVector& i_lhs, const eae6320::Math::cMatrix_transformation& i_rhs)
+{
+	return eae6320::Math::cVector(
+		i_lhs.x * i_rhs.m_00 + i_lhs.y * i_rhs.m_10 + i_lhs.z * i_rhs.m_20,
+		i_lhs.x * i_rhs.m_01 + i_lhs.y * i_rhs.m_11 + i_lhs.z * i_rhs.m_21,
+		i_lhs.x * i_rhs.m_02 + i_lhs.y * i_rhs.m_12 + i_lhs.z * i_rhs.m_22
+	);
+}

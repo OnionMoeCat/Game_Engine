@@ -35,3 +35,18 @@ eae6320::Math::cMatrix_transformation eae6320::Core::CameraHelper::CreateViewToS
 {
 	return std::move(eae6320::Math::cMatrix_transformation::CreateViewToScreenTransform(eae6320::Math::ConvertDegreesToRadians(i_fov), i_aspect, i_nearZ, i_farZ));
 }
+eae6320::Math::cVector eae6320::Core::CameraHelper::Up(const Camera& i_camera)
+{
+	eae6320::Math::cMatrix_transformation rotation(i_camera.m_rotation, eae6320::Math::cVector());
+	return eae6320::Math::cVector(0.0f, 1.0f, 0.0f) * rotation;
+}
+eae6320::Math::cVector eae6320::Core::CameraHelper::Front(const Camera& i_camera)
+{
+	eae6320::Math::cMatrix_transformation rotation(i_camera.m_rotation, eae6320::Math::cVector());
+	return eae6320::Math::cVector(0.0f, 0.0f, -1.0f) * rotation;
+}
+eae6320::Math::cVector eae6320::Core::CameraHelper::Side(const Camera& i_camera)
+{
+	eae6320::Math::cMatrix_transformation rotation(i_camera.m_rotation, eae6320::Math::cVector());
+	return eae6320::Math::cVector(-1.0f, 0.0f, 0.0f) * rotation;
+}
