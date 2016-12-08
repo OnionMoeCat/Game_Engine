@@ -6,6 +6,8 @@
 #include "shaders.inc"
 
 uniform float3 g_ambient_light;
+uniform sampler2D g_ambient_map;
+
 uniform float3 g_light_position_world;
 uniform sampler2D g_texture;
 uniform sampler2D g_normal_map;
@@ -85,7 +87,8 @@ void main()
 		float3 diffuseLight = g_diffuse_light * diffuseBrightness;
 		
 		// Calculate the ambient light
-		float3 ambientLight = g_ambient_light;
+		float ambientOcclusion = tex2D(g_ambient_map, i_texcoords).r;
+		float3 ambientLight = g_ambient_light * ambientOcclusion;
 
 		// Calculate the specular light
 		float3 eyeVectorWorld = g_eye_position_world - i_position_world.xyz;

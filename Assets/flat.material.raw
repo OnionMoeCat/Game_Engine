@@ -56,7 +56,12 @@ return
 		},
 		{
 			name = "g_specular_map",
-			path = "data/spec_map.dds",
+			path = "data/default_spec_map.dds",
+			shader_type = "fragment",
+		},
+		{
+			name = "g_ambient_map",
+			path = "data/ambient_map.dds",
 			shader_type = "fragment",
 		},
 	},

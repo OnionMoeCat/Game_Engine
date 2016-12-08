@@ -11,6 +11,10 @@ return
 				source = "cube.mesh.raw",
 				target = "cube.mesh",
 			},
+			{
+				source = "Ogre.mesh.raw",
+				target = "Ogre.mesh",
+			},
 		},
 	},
 	{
@@ -79,6 +83,14 @@ return
 			{
 				source = "spec_map.jpg",
 				target = "spec_map.dds",
+			},
+			{
+				source = "default_spec_map.jpg",
+				target = "default_spec_map.dds",
+			},
+			{
+				source = "ambient_map.png",
+				target = "ambient_map.dds",
 			},
 		},
 	},
