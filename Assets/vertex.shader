@@ -57,7 +57,7 @@ void main(
 // These values come from one of the sVertex that we filled the vertex buffer with in C code
 layout( location = 0 ) in vec3 i_position_local;
 layout( location = 1 ) in vec4 i_color;
-layout( location = 2 ) in vec2 i_texcoords;
+layout( location = 5 ) in vec2 i_texcoords;
 
 // Output
 //=======

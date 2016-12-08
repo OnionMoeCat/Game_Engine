@@ -4,16 +4,8 @@ return
 		builder = "MeshBuilder.exe",
 		assets = {
 			{
-				source = "floor.mesh.raw",
-				target = "floor.mesh",
-			},
-			{
 				source = "cube.mesh.raw",
 				target = "cube.mesh",
-			},
-			{
-				source = "Ogre.mesh.raw",
-				target = "Ogre.mesh",
 			},
 		},
 	},
@@ -24,15 +16,22 @@ return
 		},
 		assets = {
 			{
-				source = "VertexShaderCode.shader",
-				target = "VertexShaderCode.shader",
+				source = "vertex.shader",
+				target = "vertex.shader",
 				optionalArguments = {
 					"vertex"
 				},
 			},
 			{
-				source = "FragmentShaderCode.shader",
-				target = "FragmentShaderCode.shader",
+				source = "fragment.shader",
+				target = "fragment.shader",
+				optionalArguments = {
+					"fragment"
+				},
+			},
+			{
+				source = "fragment_transparent.shader",
+				target = "fragment_transparent.shader",
 				optionalArguments = {
 					"fragment"
 				},
@@ -43,8 +42,12 @@ return
 		builder = "EffectBuilder.exe",
 		assets = {
 			{
-				source = "default.effect.raw",
-				target = "default.effect",
+				source = "opaque.effect.raw",
+				target = "opaque.effect",
+			},
+			{
+				source = "transparent.effect.raw",
+				target = "transparent.effect",
 			},
 		},
 	},
@@ -52,12 +55,12 @@ return
 		builder = "MaterialBuilder.exe",
 		assets = {
 			{
-				source = "default.material.raw",
-				target = "default.material",
+				source = "opaque.material.raw",
+				target = "opaque.material",
 			},
 			{
-				source = "flat.material.raw",
-				target = "flat.material",
+				source = "transparent.material.raw",
+				target = "transparent.material",
 			},
 		},
 	},
@@ -67,30 +70,6 @@ return
 			{
 				source = "default.jpg",
 				target = "default.dds",
-			},
-			{
-				source = "normal_map.png",
-				target = "normal_map.dds",
-			},
-			{
-				source = "default_normal_map.jpeg",
-				target = "default_normal_map.dds",
-			},
-			{
-				source = "onionmoecat.png",
-				target = "onionmoecat.dds",
-			},
-			{
-				source = "spec_map.jpg",
-				target = "spec_map.dds",
-			},
-			{
-				source = "default_spec_map.jpg",
-				target = "default_spec_map.dds",
-			},
-			{
-				source = "ambient_map.png",
-				target = "ambient_map.dds",
 			},
 		},
 	},

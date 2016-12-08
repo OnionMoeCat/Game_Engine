@@ -52,9 +52,9 @@ namespace
 	// Rect of the window
 	RECT s_mainWindow_rect;
 
-	eae6320::Core::Entity s_entity_ogre;
+	eae6320::Core::Entity s_entity_opaque;
 
-	eae6320::Core::Entity s_entity_light;
+	eae6320::Core::Entity s_entity_transparent;
 
 	eae6320::Core::Camera s_camera;
 
@@ -550,25 +550,14 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			UpdateCamera();
 
 			{
-				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_ogre, s_camera);
-				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_light, s_camera);
-			}
-
-			{
-				eae6320::Core::EntityHelper::EyePosition(s_entity_ogre, s_camera.m_position);
-				eae6320::Core::EntityHelper::EyePosition(s_entity_light, s_camera.m_position);
-			}
-
-			{
-				eae6320::Math::cVector lightPosition = s_entity_light.m_position + eae6320::Math::cVector(0.0f, 0.2f, 0.0f);
-				eae6320::Core::EntityHelper::AddLights(s_entity_ogre, lightPosition);
-				eae6320::Core::EntityHelper::AddLights(s_entity_light, lightPosition);
+				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_opaque, s_camera);
+				eae6320::Core::EntityHelper::ToCameraScreen(s_entity_transparent, s_camera);
 			}
 
 			//TODO: find a good way to show error message here
 			{
-				eae6320::Core::EntityHelper::Submit(s_entity_ogre);
-				//eae6320::Core::EntityHelper::Submit(s_entity_light);
+				eae6320::Core::EntityHelper::Submit(s_entity_opaque);
+				eae6320::Core::EntityHelper::Submit(s_entity_transparent);
 				eae6320::Graphics::Core::Render();
 			}
 		}
@@ -641,7 +630,7 @@ namespace
 		// that encapsulates a mesh, an effect, and a position offset.
 		// You don't have to do it this way for your assignment!
 		// You just need a way to update the position offset associated with the colorful rectangle.
-		eae6320::Core::EntityHelper::OffsetTransform(s_entity_light, offset, eae6320::Math::cQuaternion());
+		eae6320::Core::EntityHelper::OffsetTransform(s_entity_transparent, offset, eae6320::Math::cQuaternion());
 	}
 
 	bool GetMousePosition(POINT& cursor)
@@ -736,27 +725,25 @@ namespace
 		bool wereThereErrors = false;
 
 		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_ogre, "data/flat.material", "data/Ogre.mesh"))
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_opaque, "data/opaque.material", "data/cube.mesh"))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector ogre_position_offset(0.0f, 0.0f, 0.0f);
-			eae6320::Core::EntityHelper::OffsetTransform(s_entity_ogre, ogre_position_offset, eae6320::Math::cQuaternion());
+			eae6320::Math::cVector cube_position_offset(0.0f, 2.0f, -2.0f);
+			eae6320::Core::EntityHelper::OffsetTransform(s_entity_opaque, cube_position_offset, eae6320::Math::cQuaternion());
 		}
 
 		{
-			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_light, "data/flat.material", "data/cube.mesh"))
+			if (!eae6320::Core::EntityHelper::LoadEntityFromFile(s_entity_transparent, "data/transparent.material", "data/cube.mesh"))
 			{
 				//TODO: find a way to show error message
 				wereThereErrors = true;
 				goto OnExit;
 			}
-			eae6320::Math::cVector light_position_offset(0.0f, 4.0f, -1.0f);
-			eae6320::Math::cVector light_scale(0.1f, 0.1f, 0.1f);
-			eae6320::Core::EntityHelper::Scale(s_entity_light, light_scale);
-			eae6320::Core::EntityHelper::OffsetTransform(s_entity_light, light_position_offset, eae6320::Math::cQuaternion());
+			eae6320::Math::cVector cube_position_offset(0.0f, 2.0f, 2.0f);
+			eae6320::Core::EntityHelper::OffsetTransform(s_entity_transparent, cube_position_offset, eae6320::Math::cQuaternion());
 		}
 
 		{
@@ -784,11 +771,11 @@ namespace
 	{
 		bool wereThereErrors = false;
 		{
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_ogre))
+			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_opaque))
 			{
 				wereThereErrors = true;
 			}
-			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_light))
+			if (!eae6320::Core::EntityHelper::CleanUp(s_entity_transparent))
 			{
 				wereThereErrors = true;
 			}
