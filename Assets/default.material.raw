@@ -31,6 +31,16 @@ return
 			values = {1 / 10 / 10},
 			shader_type = "fragment",
 		},
+		{
+			name = "g_specular_light_shininess",
+			values = {50},
+			shader_type = "fragment",
+		},
+		{
+			name = "g_specular_light",
+			values = {1, 0, 0},
+			shader_type = "fragment",
+		},
 	},
 	textures =
 	{

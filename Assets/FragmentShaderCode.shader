@@ -14,6 +14,11 @@ uniform float g_k0;
 uniform float g_k1;
 uniform float g_k2;
 uniform float3 g_diffuse_light;
+
+uniform float3 g_eye_position_world;
+uniform float g_specular_light_shininess;
+uniform float3 g_specular_light;
+
 #if defined( EAE6320_PLATFORM_D3D )
 
 // Entry Point
@@ -80,9 +85,16 @@ void main()
 		
 		// Calculate the ambient light
 		float3 ambientLight = g_ambient_light;
+
+		// Calculate the specular light
+		float3 eyeVectorWorld = g_eye_position_world - i_position_world.xyz;
+		float3 lightVectorReflect = reflect(-lightVectorWorld, normalize(normalWorld));
+		float specularBrightness = clamp(dot(normalize(lightVectorReflect), normalize(eyeVectorWorld)), 0, 1);
+		specularBrightness = pow(specularBrightness, g_specular_light_shininess);
+		float3 specularLight = g_specular_light * specularBrightness;
 		
 		// Combine them
-		float3 light = clamp(ambientLight + diffuseLight, float3(0, 0, 0), float3(1, 1, 1));
+		float3 light = clamp(ambientLight + diffuseLight + specularLight, float3(0, 0, 0), float3(1, 1, 1));
 
 		// Set the fragment to the interpolated color that originated as per-vertex data
 		// (where color is represented by 4 floats representing "RGBA" == "Red/Green/Blue/Alpha")

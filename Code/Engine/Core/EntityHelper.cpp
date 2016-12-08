@@ -144,3 +144,8 @@ bool eae6320::Core::EntityHelper::AddLights(Entity& i_entity, eae6320::Math::cVe
 {
 	return eae6320::Graphics::MaterialHelper::UpdateMaterialUniformVector(*i_entity.m_renderable->m_material, "g_light_position_world", reinterpret_cast<float*>(&i_light_position), static_cast<uint8_t>(sizeof(eae6320::Math::cVector)/sizeof(float)), eae6320::Graphics::ShaderTypes::Fragment);
 }
+
+bool eae6320::Core::EntityHelper::EyePosition(Entity& i_entity, eae6320::Math::cVector& i_eye_position)
+{
+	return eae6320::Graphics::MaterialHelper::UpdateMaterialUniformVector(*i_entity.m_renderable->m_material, "g_eye_position_world", reinterpret_cast<float*>(&i_eye_position), static_cast<uint8_t>(sizeof(eae6320::Math::cVector) / sizeof(float)), eae6320::Graphics::ShaderTypes::Fragment);
+}

@@ -20,6 +20,7 @@ namespace eae6320
 			bool static CleanUp(Entity& i_entity);
 			bool static ToCameraScreen(Entity& i_entity, const Camera& i_camera);
 			bool static AddLights(Entity& i_entity, eae6320::Math::cVector& i_light_position);
+			bool static EyePosition(Entity& i_entity, eae6320::Math::cVector& i_eye_position);
 			bool static Submit(Entity& i_entity);
 		};
 	}

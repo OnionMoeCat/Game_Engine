@@ -547,6 +547,12 @@ bool WaitForMainWindowToClose( int& o_exitCode )
 			}
 
 			{
+				eae6320::Core::EntityHelper::EyePosition(s_entity_floor, s_camera.m_position);
+				eae6320::Core::EntityHelper::EyePosition(s_entity_ball, s_camera.m_position);
+				eae6320::Core::EntityHelper::EyePosition(s_entity_light, s_camera.m_position);
+			}
+
+			{
 				eae6320::Math::cVector lightPosition = s_entity_light.m_position + eae6320::Math::cVector(0.0f, 0.2f, 0.0f);
 				eae6320::Core::EntityHelper::AddLights(s_entity_floor, lightPosition);
 				eae6320::Core::EntityHelper::AddLights(s_entity_ball, lightPosition);
