@@ -76,6 +76,10 @@ return
 				source = "onionmoecat.png",
 				target = "onionmoecat.dds",
 			},
+			{
+				source = "spec_map.jpg",
+				target = "spec_map.dds",
+			},
 		},
 	},
 }

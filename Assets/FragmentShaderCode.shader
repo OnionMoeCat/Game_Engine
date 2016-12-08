@@ -18,6 +18,7 @@ uniform float3 g_diffuse_light;
 uniform float3 g_eye_position_world;
 uniform float g_specular_light_shininess;
 uniform float3 g_specular_light;
+uniform sampler2D g_specular_map;
 
 #if defined( EAE6320_PLATFORM_D3D )
 
@@ -90,7 +91,8 @@ void main()
 		float3 eyeVectorWorld = g_eye_position_world - i_position_world.xyz;
 		float3 lightVectorReflect = reflect(-lightVectorWorld, normalize(normalWorld));
 		float specularBrightness = clamp(dot(normalize(lightVectorReflect), normalize(eyeVectorWorld)), 0, 1);
-		specularBrightness = pow(specularBrightness, g_specular_light_shininess);
+		float specularShininess = tex2D(g_specular_map, i_texcoords).r * g_specular_light_shininess;
+		specularBrightness = pow(specularBrightness, specularShininess);
 		float3 specularLight = g_specular_light * specularBrightness;
 		
 		// Combine them

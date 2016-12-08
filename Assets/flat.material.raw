@@ -8,12 +8,12 @@ return
 	{
 		{
 			name = "g_ambient_light",
-			values = {0.0, 0.0, 0.4},
+			values = {1.0, 1.0, 1.0},
 			shader_type = "fragment",
 		},
 		{
 			name = "g_diffuse_light",
-			values = {0, 1, 0},
+			values = {0, 0, 0},
 			shader_type = "fragment",
 		},
 		{
@@ -38,7 +38,7 @@ return
 		},
 		{
 			name = "g_specular_light",
-			values = {1, 0, 0},
+			values = {0, 0, 0},
 			shader_type = "fragment",
 		},
 	},
@@ -46,12 +46,17 @@ return
 	{
 		{
 			name = "g_texture",
-			path = "data/onionmoecat.dds",
+			path = "data/default.dds",
 			shader_type = "fragment",
 		},
 		{
 			name = "g_normal_map",
 			path = "data/default_normal_map.dds",
+			shader_type = "fragment",
+		},
+		{
+			name = "g_specular_map",
+			path = "data/spec_map.dds",
 			shader_type = "fragment",
 		},
 	},
